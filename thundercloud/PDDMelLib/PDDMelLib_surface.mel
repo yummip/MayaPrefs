@@ -1,0 +1,15 @@
+//===========PDDMelLib_surface.mel =================
+
+
+global proc int getLastUVsurface(string $surface,string $UV)
+{
+select $surface;
+int $result;
+duplicateCurve -ch 1 -rn 0 -local 0  (`PDD_currentSelectionName(1)`+ "." + $UV + "[9999]") ;
+string $curves[]= `ls-sl`;
+pickWalk -d down;
+select (PDD_NodeFromConnection("create","in",1));
+$result = getAttr (`PDD_currentSelectionName(1)` + ".isoparmValue");
+delete $curves;
+return $result;
+}

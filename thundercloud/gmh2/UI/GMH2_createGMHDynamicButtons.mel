@@ -1,0 +1,61 @@
+
+
+//==============================GMH2_createGMHDynamicButtons.mel======================
+//this is the main proc to create GMH2 UI main window. 
+
+global proc createGMHDynamicButtons()
+{   
+    //SURFACE EDIT
+            frameLayout -l "GMH Style System Edit";
+            
+            rowLayout -numberOfColumns 4;
+
+            string $command = ("string $GMHsystem[] =`textScrollList -query -selectItem  GMHStyleList`; if ($GMHsystem[0] == \"\"){ warning \"please select a GMH style system \\n\";}else"
+                              +"{ GMH2_connectNucleus($GMHsystem[0]); updateGUI(0);   }");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/applyNucleus.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l "Apply Nucleus" -bgc 0.060298 0.511 0.0633853;
+            
+
+            string $command = ("string $GMHsystem[] =`textScrollList -query -selectItem  GMHStyleList`; if ($GMHsystem[0] == \"\"){ warning \"please select a GMH style system \\n\";}else"
+                              +"{ GMH_disconnectNucleus($GMHsystem[0]); updateGUI(0);   }");
+            //string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/deleteNucleus.png");
+            //symbolButton -image $buttonImagePath -c $command ;
+             button -c $command -l "Delete Nucleus"-bgc 0.725 0.0855499 0.161485;
+
+
+         
+         
+         
+                        setParent ..;
+            
+              frameLayout -l "GMH Dynamic Edit";
+            
+            rowLayout -numberOfColumns 4;
+            
+          
+            
+            string $command = ("GMH_UI_convertToFolicles();");
+            //string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/folicles.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+           button -c $command -l "Select Follicles";
+
+                                    setParent ..;
+            rowLayout -numberOfColumns 4;
+            
+            string $command = ("GMH2_setGMHSurfaceSimulationState\"static\"");
+            //string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/makeStatic.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l "Make Static" -w 80;
+
+            string $command = ("GMH2_setGMHSurfaceSimulationState\"passive\"");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/makePassive.png");
+            //symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l "Make Passive" -w 80;
+            
+            string $command = ("GMH2_setGMHSurfaceSimulationState\"dynamic\"");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/makeDynamic.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l "Make Dynamic" -w 80;
+                        setParent ..;
+}

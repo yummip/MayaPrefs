@@ -1,0 +1,44 @@
+//Maya Preference 2016 (Release 1)
+//
+//
+
+runTimeCommand
+	-annotation "Only show geometry meshes."
+	-category "Custom Scripts"
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("#show Geo only\n\n\nimport maya.cmds as mc\ncurrentPanel = mc.getPanel(withFocus = True)\ngetStatus = mc.modelEditor(currentPanel, q=True, cameras=True)\nif getStatus == True:\n    mc.modelEditor(currentPanel, e=True, allObjects=False)\n    mc.modelEditor(currentPanel, e=True, polymeshes=True)\nelse:\n    mc.modelEditor(currentPanel, e=True, allObjects=True)")
+	showGeo;
+
+runTimeCommand
+	-annotation "show joints only."
+	-category "Custom Scripts"
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("#show joints only\n\nimport maya.cmds as mc\ncurrentPanel = mc.getPanel(withFocus = True)\ngetStatus = mc.modelEditor(currentPanel, q=True, cameras=True)\nif getStatus == True:\n    mc.modelEditor(currentPanel, e=True, allObjects=False)\n    mc.modelEditor(currentPanel, e=True, joints=True)\nelse:\n    mc.modelEditor(currentPanel, e=True, allObjects=True)")
+	showJoints;
+
+runTimeCommand
+	-annotation "show joints and geo only."
+	-category "Custom Scripts"
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("#show joints and geo only\n\n\nimport maya.cmds as mc\ncurrentPanel = mc.getPanel(withFocus = True)\ngetStatus = mc.modelEditor(currentPanel, q=True, cameras=True)\nif getStatus == True:\n    mc.modelEditor(currentPanel, e=True, allObjects=False)\n    mc.modelEditor(currentPanel, e=True, joints=True)\n    mc.modelEditor(currentPanel, e=True, polymeshes=True)\nelse:\n    mc.modelEditor(currentPanel, e=True, allObjects=True)")
+	showJointsAndGeo;
+
+runTimeCommand
+	-annotation "show curves and geo only."
+	-category "Custom Scripts"
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("#show curves and geo only\n\n\nimport maya.cmds as mc\ncurrentPanel = mc.getPanel(withFocus = True)\ngetStatus = mc.modelEditor(currentPanel, q=True, cameras=True)\nif getStatus == True:\n    mc.modelEditor(currentPanel, e=True, allObjects=False)\n    mc.modelEditor(currentPanel, e=True, nurbsCurves=True)\n    mc.modelEditor(currentPanel, e=True, polymeshes=True)\n    mc.modelEditor(currentPanel, e=True, cv=True)\n    mc.modelEditor(currentPanel, e=True, nurbsSurfaces=True)\nelse:\n    mc.modelEditor(currentPanel, e=True, allObjects=True)")
+	showCurvesAndGeo;
+
+runTimeCommand
+	-annotation "Show Curves "
+	-category "Custom Scripts"
+	-hotkeyCtx ""
+	-commandLanguage "python"
+	-command ("#show curves and geo only\n\n\nimport maya.cmds as mc\ncurrentPanel = mc.getPanel(withFocus = True)\ngetStatus = mc.modelEditor(currentPanel, q=True, cameras=True)\nif getStatus == True:\n    mc.modelEditor(currentPanel, e=True, allObjects=False)\n    mc.modelEditor(currentPanel, e=True, nurbsCurves=True)\n    mc.modelEditor(currentPanel, e=True, cv=True)\n    mc.modelEditor(currentPanel, e=True, nurbsSurfaces=True)\nelse:\n    mc.modelEditor(currentPanel, e=True, allObjects=True)")
+	showCurves;
+

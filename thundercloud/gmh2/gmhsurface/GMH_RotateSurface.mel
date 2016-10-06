@@ -1,0 +1,42 @@
+global proc int GMH_RotateSurface()
+{
+
+    string $obj = PDD_currentSelectionName(1);
+    
+	    //get main group 
+    string $mainGroup = getMainGroup(PDD_currentSelectionName(1));
+    if($mainGroup == ""){warning"no GMHSurface selected\n";return 0 ;}
+      //get polysurface#
+          
+    select $mainGroup;
+    string $baseSurface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","in",1);
+   
+
+          //get GMH STYLE
+    select $mainGroup;
+    string $GMHStyleSystem = PDD_NodeFromConnection("GMH_StyleMainGroupIn","in",1);
+
+    
+    int $GMHRotateID = getAttr ($baseSurface+".PDD_GMH_rotateID");
+
+	
+
+	
+	//ROTATE THE ID
+	$GMHRotateID ++;
+	if ($GMHRotateID >= 5) $GMHRotateID =1;
+	
+	//set the rotate ID for polySurface
+	select $baseSurface;
+	
+    setAttr -l false ($baseSurface+".PDD_GMH_rotateID");
+    
+	setAttr ($baseSurface+".PDD_GMH_rotateID") $GMHRotateID;
+    setAttr -l true ($baseSurface+".PDD_GMH_rotateID");
+	
+	//select the poly Surface and convert
+    select $baseSurface;
+	CreateGMHSurface($GMHStyleSystem,0);
+
+	return 1;
+}

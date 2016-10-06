@@ -1,0 +1,265 @@
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                              PDD MEL LIB CONNECTION PROC                                            //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              Get Node name from connection and direction                            //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+        global proc string PDD_NodeFromConnection(string $attr,string $direction,int $warningFlag)
+        {
+                	string $result[];
+                	string $obj= `PDD_currentSelectionName($warningFlag)`;
+                	if ((`attributeExists $attr $obj`) == 1)
+                		{
+                            		if ($direction == "in")
+                            			{
+                            				$result = `listConnections -s true -sh true ($obj + "."+ $attr)`;
+                            			}
+                            		else
+                            		if ($direction == "out")
+                            			{
+                            				$result = `listConnections -d true -sh true  ($obj + "."+  $attr)`;
+                            			}
+                            		
+                            		else
+                            		if ($result[0] =="")
+                            		{
+                            		    if($warningFlag ==1) warning ($obj +" does not have any "+$direction +" connection at attribute :" + $attr+"\n");
+                            		    return "";
+                            		}
+                		}
+                	else
+                		{
+                		if($warningFlag ==1) warning ($obj +" does not have attribute :" + $attr+"\n");
+                        $result[0] = "";
+                		    
+                		}
+                		
+                	return $result[0];
+        }
+        
+        
+        global proc string[] PDD_NodesFromConnection(string $attr,string $direction,int $warningFlag)
+        {
+                	string $result[];
+                	string $obj= `PDD_currentSelectionName($warningFlag)`;
+                	if ((`attributeExists $attr $obj`) == 1)
+                		{
+                        		if ($direction == "in")
+                        			{
+                        				$result = `listConnections -s true -sh true ($obj + "."+ $attr)`;
+                        			}
+                        		else
+                        		if ($direction == "out")
+                        			{
+                        				$result = `listConnections -d true -sh true  ($obj + "."+  $attr)`;
+                        			}
+                        		
+                        		else
+                        		if ($result[0] =="")
+                        		{
+                        		    if($warningFlag ==1) warning ($obj +" does not have any "+$direction +" connection at attribute :" + $attr+"\n");
+                        		    $result[0] = "";
+                        		}
+                		}
+                		else
+                		{
+                		if($warningFlag ==1) warning ($obj +" does not have attribute :" + $attr+"\n");
+                        $result[0] = "";
+                		    
+                		}
+                	return $result;
+        }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              BREAK CONNECTION REGARDLESS OF THEY ARE CONNETED OR NOT                //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+global proc PDD_BreakConnection (string $obj1,string $attr1, string $obj2,string $attr2,int $warningFlag)
+{
+    if ( `isConnected ($obj1 + "."+ $attr1) ($obj2 + "."+ $attr2)` == 1)
+    {
+        disconnectAttr ($obj1 + "."+ $attr1) ($obj2 + "."+ $attr2);
+    } 
+    else
+    {
+       if($warningFlag ==1)  warning ( ($obj1 + "."+ $attr1) +"and" +($obj2 + "."+ $attr2)+ "is not connected\n");
+    }
+    
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              CONNECT ATTRIBUTES OF 2 OBJECT                                         //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+global proc int PDD_ConnectAttribute(string $Obj1,string $Attr1,string $Obj2,string$Attr2,int $debugFlag)
+{
+    
+    if (( `attributeExists $Attr1 $Obj1 ` ==1)&&( `attributeExists  $Attr2 $Obj2 ` ==1))
+    {
+            if (`isConnected ($Obj1+"."+$Attr1)($Obj2+"."+$Attr2)` == 1)
+            {
+                
+                 warning ( ($Obj1+"."+$Attr1)+" and "+($Obj2+"."+$Attr2)+" already connected, ignored \n");
+                return 1;
+            }
+            else
+            {
+                connectAttr -f ($Obj1+"."+$Attr1)($Obj2+"."+$Attr2);
+                return 1;
+            } 
+    }
+else
+{
+    if ( $debugFlag == 1)
+    {
+    if( `attributeExists $Attr1 $Obj1 ` ==0)
+    warning ("  attributes <"+$Attr1+"> in object <"+$Obj1+">  not existed \n");
+    if( `attributeExists $Attr2 $Obj2 ` ==0)
+    warning ("  attributes <"+$Attr2+"> in object <"+$Obj2+">  not existed \n");
+        
+    }
+      return 0;  
+}
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              RETURN ALL CONNECTION WITH DEPTH OF A NETWORK                          //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// return all node that 's in a network of a node connections with depth value.
+global proc string[] PDD_listDepthConnections(string $node,int $depth,int $source, int $destination)
+{
+    
+    string $lists1[] = `listConnections -s $source -d $destination $node`;
+
+   $depth--;
+    
+    string $childLists[];
+    //while depth != 0 and list isnt empty then get the list of each child and add it to the parent node
+   if (($depth !=1))
+   {
+        for ($list1 in $lists1)
+        {
+        string $eachChildLists[] = PDD_listDepthConnections($list1,$depth,$source,$destination);
+        
+            if ($eachChildLists[0] !="")
+            {
+                appendStringArray($childLists,$eachChildLists,(size($eachChildLists)));
+            }
+        }
+   }
+    appendStringArray($lists1,$childLists,(size($childLists)));
+    
+    $lists1 = stringArrayRemoveDuplicates($lists1);
+
+    
+    return $lists1;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              DELETE ALL INTERMEDIATE OBJECT OF SELECTION                            //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ global proc  PDD_deleteIntermediateObject()
+    {
+                string $IOList[];  clear ($IOList);  
+                string $selections[] = `ls-sl`;  // get the model group
+
+                for ($obj in $selections)
+                {
+                       select  $obj;                           
+                        
+                             
+                             string $intermediateObjects[] = `listRelatives -s -pa`;  // get the intermediateObject list
+                             
+                             for ( $eachIO in $intermediateObjects)
+                             {  
+                                  if (`getAttr ($eachIO +".intermediateObject")`== 1)  
+                                  {
+                                      string $tmps[];
+                                      $tmps[0] = $eachIO;
+                                     if ( stringArrayContains($eachIO,$IOList)== 0)
+                                     appendStringArray($IOList,$tmps,1);
+                                   }  
+                              }  
+                                 
+
+                         
+                         if (size($IOList) !=0)
+                         {
+                                    delete $IOList;
+                         } 
+                }
+                
+
+    }

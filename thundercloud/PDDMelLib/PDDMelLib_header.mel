@@ -1,0 +1,16 @@
+
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_header.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_hierarchy.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_math.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_Naming.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_string.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_attribute.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_Connection.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_debug.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_file.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_Curve.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_surface.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_UIElement.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_UIFloatSlider.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_UILayout_thumbnailWindow.mel";
+source "THUNDERCLOUD/PDDMelLib/PDDMelLib_UILayout_userPathThumbnailWindow.mel";

@@ -1,0 +1,65 @@
+// ===================PDDMelLib_hierarchy.mel============
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                              PDD MEL LIB HIERARCHY PROC                                            //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              select transform node                                                  //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+// select a transform node of a given node , this proc will go to the top level to return the transform node
+global proc string PDD_selectTransformNode(string $node,int $debug)
+    {
+        select $node;
+        string $currentSelectionType = objectType (PDD_currentSelectionName($debug));
+        int $i = 0;
+        for ( $i = 0;$i<999;$i++)
+        {
+                        if ($currentSelectionType=="transform")
+                        {
+                            return PDD_currentSelectionName($debug);
+                        }
+                        pickWalk -d up ;
+        }
+        return 0;
+    }
+
+
+//select a range of transform DAG node of selected types and 
+
+global proc string[] PDD_lsTypeTransformNode(string $type)
+{
+    string $nodes[] = `ls-sl -type ($type)`;
+    string $transformNodes[];clear ($transformNodes);
+    for ( $eachNode in $nodes)
+    {
+        select $eachNode;
+        string $tmps[] = `pickWalk -d up`;
+       // string $tmps[];$tmps[0] = $tmp;
+       appendStringArray($transformNodes,$tmps,1);
+    }
+    
+    return $transformNodes;
+        
+    
+}
+
+global proc int PDD_isCurrentSelection(string $objType)
+{
+string $selection[]=`ls-sl`;
+if ( `objectType $selection[0]` == $objType)
+return 1;
+else
+return 0;
+}
+
+

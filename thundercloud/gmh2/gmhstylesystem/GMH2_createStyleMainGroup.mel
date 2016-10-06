@@ -1,0 +1,39 @@
+ //==================== GMH2_createStyleMainGroup.mel ===================
+ 
+ global proc string createStyleMainGroupNode(string $name,int $debugFlag)
+ {
+
+//create & init variable
+
+              string $styleMainGroup = ` container -type dagContainer -ind "history" -ind "channels" -includeHierarchyBelow -includeTransform -name ($name +"_GMHHairSystem")`;
+              string $styleMainGroup = PDD_currentSelectionName($debugFlag);
+
+                          
+    
+// add & set attr
+            addAttr -ln "GMH_styleMainGroup"  -at  "long" $styleMainGroup;  
+            addAttr -ln "PFXHair"  -at  "long" $styleMainGroup; 
+            addAttr -ln "MayaHairSystem"  -at  "long" $styleMainGroup; 
+            addAttr -ln "PFXStyle"  -at "long" $styleMainGroup; 
+            addAttr -ln "GMH_OutMainGroup"  -at  "long" $styleMainGroup; 
+            addAttr -ln "GMH_OutMainGroupAsset"  -at  "long" $styleMainGroup; 
+            
+
+            setAttr ($styleMainGroup+".blackBox") 1;
+
+
+//initial Maya Preset system so GMH preset will workable . 
+string $GMHPreset = PDD_getValidScriptPath("/attrPresets/dagContainer/GMHPRESET.mel");
+
+print ("result = " + $GMHPreset);
+if ($GMHPreset ==0)
+{
+print "saving initial preset \n";
+saveAttrPreset $styleMainGroup "GMHPRESET" false;  
+
+}
+applyAttrPreset  $styleMainGroup "GMHPRESET" 1;
+print "apply initial preset \n";
+
+           return  $styleMainGroup;  
+ }

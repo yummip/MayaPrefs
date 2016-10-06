@@ -1,0 +1,22 @@
+//===========================GMH2_pinitSubAttrToStyleMainGroup.mel===================
+global proc GMH2_publishSubAttrToStyleMainGroup(string $mainGroup,string $hairSystem, string $brush)
+{
+    
+    //make sure all the node are its shapes nodes
+    select $hairSystem; $hairSystem = PDD_currentSelectionShapeName(1);
+    
+        // publish all the hairSystem attrs to container
+            string $hairSystemAttrLists[] = initHairSystemAttributesList();
+            for ( $eachAttr in $hairSystemAttrLists)
+            {
+                print $eachAttr; print $hairSystem;
+                container -e -publishAndBind ($hairSystem+ "." +$eachAttr) ($eachAttr) $mainGroup;
+            }
+            
+        //publish all Brush Attrs to container 
+        string $brushAttrLists[] = initHairSystemBrushAttributesList();
+                     for ( $eachAttr in $brushAttrLists)
+            {
+                container -e -publishAndBind ($brush+ "." +$eachAttr) ($eachAttr) $mainGroup;
+            }   
+}

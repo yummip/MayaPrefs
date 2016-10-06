@@ -1,0 +1,128 @@
+// ========================= PDDMelLib_UIFloatSlider.mel ===============================
+global proc setNumValue(float $value, string $objectUniqueName)
+{
+
+                   if (`floatSlider -ex $objectUniqueName`==1)
+                {
+                    floatSlider -e -v $value $objectUniqueName;
+                    
+                }
+                if (`floatField -ex $objectUniqueName`==1)
+                {
+                    floatField -e -v $value $objectUniqueName;
+                    
+                }
+    
+    
+}
+
+global proc float getNumValue(string $objectUniqueName)
+{
+            
+            float $result;
+                
+               if (`floatSlider -ex $objectUniqueName`==1)
+                {
+                    $result = `floatSlider -q -v $objectUniqueName`;
+                    
+                }
+                if (`floatField -ex $objectUniqueName`==1)
+                {
+                    $result =`floatField -q -v  $objectUniqueName`;
+                    
+                }
+            return $result;
+}
+
+
+
+
+
+global proc makeUniSliderAndField(string $layout,string $label, string $uniqueObjectName,string $cc,string $dc,float $value,float $minField,float $maxField,float $step,int $dec,int $fieldWidth,int $sliderWidth,int $top,int $left)
+{
+    
+        string $fieldName = ($uniqueObjectName +"_field");
+        string $sliderName = ($uniqueObjectName +"_slider");
+        
+        string $textName = (makeText($layout,$label,$top,$left));
+        
+        int $textWidth = `text -q -w $textName`;
+        $left+= $textWidth +5;
+        
+        makeFloatField($layout,$fieldName,$sliderName,$cc,$value,$minField,$maxField,$step,$dec,$fieldWidth,$top,$left);
+
+
+
+        // get the adaptive range for slider based on field value .
+                    float $newMaxValue = clamp($minField,$maxField,((0.01+$value)*100) );   //plus 0.0001 to prevent 0 value
+                    float $newMinValue = clamp($minField,$maxField,((0.01+$value)*(-100)) );
+                    //swap position between min and max range if it's negative or positive.
+                    if ( $newMaxValue < $newMinValue)
+                        {     
+                        float $tmp  =  $newMaxValue;  
+                              $newMaxValue =  $newMinValue;
+                              $newMinValue = $tmp;
+                        }
+                        
+                        
+                       // print $newMaxValue;print "\n";
+                       // print $newMinValue;
+                         makeFloatSlider($layout,$sliderName,$fieldName,$cc,$dc,$value,$newMinValue,$newMaxValue,$step,$sliderWidth, ($top+2.5), ($left+$fieldWidth+2));
+                        
+
+              
+}
+
+
+
+global proc makeFloatField(string $layout, string $objectUniqueName,string $associatedSlider,string $cc,float $value,float $min,float $max,float $step,int $dec,int $width,int $top,int $left)
+{
+    
+
+    //set the connection with asociated int field                   
+                    // making the slider auto adjust the scale minmax slider bar to the value of the field , the value is clamped by field min max value
+    string $cc2 = (" float $fieldValue = getNumValue(\"" + $objectUniqueName + "\");\n"+
+
+                    "float $newMaxValue = clamp("+$min+","+$max+",((0.0001+$fieldValue)*10) ) ;\n"+  //plus 0.0001 to prevent 0 value
+                    "float $newMinValue = clamp("+$min+","+$max+",((0.0001+$fieldValue)*(-10)) );\n"+  //plus 0.0001 to prevent 0 value
+                    
+                    "float $sliderMaxValue = `floatSlider -q -max "+$associatedSlider +"`;"  + //get the max value of slider
+                    "float $sliderMinValue = `floatSlider -q -min "+$associatedSlider +"`;" +  //get the min value of slider
+                    
+                   // "if (( $fieldValue >$sliderMaxValue ) ||($fieldValue < $sliderMinValue)){"+       // only resize slider maxmin value if field value is out of slider maxmin range
+                    "if ( $newMaxValue >$newMinValue)"+
+                        "{"+
+                        "floatSlider -e -max ($newMaxValue) -min ($newMinValue) " +       "\""+ $associatedSlider +"\""    + ";"+
+                        "}"+
+                    "else\n"+
+                    "if ( $newMaxValue < $newMinValue)"+
+                        "{"+
+                        "floatSlider -e -min ($newMaxValue) -max ($newMinValue)" +       "\""+ $associatedSlider +"\""    +";"+
+                       // "}"+
+                        "}"+$cc);
+                        
+                        
+     string $cc3 =  "setNumValue ((getNumValue(\""+$objectUniqueName+"\")),\""+$associatedSlider+"\");"+ $cc2;
+            
+                    
+    
+        floatField -v $value -min $min -max $max -pre $dec -step $step -cc $cc3 -w $width $objectUniqueName;
+          //floatField -v $value                     -pre $dec -step $step -cc $cc3 -w $width $objectUniqueName;
+    positioning($layout,$objectUniqueName,$top,$left);
+    
+}
+
+global proc makeFloatSlider(string $layout,string $objectUniqueName,string $associatedField,string $cc, string $dc,float $value,float $min,float $max,float $step,int $width, int $top,int $left)
+
+{  
+
+    //set the connection with asociated int field
+    string $dc2 = "setNumValue ((getNumValue(\""+$objectUniqueName+"\")),\""+$associatedField+"\");" +$dc;
+    
+    floatSlider -min $min -max $max -value $value -step $step  -cc $cc -dc $dc2 -w $width $objectUniqueName;
+    
+        positioning($layout,$objectUniqueName,$top,$left);
+
+}
+
+

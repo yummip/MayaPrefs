@@ -1,0 +1,263 @@
+//===================GMH_NURBToCurves.mel===========
+
+global proc string[] ConvertNurbsToCurves(string $maingroup,string $NURBSurfaceShape,int $rotateID,int $debugFlag)
+{
+string $curves_groups[];
+
+string $obj = $NURBSurfaceShape;                     
+
+
+
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                             PDD_debug($debugFlag,""," check availability of NURBSurfacShape");
+                                                                               /* ================ check availability of NURBSurfacShape =============*/
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                               
+               
+		if (PDD_isCurrentSelection("nurbsSurface") == 1)   							//for all NURBS object in selection do::
+        			{
+        				
+        
+        				
+        
+                        
+        		////////////////////////////////////////Create  Growing curve base on rotate ID state//////////////////////////////////////
+        
+        				string $growingCurves[]; clear ($growingCurves);
+        	            select $obj;
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                             PDD_debug($debugFlag,""," convert NURBSurfaceShape to GROW Curves");
+                                                                               /* ================ convert NURBSurfaceShape to GROW Curves =============*/
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        				if ( $rotateID ==1 )
+        				{
+        				    PDD_debug($debugFlag,""," rotateID = 1 ");
+        					duplicateCurve -ch 1 -rn 0 -local 0  (`PDD_currentSelectionName($debugFlag)` + ".u[9999]");
+        					rename "GMH_Growing_curve";							//Rename Curve
+        					appendStringArray($growingCurves,`ls-sl`,1);					// add the current growing curves to growingCurves strings
+        					pickWalk -d down;
+        					addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 0;			//Add Curve ID attribute  0 - grow  ,  1 - lead	
+        					PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);	
+        					setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");		
+        					select (PDD_NodeFromConnection("create","in",$debugFlag));					//Select the CurveFromSurface node
+        					setAttr (`PDD_currentSelectionName($debugFlag)`+".isoparmValue") 9999;				//set the U IsoParm Vlue to 9999
+        				}
+        				else
+        				if ( $rotateID ==3 )
+        				{
+        				    PDD_debug($debugFlag,""," rotateID = 3 ");
+        					duplicateCurve -ch 1 -rn 0 -local 0  (`PDD_currentSelectionName($debugFlag)` + ".u[0]");
+        					rename "GMH_Growing_curve";							//Rename Curve
+        					appendStringArray($growingCurves,`ls-sl`,1);					// add the current growing curves to growingCurves strings
+        					pickWalk -d down;
+        					PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        					addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 0;			//Add Curve ID attribute  0 - grow  ,  1 - lead
+        					PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);	
+        					setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");		
+        				}
+        				else										//Create V - Leading curve base on rotate ID state
+        				if ( $rotateID ==2 )
+        				{
+        				    PDD_debug($debugFlag,""," rotateID = 2 ");
+        					duplicateCurve -ch 1 -rn 0 -local 0  (`PDD_currentSelectionName($debugFlag)` + ".v[9999]");
+        					rename "GMH_Growing_curve";							//Rename Curve
+        					appendStringArray($growingCurves,`ls-sl`,1);					// add the current growing curves to growingCurves strings
+        					pickWalk -d down;
+        					addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 0;			//Add Curve ID attribute  0 - grow  ,  1 - lead
+        					PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        					setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");		
+        					select (PDD_NodeFromConnection("create","in",$debugFlag));				//Select the CurveFromSurface node
+        					setAttr (`PDD_currentSelectionName($debugFlag)`+".isoparmValue") 9999;				//set the U IsoParm Vlue to 9999
+        				}
+        				else
+        				if ( $rotateID ==4 )
+        				{
+        				    PDD_debug($debugFlag,""," rotateID = 4 ");
+        					duplicateCurve -ch 1 -rn 0 -local 0  (`PDD_currentSelectionName($debugFlag)` + ".v[0]");
+        					rename "GMH_Growing_curve";							//Rename Curve
+        					appendStringArray($growingCurves,`ls-sl`,1);					// add the current growing curves to growingCurves strings
+        					pickWalk -d down;
+        					PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        					addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 0;			//Add Curve ID attribute  0 - grow  ,  1 - lead
+        					setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");		
+        				}
+        		////////////////////////////////////////Create  LEADING curve base on rotate ID state//////////////////////////////////////
+        	
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                             PDD_debug($debugFlag,""," convert NURBSurfaceShape to LEAD Curves");
+                                                                               /* ================ convert NURBSurfaceShape to LEAD Curves =============*/
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        				
+        				select $obj;
+        				pickWalk -d down; 
+        				int $maxV = getLastUVsurface($obj,"v");							//get the max V of the surface
+        				//////print $maxV;
+        
+        				select $obj;
+        				pickWalk -d down; 
+        				int $maxU = getLastUVsurface($obj,"u");							//get the max U of the surface
+        				////print $maxU;
+        				
+        				string $leadingCurves[]; clear ($leadingCurves);
+        
+        				select $obj;
+        				pickWalk -d down;
+        				string $surfaces[]=`ls-sl`;
+        				if ( $rotateID ==1 )
+        				{	
+        					int $i;										//Create leading curves
+        					for ( $i = 0;$i <= $maxV; $i++)
+        					{
+        						duplicateCurve -ch 1 -rn 0 -local 0  ($surfaces[0] + ".v["+$i+"]");
+        						rename "GMH_Leading_curve";						//Rename Curve
+        						pickWalk -d down;
+        						addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 1;		//Add Curve ID attribute  0 - grow  ,  1 - lead
+        						setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");
+        						PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+			                    
+        						appendStringArray($leadingCurves,`ls-sl`,1);
+        						
+        					}
+        					for ( $obj in $leadingCurves) {reverseCurve -ch 1 -rpo 1 $obj;}			// reverse leading curve direction
+        				}
+        				else
+        				if ( $rotateID ==3 )
+        				{	
+        					int $i;										//Create leading curves
+        					for ( $i = 0;$i <= $maxV; $i++)
+        					{
+        						duplicateCurve -ch 1 -rn 0 -local 0  ($surfaces[0] + ".v["+$i+"]");
+        						rename "GMH_Leading_curve";						//Rename Curve
+        						pickWalk -d down;
+        						addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 1;		//Add Curve ID attribute  0 - grow  ,  1 - lead
+        						setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");
+        						PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        						appendStringArray($leadingCurves,`ls-sl`,1);
+        						
+        					}
+        				}
+        				else
+        				if ( $rotateID ==2 )
+        				{	
+        					int $i;										//Create leading curves
+        					for ( $i = 0;$i <= $maxU; $i++)
+        					{
+        						duplicateCurve -ch 1 -rn 0 -local 0  ($surfaces[0] + ".u["+$i+"]");
+        						rename "GMH_Leading_curve";						//Rename Curve
+        					pickWalk -d down;
+        						addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 1;		//Add Curve ID attribute  0 - grow  ,  1 - lead
+        						setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");
+        						PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        						appendStringArray($leadingCurves,`ls-sl`,1);
+        						
+        					}
+        					for ( $obj2 in $leadingCurves) {reverseCurve -ch 1 -rpo 1 $obj2;}			// reverse leading curve direction
+        				}
+        				else
+        				if ( $rotateID ==4 )
+        				{	
+        					int $i;										//Create leading curves
+        					for ( $i = 0;$i <= $maxU; $i++)
+        					{
+        						duplicateCurve -ch 1 -rn 0 -local 0  ($surfaces[0] + ".u["+$i+"]");
+        						rename "GMH_Leading_curve";						//Rename Curve
+        					pickWalk -d down;
+        						addAttr -ln "GMH_curveID"  -at long  -min 0 -max 1 -dv 1;		//Add Curve ID attribute  0 - grow  ,  1 - lead
+        						setAttr -e-keyable true (`PDD_currentSelectionName($debugFlag)`+".GMH_curveID");
+        						PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);						//add attribute to Main group
+        						appendStringArray($leadingCurves,`ls-sl`,1);
+        						
+        					}
+        					//for ( $obj in $leadingCurves) {reverseCurve -ch 1 -rpo 1 $obj;}			// reverse leading curve direction
+        
+        				}
+        				
+
+
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                             PDD_debug($debugFlag,""," connecting curves");
+                                                                               /* ================ connecting curves =============*/
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        				
+                
+				// CREATE CONNECTION FROM CURVES TO MAIN GROUP 
+
+				for ($eachCurve in $leadingCurves)								// for each curve in leading curve
+    				{
+    					connectAttr -f ($maingroup +".GMH_outLeadingCurves") ($eachCurve+".GMH_InMainGroup");		//connect main group to Leading Curve
+    				}
+
+				for ($eachCurve in $growingCurves)								// for each curve in growing curve
+    				{
+    					connectAttr -f ($maingroup +".GMH_outGrowingCurves") ($eachCurve+".GMH_InMainGroup");		//connect main group to growing Curve
+    				}
+				
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                                                             PDD_debug($debugFlag,""," parenting");
+                                                                               /* ================ parenting =============*/
+                                                                ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                //get Base mesh name to rename
+                select $maingroup;
+                select (PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",$debugFlag));
+                pickWalk -d up;
+                string $objName = PDD_currentSelectionName($debugFlag);
+                string $name = $objName;
+                $name = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+            
+				createNode transform ;rename ($name+"_GMH_curves_null");							// create Curves parent node
+				string $curves_group = `PDD_currentSelectionName($debugFlag)`;
+				
+				
+	
+	
+	
+	            //GROUP
+				
+				select $leadingCurves;select -add $growingCurves;
+				pickWalk -d up;
+				select -add $curves_group; parent ;								//parent curves to curves group
+                
+
+
+                //PARENT
+				select $curves_group;
+				select -add $maingroup;
+				parent;
+				
+
+
+// update the curve list after parent
+
+                select $maingroup;
+                $leadingCurves = PDD_NodesFromConnection("GMH_outLeadingCurves","out",$debugFlag);
+                
+                select $maingroup;
+                $growingCurves = PDD_NodesFromConnection("GMH_outGrowingCurves","out",$debugFlag);
+                
+                
+                select $leadingCurves;
+                pickWalk -d up;
+                PDD_patchRename($maingroup+"_leadingCurves");
+                pickWalk -d down;
+                $leadingCurves = `ls-sl`;
+				
+				select $growingCurves;
+                pickWalk -d up;
+                PDD_patchRename($maingroup+"_growingCurves");
+                pickWalk -d down;
+                $growingCurves =  `ls-sl`;
+                
+                
+                
+                
+				select $leadingCurves; select -add $growingCurves;
+				
+				$curveGroups = `ls-sl`;
+				return $curveGroups;
+				
+			}			// end of NURBS surface OBJ scope
+
+		
+
+return $curves_groups;
+}

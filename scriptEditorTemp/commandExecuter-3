@@ -1,0 +1,29 @@
+import maya.cmds as cmds
+
+source = cmds.ls(sl=1)
+dest = cmds.ls(sl=1)
+
+for i in range(0,len(source)):
+    #deselect everything
+    cmds.select(d=1)
+    #get bind joints
+    cmds.select(source[i])
+    try:
+        bindJnts = cmds.skinCluster(q=1,weightedInfluence=1)
+        cmds.select(bindJnts)
+        #then select new mesh & bind
+        cmds.select(dest[i],add=1)
+        try:
+            maya.mel.eval('newSkinCluster "-toSelectedBones -bindMethod 1 -normalizeWeights 1 -weightDistribution 0 -mi 3 -omi true -dr 4 -rui true,multipleBindPose,0";')
+        except:
+            cmds.delete('bindPose*')
+            maya.mel.eval('newSkinCluster "-toSelectedBones -bindMethod 1 -normalizeWeights 1 -weightDistribution 0 -mi 3 -omi true -dr 4 -rui true,multipleBindPose,0";')
+    
+        #clear selection
+        cmds.select(d=1)
+        
+        #finally, copy weights
+        cmds.select(source[i],dest[i])
+        cmds.copySkinWeights(noMirror=1, surfaceAssociation ='closestPoint' ,influenceAssociation='closestJoint')
+    except:
+        continue

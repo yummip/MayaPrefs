@@ -1,0 +1,62 @@
+//GUI PROC MEL
+
+// select a collide surface and any GMH base surface or GMH style System to collide with
+global proc GUIMakeCollideGMHSurface()
+{
+    string $selection[] =`ls-sl`;
+    
+    for ($obj in $selection)
+    {
+        
+        if ($obj != $selection[0])
+            {
+            makeCollide($selection[0],$obj );
+            }
+    }
+    
+    
+}
+
+
+global proc GUIAsignStickyConstrainGMHsurface()
+{
+    //apply sticky constrain to selections , first selection is the parent mesh , the rest is GMH surface
+     string $selections[] = `ls-sl`;
+     if(size($selections) <= 1 )
+     {warning "Usage: select one parent mesh Object and then select GMH base surface \n ";}
+     else
+     {
+         for ($obj in $selections)
+         {
+             if($obj != $selections[0])
+             {
+                 constrainGMHNclothSurfaceSticky($obj,$selections[0]); 
+             }
+         }
+     }
+
+}
+
+
+// delete all constrain from selection GMH surfaces
+global proc GUIdeleteStickyConstrainGMHSurface()
+{
+    string $selections[] = `ls-sl`;
+    for($obj in $selections)
+    {
+    deleteConstrainGMHSurfaceSticky($obj);
+    }
+}
+
+
+
+//delete all constrain from selected parent surface
+global proc GUIdeleteGMHConstrainFromParentSurface()
+{
+      string $selections[] = `ls-sl`;
+    for($obj in $selections)
+    {
+     deleteConstrainFromRigidShape($obj);
+    }
+
+}

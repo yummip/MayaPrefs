@@ -1,0 +1,59 @@
+ //==================== GMH2_setHairSYstemAttr.mel ===================
+ global proc setHairSystemAttr(string $hairSystem)
+ {
+     
+     // ============== dynamic attr =================//
+        setAttr ($hairSystem+ ".displayQuality") 20;
+        setAttr ($hairSystem+ ".startCurveAttract") 0.1;
+        setAttr ($hairSystem+ ".collide") 1;
+        setAttr ($hairSystem+ ".iterations") 4;
+        setAttr ($hairSystem+ ".simulationMethod") 3;
+        setAttr ($hairSystem+ ".displayQuality") 100;
+        setAttr ($hairSystem+ ".clumpWidth") 1;
+        setAttr ($hairSystem+ ".hairWidth") 0.01;
+        setAttr ($hairSystem+ ".hairsPerClump") 10;
+        setAttr ($hairSystem+ ".subSegments") 3;
+        setAttr ($hairSystem+ ".thinning") 0.19;
+        setAttr ($hairSystem+ ".stiffness") 0.15;
+        setAttr ($hairSystem+ ".noiseMethod") 2;
+        setAttr ($hairSystem+ ".curlFrequency") 2;
+        
+        
+     // ======================== hair shape attr =======================
+        setAttr ($hairSystem+ ".clumpCurl[1].clumpCurl_Position") 1;
+        setAttr ($hairSystem+ ".clumpCurl[1].clumpCurl_FloatValue") 1;
+        setAttr ($hairSystem+ ".clumpCurl[0].clumpCurl_Position") 0;
+        setAttr ($hairSystem+ ".clumpCurl[0].clumpCurl_FloatValue") 0.74;
+
+        setAttr ($hairSystem+ ".clumpWidthScale[2].clumpWidthScale_Position") 0.495652;
+        setAttr ($hairSystem+ ".clumpWidthScale[2].clumpWidthScale_FloatValue") 0.88;
+        setAttr ($hairSystem+ ".clumpWidthScale[2].clumpWidthScale_Interp") 2;
+        setAttr ($hairSystem+ ".clumpWidthScale[1].clumpWidthScale_Position") 1;
+        setAttr ($hairSystem+ ".clumpWidthScale[1].clumpWidthScale_FloatValue") 0.3;
+        setAttr ($hairSystem+ ".clumpWidthScale[0].clumpWidthScale_Position") 0;
+        setAttr ($hairSystem+ ".clumpWidthScale[0].clumpWidthScale_FloatValue") 0.44;
+        
+        
+        setAttr ($hairSystem+ ".hairWidthScale[0].hairWidthScale_Position") 0.530435;
+        setAttr ($hairSystem+ ".hairWidthScale[0].hairWidthScale_FloatValue") 1;
+        setAttr ($hairSystem+ ".hairWidthScale[2].hairWidthScale_Position") 0.0173913;
+        setAttr ($hairSystem+ ".hairWidthScale[2].hairWidthScale_Interp") 2;
+        setAttr ($hairSystem+ ".hairWidthScale[2].hairWidthScale_Position") 0;
+        setAttr ($hairSystem+ ".hairWidthScale[2].hairWidthScale_FloatValue") 0.54;
+        
+        setAttr ($hairSystem+ ".hairWidthScale[1].hairWidthScale_Position") 1;
+        setAttr ($hairSystem+ ".hairWidthScale[1].hairWidthScale_FloatValue") 0.26;
+        
+        setAttr ($hairSystem+ ".displacementScale[1].displacementScale_FloatValue") 1;
+        setAttr ($hairSystem+ ".displacementScale[1].displacementScale_Position") 1;
+        setAttr ($hairSystem+ ".displacementScale[1].displacementScale_Interp") 1;
+        setAttr ($hairSystem+ ".displacementScale[0].displacementScale_FloatValue") 1;
+        setAttr ($hairSystem+ ".displacementScale[0].displacementScale_Position") 0;
+        setAttr ($hairSystem+ ".displacementScale[0].displacementScale_Interp") 3;
+        
+        //======================= hair shading attr =====================================
+        
+        setAttr ($hairSystem+ ".hairColor") -type double3 0.431373 0.37735 0.202999 ;
+        
+ }
+       

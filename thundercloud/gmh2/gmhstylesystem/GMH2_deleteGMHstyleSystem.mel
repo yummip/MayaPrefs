@@ -1,0 +1,36 @@
+
+
+global proc int deleteGMHStyleSystem(string $GMHstyle)
+{
+    
+    //check if GMH style exist or nor
+    if ( `objExists ($GMHstyle)` == 0 )
+    {
+        warning ("The GMH Style system name :\" " + $GMHstyle + " \" does not exist \n");
+        return 0;
+    }
+    
+    
+    
+    // get the list of GMH MainGroup from GMH style 
+    
+    select $GMHstyle;//pickWalk -d down;
+    string $GMHMainGroups[] = PDD_NodesFromConnection("GMH_OutMainGroup","out",0);
+    
+    //delete GMH main Group
+    for ( $everyMainGroup in $GMHMainGroups)
+    {
+    deleteGMHMainGroup($everyMainGroup);
+    }
+    
+    //delete the asset GMH Surface MainGroup
+    select $GMHstyle;//pickWalk -d down;
+    string $GMHsurfaceAsset  = PDD_NodeFromConnection("GMH_OutMainGroupAsset","out",1);
+    delete $GMHsurfaceAsset;
+    
+    //delete GMH style
+    delete $GMHstyle;
+    
+    return 1;
+    
+}

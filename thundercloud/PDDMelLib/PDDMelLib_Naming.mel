@@ -1,0 +1,198 @@
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                              PDD MEL LIB NAMMING    PROC                                            //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              REMOVE INVALID CHARACTER FROM OBJECT NAME                              //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+global proc string PDD_removeInvalidCharactersFromName(string $name,string $replaceChar,int $debugFlag)
+{
+                
+            ////////// warning//
+            if ($name =="")
+            {
+                 if ($debugFlag == 1)warning "input name is NULL, ignored\n";
+                return "";
+            }
+            // this proc will remove all | character in object name and replace with _ , if | at the start of object in remove it 
+            
+                //print ("old name = "+$name +"\n");
+            //break up the name base on the character  of the string $invalidCharacterArray, edit this string to add more case of invalid character to be removed.
+            
+            string $invalidCharacters = "|¬!\"£$%^&*()+-/\~@?<>.,`=";   
+            
+            
+            string $newName="";
+            
+            
+            
+                  string $nameArrays[]= stringToStringArray ($name,$invalidCharacters);   //break up the original name into smaller string array base on the invalid character
+             
+                
+            
+                    $newName = stringArrayToString($nameArrays,$replaceChar);
+            
+            
+            
+                
+               // print ("new name = "+$newName+"\n");
+                
+                return $newName;
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              RETURN DAG NAME OF FIRST CURRENT SELECTED OBJECT  AS A STRING          //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+global proc string PDD_currentSelectionName(int $debugFlag) //return the DAG name of the first selected object as a string
+{
+            string $selection[] =`ls-sl`;
+            if ($selection[0] =="")
+                {
+                    if ($debugFlag == 1)warning "nothing selected, ignored \n";
+                    return "";
+                }
+        return $selection[0];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                            RETURN SHAPE NAME OF FIRST CURRENT SELECTED OBJECT  AS A STRING          //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+global proc string PDD_currentSelectionShapeName(int $debugFlag) //return the name Shape of the first selected object as a string
+{
+            string $object = PDD_currentSelectionName($debugFlag);
+            if ( `objectType $object` == "transform")
+            {
+                   string $shapeOfSelections[] = `listRelatives -s (PDD_currentSelectionName($debugFlag))`;
+
+                    if(size($shapeOfSelections)>1)
+                    {
+                        if ($debugFlag == 1) warning ("object"+$object+" has more than one child shape, return name of first child object instead \n");
+                    }
+                    
+                return $shapeOfSelections[0];
+            }
+            else
+            {
+                if ($object =="")
+                        {
+                           if ($debugFlag == 1) warning "nothing selected, ignored \n";
+                            return "";
+                        }
+                return $object;
+            }
+
+    
+    
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              RENAME OBJECT AND RETURN THE NEW VALID NAME                            //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+global proc string PDD_renameCurrentSelection(string $name,int$debugFlag)
+{
+    string $obj = PDD_currentSelectionName($debugFlag);
+    select $obj;
+    string $newName = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);    // replace any invalid character in the newname and replace with "_"
+    rename $newName;
+    
+    string $newNameObj = PDD_currentSelectionName($debugFlag);    //get the new name of object
+    return $newNameObj;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+// rename a group of object and return them as a string array 
+global proc string[] PDD_patchRename (string $name )
+{
+    
+    string $selections[] = `ls-sl`;
+    
+    string $newNameSelections[];
+    
+    for ($obj in $selections)
+    {
+        select $obj;
+        rename $name;
+        string $select[] = `ls-sl`;
+        $obj = `PDD_currentSelectionName(1)`;
+        appendStringArray($newNameSelections,$select,1);
+        
+    }
+    
+    select $newNameSelections;
+    return $newNameSelections;
+}
+
+
+
+
+

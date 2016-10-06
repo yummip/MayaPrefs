@@ -1,0 +1,82 @@
+#Break out game rig
+import maya.cmds as cmds
+
+rootGroup = cmds.ls(sl=1)
+
+#ENTER ROOT GAME-RIG GROUP
+#Import model and rig references
+for i in range(0,2):
+    refs = cmds.ls(type='reference')
+    for i in refs:
+        try:
+            rFile = cmds.referenceQuery(i, f=True)
+            cmds.file(rFile, importReference=True)
+        except:
+            pass
+
+#rootGroup = cmds.ls(sl=1)
+modelGroup = ['jacob_mesh'] # 
+
+
+for groups in rootGroup:
+    cmds.select(groups)
+    cmds.select(groups,hi=1,add=1)
+    cmds.select(groups,d=1)
+    
+    hierarchy = cmds.ls(sl=1)
+    jntList = []
+    otherList = []
+    
+    for obj in hierarchy:
+        if cmds.objectType(obj,i='joint'):
+            jntList.append(obj)
+        else:
+            otherList.append(obj)
+    
+    start = cmds.playbackOptions(q=1, minTime=1)
+    end = cmds.playbackOptions(q=1, maxTime=1)
+    
+    cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)
+    
+
+#find all non-joint items in rootGroup
+cmds.select(rootGroup[0],add=1,hi=1)
+hi = cmds.ls(sl=1)
+
+#get all joints items
+noChild = []
+for item in hi:
+    if cmds.objectType(item) == 'joint':
+        noChild.append(item)
+        
+#Drill up from joint and append all parents to keepList
+keepList = []
+incr = 0
+for item in noChild:
+    if cmds.objectType(item,i='joint'):
+        keepList.append(item)
+        print item
+        par = cmds.listRelatives(item,p=1)
+        while par != rootGroup:
+            print item,par,incr
+            keepList.append(par)
+            par = cmds.listRelatives(par,p=1)
+            incr += 1
+            if incr > 1000:
+                break
+
+#Delete everything under rootGroup that is not a joint, or a relative/parent of a joint
+for i in keepList:
+    cmds.select(i,d=1)
+
+cmds.select(rootGroup,d=1)
+cmds.delete()
+
+#Delete everything other than rootGroup and modelGroup
+cmds.select(ado = 1)
+cmds.select(rootGroup,modelGroup,d=1)
+cmds.delete()
+
+
+
+mel.eval('hyperShadePanelMenuCommand("hyperShadePanel1", "deleteUnusedNodes");')

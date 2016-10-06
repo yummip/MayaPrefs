@@ -1,0 +1,93 @@
+
+
+//==============================GMH2_GUIcreate_GMHStyleTable.mel======================
+//this is the main proc to create GMH2 UI main window. 
+
+global proc int create_GMHStyleTable(string $form_name,int $top, int $left)
+{    
+
+    int $ver_space = 10;
+    int $button_space = 20;
+    int $initialTop = $top;
+     makeText($form_name,"========================= GMH STYLE ================",$top,$left);
+            $top = $top + $ver_space+10;
+            
+/*============== GMH STYLE BUTTON ======================*/            
+            string $command = "createNameWindow (\"CreateNewGMHStyleWindow\",\"Create new GMH style\");";
+            makeButton("createGMHStyleButton",$form_name," Create GMH Style     ",$top,$left,$command); //CREATE GMH STYLE
+            $top = $top + $ver_space +$button_space ;
+                        
+            
+/*============== GMH PRESET BUTTON ======================*/            
+            string $command = "PDD_GMHPresetLoaderUILoader\"THUNDERCLOUD/GMH2/presetsLoader/presets/\";";
+            makeButton("applyPresetButton",$form_name," Apply Preset             ",$top,$left,$command); //CREATE GMH STYLE
+            $top = $top + $ver_space +$button_space ;
+            
+/*============== GMH SAVE PRESET BUTTON ======================*/            
+            string $command = "GMH2_SaveGMHPreset();";
+            makeButton("SavePresetButton",$form_name," Save Preset              ",$top,$left,$command); //CREATE GMH STYLE
+            $top = $top + $ver_space +$button_space ;
+                        
+                        
+                      
+/*============== RENAME GMH STYLE BUTTON ======================*/  
+            string $command = "createNameWindow (\"RenameGMHStyleWindow\",\"Rename GMH style\");";
+            makeButton("renameGMHStyleButton",$form_name," Rename GMH Style   ",$top,$left,$command);      // RENAME GMH STYLE     
+            $top = $top + $ver_space+$button_space ;
+            
+            
+            
+
+/*============== DELETE GMH STYLE BUTTON ======================*/                          
+            string $command = ("string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`; for ($obj in $GMHStyleSystem){deleteGMHStyleSystem($obj);};updateGUI(1);");
+            makeButton("deleteGMHStyleButton",$form_name," Delete GMH Style      ",$top,$left,$command); // UPDATE GMH STYLE
+            $top = $top + $ver_space+$button_space ;
+            
+
+/*============== UPDATE GMH STYLE BUTTON ======================*/              
+            string $command = ("updateGUI(1);");
+            makeButton("updateGMHStyleButton",$form_name," Update GUI               ",$top,$left,$command); // UPDATE GMH STYLE
+           // $top = $top + $ver_space+$button_space ;
+           
+            makeText($form_name,"      Current:",($top+5),130);
+            text -label "[ Please create/select a GMH Style ]" GMHStyleNameText;
+						 formLayout -edit
+				        		-attachForm GMHStyleNameText "top" ($top+5)
+				          		-attachForm GMHStyleNameText "left" ($left + 200)
+						 $form_name;
+						 
+            $top = $top + $ver_space+$button_space ;
+                makeText($form_name,"                                                                          advance edit                   ",($top+5),$left);
+            $top = $top + $ver_space+$button_space ;
+/*============== EDIT GMH STYLE BUTTON ======================*/  
+            //string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`; select$GMHStyleSystem[0]; string $PFXHair= NodeFromConnection(\"PFXHair\",\"out\");select $PFXHair; ";
+            string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`;select $GMHStyleSystem[0];";
+            makeButton("editGMHStyleDetailButton",$form_name," Edit   GMH Style        ",$top,($left),$command);      // EDIT GMH STYLE     
+           
+            
+  /*============== EDIT MAYA HAIR BUTTON ======================*/  
+            //string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`; select$GMHStyleSystem[0]; string $PFXHair= NodeFromConnection(\"PFXHair\",\"out\");select $PFXHair; ";
+            string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`;SelectHairSystemShape($GMHStyleSystem[0]);";
+            makeButton("editMayaHairButton",$form_name,"Select Maya Hair ",$top,($left+160),$command);      // EDIT GMH STYLE     
+
+            
+    /*============== EDIT BRUSH BUTTON ======================*/  
+            //string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`; select$GMHStyleSystem[0]; string $PFXHair= NodeFromConnection(\"PFXHair\",\"out\");select $PFXHair; ";
+            string $command = "string $GMHStyleSystem[] = `textScrollList -query -selectItem  GMHStyleList`;SelectBrushNode($GMHStyleSystem[0]);";
+            makeButton("editBrushButton",$form_name,"  Select Brush ",$top,($left+270),$command);      // EDIT GMH STYLE     
+            $top = $top + $ver_space+$button_space ;
+                     
+
+/*==============  GMH STYLE  SCROLL LIST ======================*/              
+            //GMH style Scroll list
+            int $config[]={250,150,($initialTop+20),(145),8};   //Width, heigh, top ,left, collumn        
+          string $singleClickCommand = "updateGUI(0);";              
+            string $doubleClickCommand = ("string $currentGMHStyle = `textScrollList -q -si \"GMHStyleList\"`; select $currentGMHStyle");
+            makeTextScrollList($form_name, "GMHStyleList",$singleClickCommand,$doubleClickCommand,$config);
+            textScrollList -e -ams 1 "GMHStyleList";
+            $top = $top   - 25;
+
+          
+	return $top;					 
+}
+

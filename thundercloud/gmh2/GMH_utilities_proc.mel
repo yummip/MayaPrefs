@@ -1,0 +1,146 @@
+// ======================GMH_utilities_proc.mel======================
+
+global proc string getMainGroup(string $obj)
+{
+    select $obj;
+                //if the object itself is main group then return main group 
+        		if ((`attributeExists "GMH_MainGroup" $obj`) == 1)
+        		{
+        		    return $obj;
+        		}
+        
+        
+        //get the shape
+        $obj = `PDD_currentSelectionShapeName(1)`;
+        string $maingroup;
+        
+                //check if there is a connection MainGroup 
+        		if ((`attributeExists "GMH_InMainGroup" $obj`) == 1)
+        		{
+        		//print ("finding mainGroup for"+$obj +"\n");
+        		select $obj;	
+        		$maingroup = PDD_NodeFromConnection ("GMH_InMainGroup","in",1);
+        		    if ($maingroup =="")
+        		    {
+        		        warning " No mainGroup found\n";
+        		    }
+        		}
+        		else
+        		{
+        		    warning"no MainGroup attributes exist \n";
+        		}
+                
+	
+        return $maingroup;
+
+}
+
+
+
+
+global proc SelectBrushNode(string $GMHHairSystem)
+{
+    //check the checkBox  
+    if (getAttr ($GMHHairSystem+".blackBox")==1)
+    {
+        setAttr ($GMHHairSystem+".blackBox") 0;
+    }
+    select $GMHHairSystem;
+    string $brush = PDD_NodeFromConnection("PFXStyle","out",1);
+    
+    if ($brush!="")
+    select $brush;
+}
+
+
+
+
+
+
+global proc SelectHairSystemShape(string $GMHHairSystem)
+{
+    //check the checkBox  
+    if (getAttr ($GMHHairSystem+".blackBox")==1)
+    {
+        setAttr ($GMHHairSystem+".blackBox") 0;
+    }
+    select $GMHHairSystem;
+    string $mayaHairSystem = PDD_NodeFromConnection("MayaHairSystem","out",1);
+    
+    if ($mayaHairSystem!="")
+    select $mayaHairSystem;
+}
+
+
+
+
+
+
+
+global proc int renameGMHSystem(string $GMHstyleSystem,string $name ) 
+{
+   
+   // check availability of the GMH Style System
+    if (!`attributeExists  "GMH_styleMainGroup" $GMHstyleSystem `)
+    {
+   
+            warning " no valid GMH Style System selected";
+            return 0;
+    }
+
+    int $oldBlackBoxAttr = getAttr ($GMHstyleSystem+".blackBox");
+    setAttr  ($GMHstyleSystem+".blackBox") 0;
+    //rename the GMHstyle Main Group
+    select $GMHstyleSystem;
+   rename  ($name + "_GMHStyleSystem");
+   $GMHstyleSystem= PDD_currentSelectionName(1);
+
+
+print ("rename GMHStyleSYstem =:" +$GMHstyleSystem +"\n");
+
+    //rename the Maya Hair System
+   select $GMHstyleSystem;
+   
+   string $mayaHairSystem = PDD_NodeFromConnection("MayaHairSystem","out",1);
+   select $mayaHairSystem;
+   pickWalk -d up;string $mayaHairSystemDAG = PDD_currentSelectionName(1);
+  $mayaHairSystemDAG =` rename $mayaHairSystemDAG ($name + "_MayaHairSystem") `;
+
+
+print "rename hair system \n";
+
+
+    //rename the pfxHair
+    select $GMHstyleSystem; 
+  select (PDD_NodeFromConnection("PFXHair","out",1));
+       pickWalk -d up;rename ($name + "_pfxHair");pickWalk -d down;
+
+print "rename pfxhair \n";
+
+    //rename BRUSH
+    select (PDD_NodeFromConnection("in_GMH_styleMainGroup","out",1)); // go to GMHStyleMaingroup
+    select (PDD_NodeFromConnection("PFXStyle","out",1)); //go to Brush
+    rename ($name + "_Brush");
+    
+    //rename stroke
+    select (PDD_NodesFromConnection("outBrush","out",1)); 
+    pickWalk -d up;
+    string $selections[] =`ls-sl`;
+    for ( $eachStroke in $selections) 
+    { 
+    select $eachStroke;
+    rename ($name + "_stroke");
+    
+    }
+   
+
+    
+    //rename the GMH surface Main Group 
+    select $GMHstyleSystem;
+    string $GMHSurfaceMainGroup = PDD_NodeFromConnection("GMH_OutMainGroupAsset","out",1);
+    select $GMHSurfaceMainGroup ;rename ($name + "_surfaceGrp");
+    
+    
+    setAttr  ($GMHstyleSystem+".blackBox") $oldBlackBoxAttr;
+    return 1;
+}

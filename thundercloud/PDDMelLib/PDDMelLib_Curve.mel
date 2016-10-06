@@ -1,0 +1,22 @@
+//====================PDDMelLib_Curve.mel============
+
+global proc int getLastCurveCV()
+{
+if ( `nodeType (PDD_currentSelectionName(1))`== "nurbsCurve")
+{
+    
+    pickWalk -d up;
+    
+}
+
+string $results;
+ selectCurveCV("last");
+string $name = `PDD_currentSelectionName(1)`;
+string $buffer[];
+tokenize (`PDD_currentSelectionName(1)`) "[*]" $buffer;
+$results = $buffer[1];
+
+int $return;
+$return = $results;
+return $return;
+}

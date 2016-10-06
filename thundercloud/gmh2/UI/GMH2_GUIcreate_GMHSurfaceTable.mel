@@ -1,0 +1,59 @@
+
+
+//==============================GMH2_GUIcreate_GMHSurfaceTable.mel======================
+//this is the main proc to create GMH2 UI main window. 
+
+global proc int create_GMHSurfaceTable(string $form_name,int $top, int $left)
+{    
+   $top = $top + 30;
+    int $ver_space = 10;
+    int $button_space = 20;
+    int $initialTop = $top;
+            makeText($form_name,"========================= GMH Surface ===============",$top,$left);
+            $top = $top + $ver_space+10;
+            
+ 
+/*============== APPLY GMH STYLE BUTTON ======================*/             
+            // APPLY GMH STYLE
+            string $command = ("string $GMHsystem[] =`textScrollList -query -selectItem  GMHStyleList`; if ($GMHsystem[0] == \"\"){ warning \"please select a GMH style system \\n\";}else"
+                              +"{ string $selections[] = `ls-sl`; for ($eachObj in $selections)" 
+                              +"{int $debugFlag = `checkBox -q -v \"debugCheckBox\"`;"
+                             + "select $eachObj; CreateGMHSurface($GMHsystem[0],$debugFlag);} select $selections;  updateGUI(0);   }");
+            //convert  surface              
+            makeButton("applyGMHSurface",$form_name,"      Apply GMHStyle        ",$top,$left,$command);
+            $top = $top + $ver_space +$button_space ;
+            
+            
+     /*============== APPLY SECONDARY GMH STYLE BUTTON ======================*/             
+            // APPLY GMH STYLE
+            string $command = ("string $GMHsystem[] =`textScrollList -query -selectItem  GMHStyleList`; if ($GMHsystem[0] == \"\"){ warning \"please select a GMH style system \\n\";}else"
+                              +"{ string $selections[] = `ls-sl`; for ($eachObj in $selections)" 
+                              +"{int $debugFlag = `checkBox -q -v \"debugCheckBox\"`;"
+                             + "select $eachObj; applySecondaryGMHHairSystem($eachObj,$GMHsystem[0],$debugFlag);} select $selections;  updateGUI(0);   }");
+            //convert  surface              
+            makeButton("applySecondaryGMHSurface",$form_name," Apply Second GMHStyle",$top,$left,$command);
+            $top = $top + $ver_space +$button_space ;       
+
+
+/*============== DELETE GMH SURFACE BUTTON ======================*/              
+            //delete surface      
+            string $command = ("string $selections[] = `ls-sl`; for ($eachObj in $selections){select $eachObj;string $mainGroup = getMainGroup(PDD_currentSelectionName(1));deleteGMHMainGroup($mainGroup);} updateGUI(0)");
+            makeButton("deleteGMHSurface",$form_name,"   Delete GMH Surface    ",$top,$left,$command);
+
+
+/*============== SCROLL LIST GMH SURFACE  ======================*/  
+            //GMH SURFACE Scroll list
+            int $scrollListHeight = 240;
+            int $scrollListTop = ($initialTop+20);
+            int $config[]={250,$scrollListHeight,$scrollListTop,(145),8}; //Width, heigh, top ,left, collumn
+            string $singleClickCommand = ("string $GMHSurface[] =  (`textScrollList -query -selectItem  GMHSurfaceList`);"
+                                        +
+                                         "select $GMHSurface;updateGUI(0)");
+                                         
+                                         
+            makeTextScrollList($form_name, "GMHSurfaceList",$singleClickCommand,"print\"DoubleClick Command\";",$config);
+            
+            $top = $scrollListTop +$scrollListHeight+$button_space;
+            return $top;				 
+}
+

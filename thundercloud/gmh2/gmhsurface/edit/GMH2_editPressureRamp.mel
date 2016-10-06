@@ -1,0 +1,21 @@
+global proc int GMH2_editPressureRampGMHSurface()
+{
+    string $obj = PDD_currentSelectionName(1);
+    if ($obj =="")
+    {
+            warning "Please select a GMH Surface \n";
+    return 0;
+    }
+string $mainGroup = getMainGroup(PDD_currentSelectionName(1));
+if ( $mainGroup =="")
+{
+    warning "Please select a GMH Surface \n";
+    return 0;
+    
+}
+select $mainGroup;
+string $stroke = PDD_NodeFromConnection("GMH_outStrokes","out",1);
+editRampAttribute ($stroke+".pressureScale");
+select $obj;
+return 1;
+}

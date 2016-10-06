@@ -1,0 +1,141 @@
+
+
+global proc GMH_display(string $main_group)
+{
+			
+			// find groups			
+	select $main_group;
+	string $subDSurface  = PDD_NodeFromConnection ("GMH_outSubDSurfaceShape","out",0);
+	select $main_group;
+	string $NURBSurface = PDD_NodeFromConnection ("GMH_outNURBSurfaceShape","out",0);
+	select $main_group;
+	string $LeadingCurve[] = PDD_NodesFromConnection ("GMH_outLeadingCurves","out",0);
+	select $main_group;
+	string $GrowinggCurve[] = PDD_NodesFromConnection ("GMH_outGrowingCurves","out",0);
+	select $main_group;
+	string $Strokes = PDD_NodeFromConnection ("GMH_outStrokes","out",0);
+	select $main_group;
+	string $OutputCurves[] = PDD_NodesFromConnection ("GMH_OutputCurves","out",0);
+	select $main_group;
+	string $folliclesCurve[] = PDD_NodesFromConnection ("GMH_StrokesCurves","out",0);
+	select $main_group;
+	string $baseSurfaceShape = PDD_NodeFromConnection ("GMH_outPolySurfaceShape","out",0);
+    string $follicles[]= PDD_NodesFromConnection("GMH_Follicles","out",1);
+	// set base surface display state
+	select $baseSurfaceShape;
+	setAttr ($baseSurfaceShape+".overrideEnabled") 1;				// set MESH SURFACE become wire
+	setAttr ($baseSurfaceShape+".overrideShading") 0;
+    setAttr ($baseSurfaceShape+".castsShadows") 0;
+    setAttr ($baseSurfaceShape+".receiveShadows") 0;
+    setAttr ($baseSurfaceShape+".motionBlur") 0;
+    setAttr ($baseSurfaceShape+".primaryVisibility") 0;
+    setAttr ($baseSurfaceShape+".smoothShading") 0;
+    setAttr ($baseSurfaceShape+".visibleInReflections") 0;
+    setAttr ($baseSurfaceShape+".visibleInRefractions") 0;
+    setAttr ($baseSurfaceShape+".doubleSided") 0;
+
+
+
+
+
+    select $Strokes;
+    setAttr ($Strokes+".overrideEnabled") 1;
+    setAttr ($Strokes+".overrideDisplayType") 2;
+
+
+
+	select $subDSurface;
+	setAttr ($subDSurface+".visibility") 0;					// hide SUBD surface
+	
+
+
+	select $NURBSurface;
+	setAttr ($NURBSurface+".visibility") 0;					// hide NURB surface
+	
+	
+    select $Strokes;                                        //Freeze stroke
+    setAttr ($Strokes+".overrideEnabled") 1;
+    setAttr ($Strokes+".overrideDisplayType") 2;
+    
+    
+    
+    
+    
+    
+    // HIDE all : 
+  //  select -hierarchy $main_group;
+    //hide;
+    
+    
+        //Add display toggle attr for maingroup
+    select $main_group;
+    
+		    PDD_addUserAttribute("outputCurves",0,0,1,0);
+		    PDD_addUserAttribute("GMH_PFXGuideCurves",0,0,1,0);
+		    PDD_addUserAttribute("GMH_folliclesCurves",0,0,1,0);
+	
+	
+	
+                select $LeadingCurve;
+                select -add $GrowinggCurve;   
+                //connect Curves display setting to Main group toogle display attr
+                
+                // PFX guide curves
+                string $PFXGuideCurves[] = `ls-sl`;
+                for ( $eachCurve in $PFXGuideCurves)
+                {
+                    connectAttr ($main_group+".GMH_PFXGuideCurves") ($eachCurve+".visibility");
+                }
+
+
+                // maya Hair output Curve
+                for ( $eachCurve in $OutputCurves)
+                {
+                    if (`objectType $eachCurve`=="nurbsCurve")
+                   { connectAttr ($main_group+".outputCurves") ($eachCurve+".visibility");}
+                   
+                }
+
+                //follicles
+                for ( $eachCurve in $follicles)
+                {
+                    
+                        // set follicle transform Node as template
+                      
+                        setAttr ($eachCurve+".overrideEnabled") 1;
+                        setAttr ($eachCurve+".overrideDisplayType") 1;
+                    
+                    
+                }
+                for ( $eachCurve in $folliclesCurve)
+                {
+                     if (`objectType $eachCurve`=="nurbsCurve")
+                    {
+                        
+                        
+                        connectAttr ($main_group+".GMH_folliclesCurves") ($eachCurve+".visibility");
+                        setAttr ($eachCurve+".overrideEnabled") 1;
+                        setAttr ($eachCurve+".overrideColor") 22;
+                        
+                        }
+                }
+    // SET COLOR OVERIDE BASED ON SIMULATION STATE 
+    int $staticColorIndex = 11;
+     int $passiveColorIndex = 24;
+      int $dynamicColorIndex = 7;
+      
+      select $baseSurfaceShape;
+      if ( PDD_NodeFromConnection("overrideColor","in",1)== "")
+      {
+    expression -s ("if ("+$baseSurfaceShape+".SimulationType == 0)\n{\n"+$baseSurfaceShape+".overrideColor ="+$staticColorIndex +";}"
+                  +"if ("+$baseSurfaceShape+".SimulationType == 1)\n{\n"+$baseSurfaceShape+".overrideColor ="+$passiveColorIndex +";}"
+                  +"if ("+$baseSurfaceShape+".SimulationType == 2)\n{\n"+$baseSurfaceShape+".overrideColor ="+$dynamicColorIndex +";}") 
+                  -o "" -ae 1 -uc all ;
+        }
+//select $NURBSurface;
+
+//GMH_AssignShader();
+
+
+
+}

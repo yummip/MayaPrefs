@@ -1,0 +1,33 @@
+//=================GMH2_convertToFolicle.mel=============
+
+global proc string[] GMH_convertToFolicles(string $surface)
+{
+    string $follicles[];
+    string $surfaceShapes[] = `listRelatives -s $surface`;
+    if ((`attributeExists "GMH_Clump_Width_Mul" $surfaceShapes[0]`) == 1)  // if surface has valid GMH attributes then track to its conntected follicles
+    {
+        select $surfaceShapes[0];
+        $follicles = PDD_NodesFromConnection("GMH_Clump_Width_Mul","out",1);
+        return $follicles;
+    }
+    
+    
+    return $follicles;
+}
+
+global proc string[] GMH_UI_convertToFolicles()
+{
+    string $surfaces[] = `ls-sl`;
+    string $foliclesLists[];clear($foliclesLists);
+    
+    for ( $eachSurface in $surfaces)
+    {
+        string $tmp[] = GMH_convertToFolicles($eachSurface);
+        
+         appendStringArray($foliclesLists, $tmp, size($tmp));
+    }
+    
+    select $foliclesLists;
+    return $foliclesLists;
+    
+}

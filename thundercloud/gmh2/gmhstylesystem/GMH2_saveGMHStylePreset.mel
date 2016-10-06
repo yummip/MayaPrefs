@@ -1,0 +1,18 @@
+//============================GMH2_saveGMHStylePreset.mel==================
+
+source "PDDMelLib/PDDMelLib_header.mel";
+
+global proc int saveGMHStylePreset(string $GMHHairSystem,int $debugFlag)
+{
+
+
+
+return 1;  
+}
+
+string $GMHHairSystem = "A_GMHHairSystem";
+int $debugFlag = 1;
+saveGMHStylePreset($GMHHairSystem,$debugFlag)
+
+
+

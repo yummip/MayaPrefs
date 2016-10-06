@@ -1,0 +1,191 @@
+//=================================GMH_ConvertPFXCurvesToMayaHair.mel ==================
+
+global proc string[] ConvertPFXCurvesToMayaHair(string $mainGroup,string $curves[],string $MayaHairSystem,int $debugFlag)
+{
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: get mainGroup");
+            /*======================= get mainGroup ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+   string $folliclesGroup[];
+   string $outputCurves[];
+   //get main group
+   //string $mainGroup = getMainGroup(PDD_currentSelectionName($debugFlag)); 
+   select $mainGroup;
+
+   //get PFX curves group
+   string $PFXCurvesGroup[] = PDD_NodesFromConnection("GMH_StrokesCurves","out",$debugFlag);
+   
+   select $PFXCurvesGroup;
+   
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: assign hairSystem");
+            /*======================= assign hairSystem ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+   
+   //ASIGN HAIR SYSTEM TO PFXSTROKE CURVES GROUP
+   assignHairSystem $MayaHairSystem;
+
+               
+   //get PFX curves group after asigning Hair system
+   select $mainGroup;
+   $PFXCurvesGroup = PDD_NodesFromConnection("GMH_StrokesCurves","out",$debugFlag);
+
+
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: connect attributes");
+            /*======================= connect attributes ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+   //connect follicles and outputCurves to main Group
+   for ( $eachCurves in $PFXCurvesGroup)
+   {
+       string $eachFollicle;
+        string $mayaVer = `about -version`;
+        string $tmp[];
+        tokenize ($mayaVer,$tmp);
+        int $version = $tmp[0];
+        if ($version <=2012)
+        {
+           select $eachCurves;
+           $eachFollicle = PDD_NodeFromConnection("worldSpace","out",$debugFlag);
+           
+        }
+        else
+        {
+           select $eachCurves;
+           $eachFollicle = PDD_NodeFromConnection("local","out",$debugFlag);
+        }
+       //FOLLICLES
+
+       select $eachFollicle;
+	    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+       PDD_ConnectAttribute($mainGroup,"GMH_Follicles",$eachFollicle,"GMH_InMainGroup",$debugFlag);
+       //set rest post of follicle to "start curve"
+       
+        setAttr ($eachFollicle+".restPose") 1;
+        setAttr ($eachFollicle+".degree") 1;
+       //OUTPUT CURVES
+       select $eachFollicle;
+       string $outputCurve = PDD_NodeFromConnection("outCurve","out",$debugFlag);
+       select $outputCurve;
+		    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+       PDD_ConnectAttribute($mainGroup,"GMH_OutputCurves",$outputCurve,"GMH_InMainGroup",$debugFlag);
+       
+   }
+   
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: organize");
+            /*======================= organize ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+   //GET THE OUTPUTCURVES GROUP AND DELETE Extra Follicle Group
+           //get main Group
+           select $mainGroup;
+           $outputCurves = PDD_NodesFromConnection("GMH_OutputCurves","out",$debugFlag);
+        
+            //get output Curves
+           select $outputCurves;
+           pickWalk -d up; //curve shape level
+           pickWalk -d up; //Parent level
+           string $outputCurvesParent = PDD_currentSelectionName($debugFlag);
+           
+           //connect outputCurves Parent to Main group
+		    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+           PDD_ConnectAttribute($mainGroup,"GMH_OutputCurvesGroup",$outputCurvesParent,"GMH_InMainGroup",$debugFlag);
+          
+          //delete the unused follicle group
+          
+          
+                  //get the mutual name bettwen follicle and outputcurves group
+                  string $mutualOutputCurvesName = substituteAllString($outputCurvesParent, "OutputCurves", "Follicles");
+                  
+                  
+                  //delete all the mutual name group with * increment
+                  string $allNullGroups[]=`ls-tr`;
+                  for ($eachnode in $allNullGroups)
+                  {
+                      if(`gmatch $eachnode ($mutualOutputCurvesName+"*")`==1)
+                      {
+                          delete $eachnode;
+                      }
+                  }
+                  
+
+
+      
+       //RENAME OUTPUTCURVE PARENT GROUP
+         
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: rename");
+            /*======================= rename ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+               //get polysurface nice name
+               select $mainGroup;
+               string $baseSurfaceShape = PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",$debugFlag);
+               select $baseSurfaceShape;
+               pickWalk -d up;
+               string $name = PDD_currentSelectionName($debugFlag);
+            $name = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+           
+               //rename
+               select $outputCurvesParent;
+               $outputCurvesParent = PDD_renameCurrentSelection(($name+"_OutputCurves_null"),$debugFlag);
+           
+       
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,"","PFXCurveToMayaHair: PARENTING");
+            /*======================= PARENTING ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+
+       //parent outputCurves Parent under Main Group
+       select $outputCurvesParent;
+       select -add $mainGroup;
+       parent;
+       
+       
+       //get new name for $outputCurves and return it
+       select $mainGroup;
+       string $follicles[] = PDD_NodesFromConnection("GMH_Follicles","out",$debugFlag);
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,$follicles[0],"PFXCurveToMayaHair: get follicles list");
+            /*======================= get follicles list ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+       select $mainGroup;
+        string $baseSurfaceShape = PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",$debugFlag);
+        
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,$baseSurfaceShape,"PFXCurveToMayaHair: connect Follicles attributes to poly surface");
+            /*======================= connect Follicles attributes to poly surface ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+        for ( $eachFollicle in $follicles)
+        {
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Hair_Num_Per_Clump_Mul",$eachFollicle,"densityMult",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Clump_Width_Mul",$eachFollicle,"clumpWidthMult",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Overide_Hair_Color",$eachFollicle,"colorBlend",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Hair_Color_R",$eachFollicle,"colorR",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Hair_Color_G",$eachFollicle,"colorG",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Hair_Color_B",$eachFollicle,"colorB",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Curl_Mult",$eachFollicle,"curlMult",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"GMH_Braid",$eachFollicle,"braid",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"FolliclesLockType",$eachFollicle,"pointLock",$debugFlag);
+        PDD_ConnectAttribute($baseSurfaceShape,"SimulationType",$eachFollicle,"simulationMethod",$debugFlag);
+        
+        }
+          //setup Follicle Curl mult with hair System curl and Base surface Curl mult
+       // expression -s ($eachFollicle+ ".curlMult = "+$MayaHairSystem+".curl * "+$baseSurfaceShape+".GMH_Curl_Mult")  -o $eachFollicle -ae 1 -uc all ;
+        
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+                                               PDD_debug($debugFlag,$baseSurfaceShape,"PFXCurveToMayaHair: DONE");
+            /*======================= DONE ======================*/ 
+            //////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+      // select $outputCurves;
+return $follicles;
+}

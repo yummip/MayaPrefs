@@ -1,0 +1,73 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                              PDD MEL LIB ATTRIBUTES PROC                                            //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                     //
+//                                                                                                     //
+//                              ADD a float ATTRIBUTE to current Selected object                       //
+//                                                                                                     //
+//                                                                                                     //
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+global proc PDD_addUserAttribute(string $name,float $value, float $minValue, float $Maxvalue,int $warningFlag)
+{
+
+	string $obj = `PDD_currentSelectionName($warningFlag)`;
+	
+	if ((`attributeExists $name $obj`) == 0)
+		{
+			addAttr -ln $name -at double  -min $minValue -max $Maxvalue -dv $value -hsn 1 -smx 1;
+			setAttr -e-keyable true (`PDD_currentSelectionName($warningFlag)`+"."+ $name);
+		}
+	else
+		{
+			if($warningFlag ==1)warning ($obj+" already had attribute name: "+$name+" set the attribute value to "+ $value +" instead \n");
+
+             setAttr -l false ($obj+"."+$name);
+			//setAttr ($obj+"."+$name) $value;
+
+		}	
+}
+
+
+global proc int getNextAvailableIndexOfMultiAttr(string $object,string $attr ) 
+{
+    int $index = 0;
+int $lock = 0;
+while ($lock ==0)
+{
+string $results[] = `listConnections -d on -s on ($object+"."+$attr+"["+$index+"]")`;
+    if (size($results)==0)
+    {
+        $lock = 1;
+    }
+    else
+    {
+        $index ++;
+    }
+}
+ return $index;   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

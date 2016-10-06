@@ -1,0 +1,62 @@
+// =================GMH2_GMHSurfaceAttributeReset.mel==================
+
+
+global proc string GMH2_GMHSurfaceAttributeReset(string $surface,int $debugFlag) 
+{
+
+// list of attribute that need to rebuild the GMH surface when change
+                                               PDD_debug($debugFlag,"","check available of the surface");
+    //CHECK : if surface does not have a GMH mainGroup hence not a valid GMH surfac
+    
+    string $mainGroup = getMainGroup($surface);                                 
+    if ( $mainGroup =="")        
+    {
+        warning ("object: \""+$surface+"\" is not a valid GMH surface, ignored \n"); 
+        return ""; 
+    }
+    
+                                               PDD_debug($debugFlag,$surface,"surface check passed ");
+                                               PDD_debug($debugFlag,"","checking GMH Style Main Group ");
+                                               
+                                            
+    //CHECK : if surface have a GMHstyle associated with it 
+    select $mainGroup;   
+    string $GMHStyleMainGroup = PDD_NodeFromConnection("GMH_StyleMainGroupIn","out",$debugFlag);                           
+        if ( $GMHStyleMainGroup =="")        
+    {
+        warning ("object: \""+$surface+"\" does not have a valid GMH Style assigned to it, ignored \n"); 
+        return ""; 
+    }
+    select $GMHStyleMainGroup;
+                                               PDD_debug($debugFlag,"","GMHStyle check passed ");
+                                                    
+           
+    select $mainGroup;
+    string $surface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","in",1);
+    
+           select $surface;
+           string $surfaceShape = PDD_currentSelectionShapeName(1); 
+                        
+        setAttr ($surfaceShape + ".GMH_Hair_Num_Per_Clump_Mul") 1; 
+        setAttr ($surfaceShape + ".GMH_Clump_Width_Mul") 1; 
+        setAttr ($surfaceShape + ".GMH_Clump_Per_Edge_loop") 1; 
+        setAttr ($surfaceShape + ".GMH_Overide_Hair_Color") 0; 
+        setAttr ($surfaceShape + ".GMH_Hair_Color_R") 0; 
+        setAttr ($surfaceShape + ".GMH_Hair_Color_G") 0; 
+        setAttr ($surfaceShape + ".GMH_Hair_Color_B") 0; 
+        setAttr ($surfaceShape + ".GMH_Curl_Mult") 0; 
+        setAttr ($surfaceShape + ".GMH_Braid") 0; 
+
+         
+    //rebuild the GMH surface to update the new attribute value , depend on which attributes is set to change
+ 
+        select $surface;
+        CreateGMHSurface($GMHStyleMainGroup,$debugFlag);
+
+                                                    
+                                                    
+                                                    
+return $surface;
+
+}
+

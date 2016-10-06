@@ -1,0 +1,36 @@
+//===========================GMH2_setGMHSurfaceSimulationState.mel===============
+
+//create a universal GMHStyleSystem to assign GMH hair to meshes.
+global proc GMH2_setGMHSurfaceSimulationState(string $state)
+{
+    
+    string $GMHSurface[];
+    string $selections[] = `ls-sl`;
+    for ( $obj in $selections ) 
+    {
+        select $obj;string $objShape = PDD_currentSelectionShapeName(1); 
+        if ( `attributeExists "GMH_baseMesh" $objShape`)
+        {
+		//setAttr ($objShape+".overrideDynamics") 1;
+            if ($state =="dynamic")
+            {
+                setAttr ($objShape+".SimulationType") 2;
+            }
+            
+                        if ($state =="passive")
+            {
+                setAttr ($objShape+".SimulationType") 1;
+            }
+            
+                        if ($state =="static")
+            {
+                setAttr ($objShape+".SimulationType") 0;
+            }
+             string $tmps[]; $tmps[0] = $obj; appendStringArray ($GMHSurface,$tmps,1);
+        }
+          
+    }
+    
+    
+    select $GMHSurface;
+}

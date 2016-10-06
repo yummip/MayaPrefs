@@ -1,0 +1,130 @@
+//=======================GMH_baseMeshToNURB.mel================
+//MeshToNurb
+global proc string GMH_baseMeshToNURB(string $mainGroup,string $baseMeshShape,int $debugFlag)
+{
+        string $objName;                                        // create holder for GMH name
+			string $subDSurfaceShape;							// create holder for surfaces
+			string $NURBSurfaceShape;							// create holder for surfaces
+	
+
+                                               PDD_debug($debugFlag,"","getting Base mesh name ");
+            /*======================= getting Base mesh name ======================*/  
+			
+		select $baseMeshShape;
+		if (PDD_isCurrentSelection("transform") != 1) 
+		{
+		pickWalk -d up;
+		$objName =PDD_currentSelectionName($debugFlag);
+		pickWalk -d down;
+		}
+
+			
+		select $baseMeshShape;
+		if (PDD_isCurrentSelection("transform") == 1) 
+		{
+		$baseMeshShape = PDD_currentSelectionShapeName($debugFlag);
+		}
+	
+
+
+
+
+		
+		
+		
+
+                                               PDD_debug($debugFlag,"","adding/connect GMH Primary attrs to GMH base Mesh");
+            /*======================= adding GMH Primary attrs to GMH base Mesh ======================*/  
+            
+            
+		    select $baseMeshShape;
+		    PDD_addUserAttribute("GMH_baseMesh",1,0,1,0);
+		    
+		    if (`attributeExists "GMH_InMainGroup" $baseMeshShape`==0)
+            addAttr -ln "GMH_InMainGroup"  -at double $baseMeshShape ;
+		   // PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+			
+			setAttr -keyable false -channelBox false ($baseMeshShape+".GMH_InMainGroup"); //hide GMH_InMainGroup attribute
+            setAttr -keyable false -channelBox false ($baseMeshShape+".GMH_baseMesh"); //hide GMH_baseMesh attribute
+			
+
+		
+            
+
+
+
+
+                                               PDD_debug($debugFlag,"","base mesh to SUBD");
+            /*======================= base mesh to SUBD ======================*/  
+
+												// SUBD SURFACE
+			polyToSubdiv -mpc 100000;  	 					//convert to SUBD
+			
+            string $name = $objName;
+            $name = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+
+			rename ($name+"_GMHSurface_GMH_SUBD_Surface");						//rename
+			pickWalk -d down;				
+		    PDD_addUserAttribute("GMH_baseMesh",2,0,1,0);//add attribute GMH base mesh 1 = polygon 2 = SubD 3 = NURB
+			$subDSurfaceShape= PDD_currentSelectionShapeName($debugFlag);					// get the subD surface name
+		    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+
+
+
+
+                                               PDD_debug($debugFlag,"","SUBD to NURB");
+            /*======================= SUBD to NURB ======================*/  
+												// NURBS SURFACE
+			subdToNurbs -ch on  -aut on  -ot 0;					//Convert to NURBS
+			string $name = $objName;
+            $name = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+			rename ($name+"_GMHSurface_GMH_NURB_Surface");						//rename
+			pickWalk -d down;
+			pickWalk -d down;
+			$NURBSurfaceShape = PDD_currentSelectionShapeName($debugFlag);				// get the NURB surface name
+			
+		    PDD_addUserAttribute("GMH_baseMesh",3,0,1,0);
+		    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+
+
+
+			
+												//MAIN GROUP
+
+                                               PDD_debug($debugFlag,"","connect surfaces to GMHmainGroup");
+            /*======================= connect converted surface to GMHmainGroup ======================*/  
+            
+
+
+			connectAttr -f ($mainGroup+".GMH_outPolySurfaceShape") ($baseMeshShape+".GMH_InMainGroup");		//connect main group to SUBD surface
+			connectAttr -f ($mainGroup+".GMH_outSubDSurfaceShape") ($subDSurfaceShape+".GMH_InMainGroup");		//connect main group to SUBD surface
+			connectAttr -f ($mainGroup+".GMH_outNURBSurfaceShape") ($NURBSurfaceShape+".GMH_InMainGroup");		//connect main group to NURB surface
+
+
+
+
+			select $subDSurfaceShape;pickWalk - d up ;
+
+
+
+
+            /*======================= organize ======================*/  
+			select -add $mainGroup; parent ;
+			////print "done \n";
+
+			
+			
+
+
+
+			
+			
+			
+			
+			//preserve selection
+			select $NURBSurfaceShape;
+			
+			return $NURBSurfaceShape;
+
+}
+

@@ -1,0 +1,1211 @@
+global proc shelf_Awesome () {
+    global string $gBuffStr;
+    global string $gBuffStr0;
+    global string $gBuffStr1;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal sphere on the grid" 
+        -enableBackground 0
+        -align "center" 
+        -label "Sphere" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polySphere.png" 
+        -image1 "polySphere.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polySphere -r 1 -sx 20 -sy 20 -ax 0 1 0 -cuv 2 -ch 1; objectMoveCommand;" 
+        -sourceType "mel" 
+        -doubleClickCommand "CreatePolygonSphereOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal cube on the grid" 
+        -enableBackground 0
+        -align "center" 
+        -label "Cube" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyCube.png" 
+        -image1 "polyCube.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyCube -w 1 -h 1 -d 1 -sx 1 -sy 1 -sz 1 -ax 0 1 0 -cuv 4 -ch 1; objectMoveCommand;" 
+        -sourceType "mel" 
+        -doubleClickCommand "CreatePolygonCubeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal cylinder on the grid" 
+        -enableBackground 0
+        -align "center" 
+        -label "Cylinder" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyCylinder.png" 
+        -image1 "polyCylinder.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyCylinder -r 1 -h 2 -sx 20 -sy 1 -sz 1 -ax 0 1 0 -rcp 0 -cuv 3 -ch 1; objectMoveCommand;" 
+        -sourceType "mel" 
+        -doubleClickCommand "CreatePolygonCylinderOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal pipe on the grid" 
+        -enableBackground 0
+        -align "center" 
+        -label "Pipe" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyPipe.png" 
+        -image1 "polyPipe.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyPipe -r 1 -h 2 -t 0.5 -sa 20 -sh 1 -sc 0 -ax 0 1 0 -cuv 1 -rcp 0 -ch 1; objectMoveCommand;" 
+        -sourceType "mel" 
+        -doubleClickCommand "CreatePolygonPipeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a polygonal plane on the grid" 
+        -enableBackground 0
+        -align "center" 
+        -label "Plane" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyMesh.png" 
+        -image1 "polyMesh.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyPlane -w 1 -h 1 -sx 10 -sy 10 -ax 0 1 0 -cuv 2 -ch 1; objectMoveCommand;" 
+        -sourceType "mel" 
+        -doubleClickCommand "CreatePolygonPlaneOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Split selected edge ring" 
+        -enableBackground 0
+        -align "center" 
+        -label "Insert Edge Loop Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polySplitEdgeRing.png" 
+        -image1 "polySplitEdgeRing.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "SplitEdgeRingTool" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Extrude the selected component" 
+        -enableBackground 0
+        -align "center" 
+        -label "Extrude" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyExtrudeFacet.png" 
+        -image1 "polyExtrudeFacet.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyExtrude 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "PolyExtrudeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a bridge between two sets of edges or faces " 
+        -enableBackground 0
+        -align "center" 
+        -label "Bridge" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyBridge.png" 
+        -image1 "polyBridge.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyBridgeEdge 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "BridgeEdgeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Interactively select and merge vertices" 
+        -enableBackground 0
+        -align "center" 
+        -label "Merge Vertex Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyMergeVertex.png" 
+        -image1 "polyMergeVertex.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "MergeVertexTool" 
+        -sourceType "mel" 
+        -doubleClickCommand "MergeVertexToolOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Merge vertices / border edges based on selection" 
+        -enableBackground 0
+        -align "center" 
+        -label "Merge" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyMerge.png" 
+        -image1 "polyMerge.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyMerge 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "PolyMergeOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a curve on the grid or live surface specifying control vertices" 
+        -enableBackground 0
+        -align "center" 
+        -label "CV Curve Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "curveCV.png" 
+        -image1 "curveCV.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "CVCurveTool" 
+        -sourceType "mel" 
+        -doubleClickCommand "CVCurveToolOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "polyPerformAction polyUnite o 0;\nCenterPivot;" 
+        -enableBackground 0
+        -align "center" 
+        -label "polyPerformAction polyUnite o 0;\nCenterPivot;" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "COM" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "commandButton.png" 
+        -image1 "commandButton.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyPerformAction polyUnite o 0;\nCenterPivot;" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\n\nlist = []\nobject = cmds.ls(sl=True)\nlist.append(object)\ncmds.SeparatePolygon()\nfor i in range(len(list)):\n    cmds.CenterPivot(list[i])\n    " 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\nlist = []\nobject = cmds.ls(sl=True)\nli..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "SEP" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\nlist = []\nobject = cmds.ls(sl=True)\nlist.append(object)\ncmds.SeparatePolygon()\nfor i in range(len(list)):\n    cmds.CenterPivot(list[i])\n    " 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a face filling the hole around the selected border edge(s)" 
+        -enableBackground 0
+        -align "center" 
+        -label "Fill Hole" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyCloseBorder.png" 
+        -image1 "polyCloseBorder.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "FillHole" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Create a bevel along the selected edges" 
+        -enableBackground 0
+        -align "center" 
+        -label "Bevel" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyBevel.png" 
+        -image1 "polyBevel.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "polyPerformAction \"polyBevel -offset 0.05 -offsetAsFraction 1 -autoFit 1 -segments 1 -worldSpace 1 -uvAssignment 1 -fillNgons 1 -mergeVertices 1 -mergeVertexTolerance 0.0001 -smoothingAngle 30 -miteringAngle 180 -angleTolerance 180\" e 0" 
+        -sourceType "mel" 
+        -doubleClickCommand "BevelPolygonOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select border edges to append a face to the selected shell" 
+        -enableBackground 0
+        -align "center" 
+        -label "Append to Polygon Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyAppendFacet.png" 
+        -image1 "polyAppendFacet.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "setToolTo polyAppendFacetContext ; polyAppendFacetCtx -e -pc `optionVar -q polyKeepFacetsPlanar` polyAppendFacetContext" 
+        -sourceType "mel" 
+        -doubleClickCommand "setToolTo polyAppendFacetContext ; polyAppendFacetCtx -e -pc `optionVar -q polyKeepFacetsPlanar` polyAppendFacetContext; toolPropertyWindow" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Delete the selected Vertices / Edges" 
+        -enableBackground 0
+        -align "center" 
+        -label "Delete Edge/Vertex" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polyDelEdgeVertex.png" 
+        -image1 "polyDelEdgeVertex.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "performPolyDeleteElements" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Sculpt geometry tool options" 
+        -enableBackground 0
+        -align "center" 
+        -label "menuItem489" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "putty.png" 
+        -image1 "putty.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "SculptGeometryToolOptions" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select a point on an edge to start cutting the face" 
+        -enableBackground 0
+        -align "center" 
+        -label "Interactive Split Tool" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "polySplitFacet.png" 
+        -image1 "polySplitFacet.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "InteractiveSplitTool" 
+        -sourceType "mel" 
+        -doubleClickCommand "InteractiveSplitToolOptions" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 39
+        -height 39
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Fixes render issue error" 
+        -enableBackground 0
+        -align "center" 
+        -label "Render Fixer" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "RENFIX" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "C:/Users/pcworld/Documents/icon test.png" 
+        -image1 "C:/Users/pcworld/Documents/icon test.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "$exists=0;\n for ($item in `getPanel -scriptType \"renderWindowPanel\"`) {\n        if ( $item == \"renderView\" ) {\n                print \"renderView exists.\\n\";\n                $exists=1;\n        }\n }\n if ( $exists == 0 ) {\n        for ($item in `getPanel -scriptType \"renderWindowPanel\"`) {\n                //print ( $item + \"\\n\");\n                if ( $item == \"renderWindowPanel1\" ) {\n                deleteUI renderWindowPanel1;\n                $renderPanel = `scriptedPanel -type \"renderWindowPanel\" -unParent renderView`;\n                scriptedPanel -e -label `interToUI $renderPanel` $renderPanel;\n                }\n        }\n } " 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select an object(s)" 
+        -enableBackground 0
+        -align "center" 
+        -label "Center Pivot" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "CP" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "menuIconModify.png" 
+        -image1 "menuIconModify.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "CenterPivot" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\nimport random\n\ndef disperse():\n    #setting values to sliders.\n    xmax = cmds.intSliderGrp('fieldname_xmax',q=1,v=1)\n    ymax = cmds.intSliderGrp('fieldname_ymax',q=1,v=1)\n    zmax = cmds.intSliderGrp('fieldname_zmax',q=1,v=1)\n    global randchk\n    randchk = cmds.checkBoxGrp(randchkbx, query = True, value1 = True)\n    #error window\n    objectlist = cmds.ls(selection=True)\n    if objectlist == []:\n        if cmds.window('Nolisterror4', exists = True):\n            cmds.deleteUI('Nolisterror4')\n        _error = cmds.window('Nolisterror4',t='Error',w=10,h=100,sizeable=False)\n        cmds.columnLayout(columnAlign=('center'), columnAttach=('both', 0), columnWidth=(230))\n        cmds.text('Please select objects you want to randomly')\n        cmds.text('disperse before dispersing')\n        cmds.button(l='Ok',command='cmds.deleteUI(_error)')\n        cmds.showWindow(_error)\n    #disperison code\n    for i in range(0,len(objectlist)):\n        if randchk == True:\n            cmds.xform(objectlist[i],t=[random.randint(0,xmax),random.randint(0,ymax),random.randint(0,zmax)],ws=True)\n        if randchk == False:\n            cmds.xform(objectlist[i],t=[xmax*i,ymax*i,zmax*i],ws=True)\n\n\n\ndef defrandchk():\n    #query random checkbox\n    global randchk\n    randchk = cmds.checkBoxGrp(randchkbx, query = True, value1 = True)\n    if randchk == False:\n        cmds.intSliderGrp('fieldname_xmax', edit = True,maxValue = 10)\n        cmds.intSliderGrp('fieldname_ymax', edit = True,maxValue = 10)\n        cmds.intSliderGrp('fieldname_zmax', edit = True,maxValue = 10)\n    if randchk == True:\n        cmds.intSliderGrp('fieldname_xmax', edit = True,maxValue = 10000)\n        cmds.intSliderGrp('fieldname_ymax', edit = True,maxValue = 10000)\n        cmds.intSliderGrp('fieldname_zmax', edit = True,maxValue = 10000)\n\n\n\ndef gui():\n    if cmds.window('rdisperse', exists = True):\n        cmds.deleteUI('rdisperse')\n    random_disperse = cmds.window('rdisperse',t='Random Disperse',w=300,h=300,sizeable=False)\n    cmds.columnLayout(columnAlign=('center'), columnAttach=('both', 0), columnWidth=(312.5) )\n    cmds.separator( height=10, st='none')\n    cmds.text('Decide the values you want to randomly disperse in each axis:')\n    cmds.separator( height=20, style='in' )\n    \n    #random checkbox\n    global randchkbx\n    randchkbx = cmds.checkBoxGrp(label = 'Random Dispersion ',value1 = True, cc = 'defrandchk()')\n    cmds.separator( height=20, style='none' )\n    \n    #x axis slider\n    cmds.intSliderGrp('fieldname_xmax',label='Dispersion in X axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n    #y axis slider\n    cmds.intSliderGrp('fieldname_ymax',label='Dispersion in Y axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n    #z axis slider\n    cmds.intSliderGrp('fieldname_zmax',label='Dispersion in Z axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n\n    cmds.separator( height=10, st='none')\n    cmds.button(label='Disperse',command='disperse()')\n    cmds.showWindow(random_disperse)\n\ngui()" 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\nimport random\n\ndef disperse():\n    #set..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "DISPERSE" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\nimport random\n\ndef disperse():\n    #setting values to sliders.\n    xmax = cmds.intSliderGrp('fieldname_xmax',q=1,v=1)\n    ymax = cmds.intSliderGrp('fieldname_ymax',q=1,v=1)\n    zmax = cmds.intSliderGrp('fieldname_zmax',q=1,v=1)\n    global randchk\n    randchk = cmds.checkBoxGrp(randchkbx, query = True, value1 = True)\n    #error window\n    objectlist = cmds.ls(selection=True)\n    if objectlist == []:\n        if cmds.window('Nolisterror4', exists = True):\n            cmds.deleteUI('Nolisterror4')\n        _error = cmds.window('Nolisterror4',t='Error',w=10,h=100,sizeable=False)\n        cmds.columnLayout(columnAlign=('center'), columnAttach=('both', 0), columnWidth=(230))\n        cmds.text('Please select objects you want to randomly')\n        cmds.text('disperse before dispersing')\n        cmds.button(l='Ok',command='cmds.deleteUI(_error)')\n        cmds.showWindow(_error)\n    #disperison code\n    for i in range(0,len(objectlist)):\n        if randchk == True:\n            cmds.xform(objectlist[i],t=[random.randint(0,xmax),random.randint(0,ymax),random.randint(0,zmax)],ws=True)\n        if randchk == False:\n            cmds.xform(objectlist[i],t=[xmax*i,ymax*i,zmax*i],ws=True)\n\n\n\ndef defrandchk():\n    #query random checkbox\n    global randchk\n    randchk = cmds.checkBoxGrp(randchkbx, query = True, value1 = True)\n    if randchk == False:\n        cmds.intSliderGrp('fieldname_xmax', edit = True,maxValue = 10)\n        cmds.intSliderGrp('fieldname_ymax', edit = True,maxValue = 10)\n        cmds.intSliderGrp('fieldname_zmax', edit = True,maxValue = 10)\n    if randchk == True:\n        cmds.intSliderGrp('fieldname_xmax', edit = True,maxValue = 10000)\n        cmds.intSliderGrp('fieldname_ymax', edit = True,maxValue = 10000)\n        cmds.intSliderGrp('fieldname_zmax', edit = True,maxValue = 10000)\n\n\n\ndef gui():\n    if cmds.window('rdisperse', exists = True):\n        cmds.deleteUI('rdisperse')\n    random_disperse = cmds.window('rdisperse',t='Random Disperse',w=300,h=300,sizeable=False)\n    cmds.columnLayout(columnAlign=('center'), columnAttach=('both', 0), columnWidth=(312.5) )\n    cmds.separator( height=10, st='none')\n    cmds.text('Decide the values you want to randomly disperse in each axis:')\n    cmds.separator( height=20, style='in' )\n    \n    #random checkbox\n    global randchkbx\n    randchkbx = cmds.checkBoxGrp(label = 'Random Dispersion ',value1 = True, cc = 'defrandchk()')\n    cmds.separator( height=20, style='none' )\n    \n    #x axis slider\n    cmds.intSliderGrp('fieldname_xmax',label='Dispersion in X axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n    #y axis slider\n    cmds.intSliderGrp('fieldname_ymax',label='Dispersion in Y axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n    #z axis slider\n    cmds.intSliderGrp('fieldname_zmax',label='Dispersion in Z axis:', field=True, minValue=0.0, maxValue=1000, fieldMinValue=0.0, fieldMaxValue=10000, value=0)\n\n    cmds.separator( height=10, st='none')\n    cmds.button(label='Disperse',command='disperse()')\n    cmds.showWindow(random_disperse)\n\ngui()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "List the objects in the scene" 
+        -enableBackground 0
+        -align "center" 
+        -label "Outliner" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Outl" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "menuIconWindow.png" 
+        -image1 "menuIconWindow.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "OutlinerWindow" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Edit animation curves" 
+        -enableBackground 0
+        -align "center" 
+        -label "Graph Editor" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "GE" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "menuIconWindow.png" 
+        -image1 "menuIconWindow.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "GraphEditor" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "tweenMachine;" 
+        -enableBackground 0
+        -align "center" 
+        -label "tweenMachine;" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "C:/Users/pcworld/Documents/maya/2012-x64/prefs/icons/tweenMachine.xpm" 
+        -image1 "C:/Users/pcworld/Documents/maya/2012-x64/prefs/icons/tweenMachine.xpm" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "tweenMachine;" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Delete history on all objects" 
+        -enableBackground 0
+        -align "center" 
+        -label "History" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Hist" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "menuIconEdit.png" 
+        -image1 "menuIconEdit.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "DeleteAllHistory" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "spPaint3d" 
+        -enableBackground 0
+        -align "center" 
+        -label "spPaint3d" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "commandButton.png" 
+        -image1 "commandButton.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "spPaint3d" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 39
+        -height 39
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Animchool Malcom Picker" 
+        -enableBackground 0
+        -align "center" 
+        -label "loadPlugin -qt \"C:/Users/pcworld/Documents/maya/2012_64bit picke..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "PICKER" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "C:/Users/pcworld/Documents/maya/PickerIcon.png" 
+        -image1 "C:/Users/pcworld/Documents/maya/PickerIcon.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "loadPlugin -qt \"C:/Users/pcworld/Documents/maya/2012_64bit picker/AnimSchoolPicker.mll\";\nAnimSchoolPicker();" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Rotate shapes evenly spaced." 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\ndef ui():\n    window = cmds.window( ti..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Rot" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\ndef ui():\n    window = cmds.window( title=\"Rotate Objects\", iconName='Object Rotator', widthHeight=(310, 180) )\n    cmds.columnLayout(columnAlign=('center'), columnAttach=('both', 0), columnWidth=(312.5) )\n    cmds.frameLayout(marginHeight=0, marginWidth=5, labelVisible=False)\n    cmds.separator( height=10, style = 'in')\n    cmds.text(\"Rotate objects in a perfect circle.\")\n    cmds.text(\"Numbers 36 can divide into exactly:\")\n    cmds.text(\"1,2,3,4,5,6,8,9,10,12,15,18,20\")\n    cmds.separator( height=10, style = 'in')\n    \n    global rotationNo\n    rotationNo = cmds.intSliderGrp('intslider_rotationNo',label='Number of Objects',field=True, minValue=1, maxValue=20, fieldMinValue=0, fieldMaxValue=100, value=1, dragCommand='rotatefunction(cmds.intSliderGrp(rotationNo,q=1,v=1))')\n#    cmds.radioCollection()\n#    global xAxis\n#    xAxis = cmds.radioButton(label='X Axis')\n#    global yAxis                                 <---- Would like to assign specific axis, but not sure how.\n#    yAxis = cmds.radioButton(label='Y Axis')\n#    global zAxis\n#    zAxis = cmds.radioButton(label='Z Axis')    \n    cmds.button(label='Duplicate Rotate',command='rotatefunction(cmds.intSliderGrp(rotationNo,query=True,value=True))')\n    cmds.showWindow( window )\n\ndef rotatefunction(numofobjects):\n#    global object\n#    if cmds.objExists(object[1]):\n#        cmds.delete(object[1:])\n    object = []\n    a = cmds.ls(selection = True)\n    object.append(a)\n    incr = 0\n#    if axis == x:\n    for i in range(0,numofobjects-1):\n        b = cmds.duplicate(object[i])\n        object.append(b)\n        incr = incr + (360/numofobjects)\n        cmds.rotate(incr,0,0,object[i+1])\n#    if axis == y:\n#        for i in range(0,numofobjects-1):\n#            b = cmds.duplicate(object[i])\n#            object.append(b)\n#            incr = incr + (360/numofobjects)\n#            cmds.rotate(0,incr,0,object[i+1])\n#    if axis == z:\n#        for i in range(0,numofobjects-1):\n#            b = cmds.duplicate(object[i])\n#            object.append(b)\n#            incr = incr + (360/numofobjects)\n#            cmds.rotate(0,0,incr,object[i+1])\n\nui()\n\n\n\n\n\n\n" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Select object(s) to generate a motion trail over time" 
+        -enableBackground 0
+        -align "center" 
+        -label "Create Editable Motion Trail" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "motionTrail.png" 
+        -image1 "motionTrail.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "doMotionTrail 2 { \"snapshot  -motionTrail 1  -increment 1 -startTime `playbackOptions -query -min` -endTime `playbackOptions -query -max`\", \"1\",\"0\",\"0\",\"1\",\"1\",\"1\"}" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Onion Skinning Tool." 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\n#Select Geometry, then hit 'Create'. T..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Onion" 
+        -overlayLabelColor 0.8 0.49546 0.184 
+        -overlayLabelBackColor 0 0 0 0.2 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\nimport riggingModule as rm\n\n#Select Geometry, then hit 'Create'. To refresh just hit 'Create' again.\n\ndef OnionUI():\n    if (cmds.window(\"OnionSkin\", exists=True)):\n        cmds.deleteUI(\"OnionSkin\")\n    OnionWindow = cmds.window(\"OnionSkin\", title=\"Onion Skinner\", iconName='oSkin', widthHeight=(350, 80),sizeable=True )\n    \n    cmds.columnLayout()\n    cmds.separator(style='in')\n    cmds.text('            Onion Skinner')\n    cmds.separator(style='in')\n    cmds.setParent( '..' )\n    \n    #cmds.columnLayout()\n    #select_objects = cmds.ls(selection=True)\n    #cmds.textFieldButtonGrp(l='loadObject', e=True, text='select_objects[0]',buttonLabel='Load Mesh')\n    #cmds.setParent( '..' )\n    \n    cmds.rowColumnLayout( nr=1)\n    cmds.text('  ')\n    StartIntField = cmds.intField('Start',w=50,v=1)\n    cmds.text(l='')\n    cmds.text(' to ')\n    cmds.text(l='')\n    EndtIntField = cmds.intField('End',w=50,v=25)\n    cmds.setParent( '..' )\n    \n    \n    cmds.rowColumnLayout( nr=1)\n    cmds.text(l='   Every  ')\n    EveryIntField = cmds.intField('Every',w=50,v=1)\n    cmds.text(l='  Frames')\n    cmds.separator(style='in')\n    cmds.setParent( '..' )\n    \n    cmds.rowColumnLayout( nr=1)\n    cmds.text('   Opacity   ')\n    cmds.floatSlider('opacity',min = 0, max = 1, value=0.5,dc=('opacityChange((cmds.floatSlider(\"opacity\",q=True,v=True)))'))\n    cmds.setParent('..')  \n    \n    CL2 = cmds.columnLayout( adjustableColumn=True )\n    RL2 = cmds.rowLayout(numberOfColumns = 3)\n    cmds.button( label='Create', command=('onionSkin(cmds.intField(\"Start\",q=1,v=1),cmds.intField(\"End\",q=1,v=1),cmds.intField(\"Every\",q=1,v=1))'))\n    cmds.button( label='Delete', command=('cmds.delete(\"ATOnion*\")'))\n    cmds.button( label='Show/Hide', command=('visCheck(\"ATOnionSkinMeshes\")'))\n    cmds.setParent( '..' )\n    cmds.text(l='www.alextavener.co.uk, 2014')\n    cmds.showWindow( OnionWindow )\n\ndef visCheck(object):\n    vis = cmds.getAttr(object+\".visibility\")\n    if vis == 1:\n        cmds.setAttr(object+\".visibility\",0)\n    else:\n        cmds.setAttr(object+\".visibility\",1)\n    \n\ndef onionSkin(start,end,every):\n    \n    #If already exists, delete\n    if cmds.objExists('ATOnionSkinMeshes'):\n        cmds.delete('ATOnionSkinMeshes')\n\n    #Create base variables\n    geo = cmds.ls(sl=True)\n    onionGeo = []\n    global onionShader\n    \n    \n    #for i in set timerange, duplicate mesh\n    for i in range(start,end+1,every):\n        cmds.currentTime(i)\n         \n        copy = cmds.duplicate(geo)\n        if len(geo) > 1:\n            copyGrp = cmds.group(copy)\n            unite = cmds.polyUnite(copy)\n            cmds.delete(copyGrp)\n            mesh = []\n            mesh.append(unite[0])\n        else:\n            mesh = copy\n            rm.unlockAttr(mesh[0],t=1,r=1,s=1,v=1)\n            \n\n        for j in mesh:\n            print j\n            cmds.currentTime(i)\n            print 'renaming to', 'frame'+str(i)\n            newName = cmds.rename(j,'frame'+str(i))\n            onionGeo.append(newName)\n            #cmds.parent(newName,w=True)\n            cmds.select(newName)\n            shape = cmds.pickWalk(d='down')\n            cmds.setAttr(shape[0]+'.overrideEnabled',1)\n            cmds.setAttr(shape[0]+'.overrideDisplayType',2)\n    \n    #Deselect, and create transparent shader\n    cmds.select(d=True)\n    onionShader=cmds.shadingNode(\"lambert\",asShader=True,n='ATOnionShader')\n    cmds.setAttr(onionShader+\".transparency\", 0.5, 0.5, 0.5)\n    \n    #select all duplicated meshes\n    for i in onionGeo:\n        cmds.select(i,add=True)\n        \n    #assign shader\n    cmds.hyperShade(a=onionShader)\n\n    #group meshes\n    onionGroup = cmds.group(n='ATOnionSkinMeshes',w=1)\n\ndef opacityChange(num):\n    cmds.setAttr(onionShader+\".transparency\",num,num,num)\n\nOnionUI()\n#onionSkin(1,90,2)\n" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import colorKey as cK\ncK.show()" 
+        -enableBackground 0
+        -align "center" 
+        -label "import colorKey as cK\ncK.show()" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "ColorKey" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import colorKey as cK\ncK.show()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "#Keyframe ripple editor. Alex Tavener 2016\n# www.alextavener.co.uk\nimport maya.cmds as cmds\n\n###########################\n#######   Listen   ########\n###########################\n\nsl = cmds.ls(sl=1)\ndefault = cmds.listAttr(sl,c=1,k=1)\n\ndef listen(object):\n    curves = cmds.keyframe(q=True, n=True, sl =1 ) or []\n    if len(curves) == 0:\n        defaultAttrs = cmds.listAttr(object,c=1,k=1)\n        curves = []\n        for i in defaultAttrs:\n            curves.append(object+'_'+i)\n        cmds.confirmDialog(t='Warning',m='Warning, no curves selected! \\nAll keyable attributes subsituted automatically.',b='Ok')\n        #curves = [object+'_translateX',object+'_translateY',object+'_translateZ',object+'_rotateX',object+'_rotateY',object+'_rotateZ']\n    listenVals = []\n    CT = cmds.currentTime(q=1)\n    for currentCurve in curves:\n        cmds.setKeyframe(currentCurve)\n        listenVals.append(cmds.keyframe(currentCurve, time=(CT, CT), q=1, vc=1)[0])\n    return listenVals, CT, curves  \n\n\n\n##########################\n#######   Ripple   #######\n##########################\ndef ripple(listenVals,CT,curves,min,max):\n    \n    cmds.currentTime(CT)\n    #After control has been editted, get all values for all curves and append them to rippleVals.\n    rippleVals = []\n    for currentCurve in curves:\n        rippleVals.append(cmds.keyframe(currentCurve, time=(CT, CT), q=1, vc=1)[0])\n    #Subtract original values from editted values and append to differenceVals\n    differenceVals = []\n    for i in range(0,len(curves)):\n        differenceVals.append( float(listenVals[i]) - float(rippleVals[i]) )\n    \n    #Set all key values back to their original state\n    incr = 0\n    for currentCurve in curves:\n        print 'setting',currentCurve,'back to',listenVals[incr]\n        cmds.keyframe(currentCurve, time=(CT, CT), vc=listenVals[incr])\n        incr +=1\n    \n    #Move ALL keys up to new set value using differenceVals as the driving offset.\n    incr = 0\n    for currentCurve in curves:\n        time = []\n        keys = cmds.keyframe(currentCurve, q=True, tc=1, vc=True) or []\n        keyNum = len(keys)\n        for i in range(0,keyNum,2):\n            time.append(keys[i])\n        for i in range(len(time)):\n            num = int(time[i])\n            #print 'if',num,'is between',min,max,'...'\n            if num >= min and num <= max:\n                print 'changing keyframe',currentCurve,num\n                values = cmds.keyframe(currentCurve, time=(num, num), q=1, vc=1)\n                cmds.keyframe(currentCurve, time=(num, num), vc=values[0]-differenceVals[incr])\n        incr +=1\n\n\n#GUI function 2\ndef listenButton():\n    sl = cmds.ls(sl=1)\n    global obj\n    obj = []\n    for i in sl:\n        listenVariables = listen(i)\n        obj.append(listenVariables)\n    return obj\n\n#GUI function 2\ndef rippleButton():\n    qMin = cmds.textField('toFrameOutput',q=1,text=1)\n    qMax = cmds.textField('fromFrameOutput',q=1,text=1)\n    \n    if not qMin:\n        qMin = cmds.playbackOptions(min=1,q=1)\n    if not qMax:\n        qMax = cmds.playbackOptions(max=1,q=1)\n    if max == 0 and min == 0:\n        qMin = cmds.playbackOptions(min=1,q=1)\n        qMax = cmds.playbackOptions(max=1,q=1)\n    \n    if qMax < qMin:\n        cmds.confirmDialog(t='Warning',m='\\nWarning, min keyframes exceed max! \\n\\nSet max higher than min, or both to 0.',b='Ok')\n        return\n    \n    for i in range(0,len(obj)):\n        ripple(obj[i][0],obj[i][1],obj[i][2],float(qMin),float(qMax))\n\n\n    \nif (cmds.window('KeyframeRippleEditor', exists=True)):\n    cmds.deleteUI('KeyframeRippleEditor')\n\ncmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/KeyframeRippleGUI3.ui')\ncmds.showWindow(keyFrameRippleGUI)\n\n\n\n\n" 
+        -enableBackground 0
+        -align "center" 
+        -label "#Keyframe ripple editor. Alex Tavener 2016\n# www.alextavener.co...." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "RIPPLE" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "#Keyframe ripple editor. Alex Tavener 2016\n# www.alextavener.co.uk\nimport maya.cmds as cmds\n\n###########################\n#######   Listen   ########\n###########################\n\ndef listen(object):\n    curves = cmds.keyframe(q=True, n=True, sl =1 ) or []\n    if len(curves) == 0:\n        defaultAttrs = cmds.listAttr(object,c=1,k=1)\n        curves = []\n        for i in defaultAttrs:\n            curves.append(object+'_'+i)\n        #cmds.confirmDialog(t='Warning',m='Warning, no curves selected! \\nAll keyable attributes subsituted automatically.',b='Ok')\n        #curves = [object+'_translateX',object+'_translateY',object+'_translateZ',object+'_rotateX',object+'_rotateY',object+'_rotateZ']\n    listenVals = []\n    CT = cmds.currentTime(q=1)\n    for currentCurve in curves:\n        cmds.setKeyframe(currentCurve)\n        listenVals.append(cmds.keyframe(currentCurve, time=(CT, CT), q=1, vc=1)[0])\n    return listenVals, CT, curves  \n\n\n\n##########################\n#######   Ripple   #######\n##########################\ndef ripple(listenVals,CT,curves,min,max):\n    \n    cmds.currentTime(CT)\n    #After control has been editted, get all values for all curves and append them to rippleVals.\n    rippleVals = []\n    for currentCurve in curves:\n        rippleVals.append(cmds.keyframe(currentCurve, time=(CT, CT), q=1, vc=1)[0])\n    #Subtract original values from editted values and append to differenceVals\n    differenceVals = []\n    for i in range(0,len(curves)):\n        differenceVals.append( float(listenVals[i]) - float(rippleVals[i]) )\n    \n    #Set all key values back to their original state\n    incr = 0\n    for currentCurve in curves:\n        print 'setting',currentCurve,'back to',listenVals[incr]\n        cmds.keyframe(currentCurve, time=(CT, CT), vc=listenVals[incr])\n        incr +=1\n    \n    #Move ALL keys up to new set value using differenceVals as the driving offset.\n    incr = 0\n    for currentCurve in curves:\n        time = []\n        keys = cmds.keyframe(currentCurve, q=True, tc=1, vc=True) or []\n        keyNum = len(keys)\n        for i in range(0,keyNum,2):\n            time.append(keys[i])\n        for i in range(len(time)):\n            num = int(time[i])\n            #print 'if',num,'is between',min,max,'...'\n            if num >= min and num <= max:\n                print 'changing keyframe',currentCurve,num\n                values = cmds.keyframe(currentCurve, time=(num, num), q=1, vc=1)\n                cmds.keyframe(currentCurve, time=(num, num), vc=values[0]-differenceVals[incr])\n        incr +=1\n\n\n#GUI function 2\ndef listenButton():\n    sl = cmds.ls(sl=1)\n    global obj\n    obj = []\n    objConfirm = '\\n'.join(sl)\n    cmds.confirmDialog(t='Loaded',m='Objects loaded: \\n\\n'+objConfirm,b='Ok')\n    for i in sl:\n        listenVariables = listen(i)\n        obj.append(listenVariables)\n    \n    return obj\n\n#GUI function 2\ndef rippleButton():\n    qMin = cmds.textField('toFrameOutput',q=1,text=1)\n    qMax = cmds.textField('fromFrameOutput',q=1,text=1)\n    \n    if not qMin:\n        qMin = cmds.playbackOptions(min=1,q=1)\n    if not qMax:\n        qMax = cmds.playbackOptions(max=1,q=1)\n    if max == 0 and min == 0:\n        qMin = cmds.playbackOptions(min=1,q=1)\n        qMax = cmds.playbackOptions(max=1,q=1)\n    \n    #if qMax < qMin:\n\t#\tprint qMax,'is less than',qMin\n    #    cmds.confirmDialog(t='Warning',m='\\nWarning, min keyframes exceed max! \\n\\nSet max higher than min, or both to 0.',b='Ok')\n    #    return\n    \n    for i in range(0,len(obj)):\n        ripple(obj[i][0],obj[i][1],obj[i][2],float(qMin),float(qMax))\n\n\n    \nif (cmds.window('KeyframeRippleEditor', exists=True)):\n    cmds.deleteUI('KeyframeRippleEditor')\n\nkeyFrameRippleGUI = cmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/KeyframeRippleGUI3.ui')\ncmds.showWindow(keyFrameRippleGUI)\n\n\n\n\n" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\n\nsl = cmds.ls(sl=1)\n\nlocList = []\n\nfor i in sl:\n    loc = cmds.spaceLocator(n=i+'_LOC')\n    cmds.delete(cmds.parentConstraint(i,loc,mo=0))\n    locList.append(loc[0])\n\ncmds.select(locList)" 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\nsl = cmds.ls(sl=1)\n\nlocList = []\n\nfor ..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "LocON" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\nsl = cmds.ls(sl=1)\n\nlocList = []\n\nfor i in sl:\n    loc = cmds.spaceLocator(n=i+'_LOC')\n    cmds.delete(cmds.parentConstraint(i,loc,mo=0))\n    locList.append(loc[0])\n\ncmds.select(locList)" 
+        -sourceType "python" 
+        -doubleClickCommand "import maya.cmds as cmds\n\nfor i in locList:\n    PC = cmds.parentConstraint(i,i[:-4],mo=0)\n    cmds.setKeyframe(i[:-4])\n    cmds.delete(PC,i)" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\n\n#Enter name of control you want to mirror FROM. Script will find other side and match it.\ndef mirrorValues(rotate = True, translate = True, scale = True, custom = True):\n    \n    object = cmds.ls(sl=1)[0]\n    prefix = ''\n    \n    \n    #Auto detect mirror\n    if 'LT' in object:\n        prefix = 'LT'\n        replaceWith = 'RT'\n    elif 'left' in object:\n        prefix = 'left'\n        replaceWith = 'right'\n    elif 'lft' in object:\n        prefix = 'lft'\n        replaceWith = 'rght'\n    elif 'L_' in object:\n        prefix = 'L'\n        replaceWith = 'R'\n    \n    elif 'RT' in object:\n        prefix = 'RT'\n        replaceWith = 'LT'\n    elif 'right' in object:\n        prefix = 'right'\n        replaceWith = 'left'\n    elif 'rght' in object:\n        prefix = 'rght'\n        replaceWith = 'lft'\n    elif 'R_' in object:\n        prefix = 'R'\n        replaceWith = 'L'\n    else:\n        cmds.confirmDialog(m='No mirror prefix detected. (eg: LT_hand_jnt)\\n\\n               Operation Aborted.',cb='Ok.',icn='critical')\n        return\n    \n    \n    mirrorList = []\n    rotValues = []\n    traValues= []\n    scaValues = []\n    \n    length = len(prefix)\n    \n    \n    incr = 0\n    #Find mirrored version of control based on prefix and replace with values.\n    mirrorName = object.replace(prefix,replaceWith)\n    mirrorList.append(mirrorName)\n    if rotate == True:\n        #Rotation\n        rotValues.append(cmds.xform(object,q=True,ro=True,os=1))\n        cmds.xform(mirrorName,ro=(rotValues[incr][0],rotValues[incr][1],rotValues[incr][2]),os=1)\n        print 'set', mirrorList[incr]+\"'s\", \"rotation to\",tuple(rotValues[incr])\n    if translate == True:\n        #Translation\n        traValues.append(cmds.xform(object,q=True,t=True,ws=1))\n        cmds.xform(mirrorName,t=(-traValues[incr][0],traValues[incr][1],traValues[incr][2]),ws=1)\n        print 'set', mirrorList[incr]+\"'s\", \"translation to\",(-traValues[incr][0],traValues[incr][1],traValues[incr][2])\n    if scale == True:\n        #Scale\n        scaValues.append(cmds.xform(object,q=True,s=True,ws=1))\n        print scaValues[incr]\n        cmds.xform(mirrorName,s=(scaValues[incr][0],scaValues[incr][1],scaValues[incr][2]),ws=1)\n        print 'set', mirrorList[incr]+\"'s\", \"scale to\",(scaValues[incr][0],scaValues[incr][1],scaValues[incr][2])\n    if custom == True:\n        #Custom Attributes\n        customAttrs = cmds.listAttr(ud=1)\n        for i in customAttrs:\n            customValue = cmds.getAttr(object+'.'+i)\n            cmds.setAttr(mirrorName+'.'+i, customValue)\n            print 'set', mirrorList[incr]+\"'s\",i,\" to\",customValue\n    \n    incr = incr+1\n\nmirrorValues(rotate = True, translate = True, scale = False, custom = True)" 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\n#Enter name of control you want to mir..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "Mirror" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\n#Enter name of control you want to mirror FROM. Script will find other side and match it.\ndef mirrorValues(rotate = True, translate = True, scale = True, custom = True):\n    \n    selection = cmds.ls(sl=1)\n    prefix = ''\n    \n    for object in selection:\n        #Auto detect mirror\n        if 'LT' in object:\n            prefix = 'LT'\n            replaceWith = 'RT'\n        elif 'left' in object:\n            prefix = 'left'\n            replaceWith = 'right'\n        elif 'lft' in object:\n            prefix = 'lft'\n            replaceWith = 'rght'\n        elif 'L_' in object:\n            prefix = 'L'\n            replaceWith = 'R'\n        \n        elif 'RT' in object:\n            prefix = 'RT'\n            replaceWith = 'LT'\n        elif 'right' in object:\n            prefix = 'right'\n            replaceWith = 'left'\n        elif 'rght' in object:\n            prefix = 'rght'\n            replaceWith = 'lft'\n        elif 'R_' in object:\n            prefix = 'R'\n            replaceWith = 'L'\n        else:\n            cmds.confirmDialog(m='No mirror prefix detected. (eg: LT_hand_jnt)\\n\\n               Operation Aborted.',cb='Ok.',icn='critical')\n            return\n        \n        \n        mirrorList = []\n        rotValues = []\n        traValues= []\n        scaValues = []\n        \n        length = len(prefix)\n        \n        \n        incr = 0\n        #Find mirrored version of control based on prefix and replace with values.\n        mirrorName = object.replace(prefix,replaceWith)\n        mirrorList.append(mirrorName)\n        if rotate == True:\n            #Rotation\n            rotValues.append(cmds.xform(object,q=True,ro=True,os=1))\n            cmds.xform(mirrorName,ro=(rotValues[incr][0],rotValues[incr][1],rotValues[incr][2]),os=1)\n            print 'set', mirrorList[incr]+\"'s\", \"rotation to\",tuple(rotValues[incr])\n        if translate == True:\n            #Translation\n            traValues.append(cmds.xform(object,q=True,t=True,ws=1))\n            cmds.xform(mirrorName,t=(-traValues[incr][0],traValues[incr][1],traValues[incr][2]),ws=1)\n            print 'set', mirrorList[incr]+\"'s\", \"translation to\",(-traValues[incr][0],traValues[incr][1],traValues[incr][2])\n        if scale == True:\n            #Scale\n            scaValues.append(cmds.xform(object,q=True,s=True,ws=1))\n            print scaValues[incr]\n            cmds.xform(mirrorName,s=(scaValues[incr][0],scaValues[incr][1],scaValues[incr][2]),ws=1)\n            print 'set', mirrorList[incr]+\"'s\", \"scale to\",(scaValues[incr][0],scaValues[incr][1],scaValues[incr][2])\n        if custom == True:\n            #Custom Attributes\n            customAttrs = cmds.listAttr(object,ud=1)\n            if customAttrs:\n                for i in customAttrs:\n                    customValue = cmds.getAttr(object+'.'+i)\n                    cmds.setAttr(mirrorName+'.'+i, customValue)\n                    print 'set', mirrorList[incr]+\"'s\",i,\" to\",customValue\n        \n        incr = incr+1\n\nmirrorValues(rotate = True, translate = True, scale = False, custom = True)" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\nimport time as pytime\n\ndef amplifyMute(val):\n    #Get curves selected\n    curves = cmds.keyframe(q=True, n=True, sl =1 ) or []\n    time = []\n    \n    #get selected time range\n    time = cmds.keyframe(curves,sl=1,q=1)\n    minTime = min(time)\n    maxTime = max(time)\n    \n    for eachCurve in curves:\n        #Get keys for iterated curve\n        keys = cmds.keyframe(eachCurve, q=True, tc=1, vc=True)\n        keyNum = len(keys)\n        minMaxVal = cmds.keyframe(eachCurve, q=True, vc=True)\n        #Find the midpoint value for all keys on iterated curve\n        if  minMaxVal:\n            minVal = min(minMaxVal)\n            maxVal = max(minMaxVal)\n            #Get average between max and min points\n            midPoint = (minVal+maxVal)/2\n    \n        #Scale curve, using midpoint, with specified value\n        cmds.selectKey(eachCurve,t=(minTime,maxTime))\n        cmds.scaleKey(iub=0,ts=1,tp=1,fs=1,fp=1,vs=val,vp=midPoint,animation='keys')\n        #cmds.refresh()\n        #pytime.sleep(1)\n        print eachCurve\n    \n    #and re-select everything we had in the beginning, incase we want to repeat.\n    cmds.selectKey(curves,t=(minTime,maxTime))\n\ndef getValue(slider):\n    value = cmds.floatSliderGrp(slider,q=1,v=1)\n    return value\n\ndef GUI():\n    if cmds.window(\"animationAmplifyMute\", exists=True):\n        cmds.deleteUI(\"animationAmplifyMute\")\n    \n    cmds.window(\"animationAmplifyMute\",title=\"Animation Amplify/Mute\")\n    \n    cmds.frameLayout(marginHeight=5, marginWidth=5, labelVisible=False)\n    cmds.columnLayout()   \n     \n    img2=cmds.text(label = '                         Animation Amplify/Mute')\n    cmds.separator()\n    \n    FL2 = cmds.frameLayout(marginHeight=5, marginWidth=5, labelVisible=False)\n    \n    valueSlider = cmds.floatSliderGrp('Amount',field=1, min=0, max=2, value=1, step=1, p=FL2 )\n    \n    cmds.button(label=\"Amplify/Mute\", height=25, width=150,\n                command=\"amplifyMute(getValue('Amount'))\")\n        \n    cmds.showWindow()\n\nGUI()\n" 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\nimport time as pytime\n\ndef amplifyMute(..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "AmpMute" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\ndef amplifyMute(val):\n    #Get curves selected\n    curves = cmds.keyframe(q=True, n=True, sl =1 ) or []\n    time = []\n    #get selected time range\n    time = cmds.keyframe(curves,sl=1,q=1)\n    minTime = min(time)\n    maxTime = max(time)\n    #For each curve do this...\n    for eachCurve in curves:\n        #Get keys for iterated curve\n        keys = cmds.keyframe(eachCurve, q=True, tc=1, vc=True)\n        keyNum = len(keys)\n        minMaxVal = cmds.keyframe(eachCurve,t=(minTime,maxTime), q=True, vc=True)\n        #Find the midpoint value for all keys on iterated curve\n        if  minMaxVal:\n            minVal = min(minMaxVal)\n            maxVal = max(minMaxVal)\n            #Get average between max and min points\n            midPoint = (minVal+maxVal)/2\n        #Scale curve, using midpoint, with specified value\n        cmds.selectKey(eachCurve,t=(minTime,maxTime))\n        cmds.scaleKey(iub=0,ts=1,tp=1,fs=1,fp=1,vs=val,vp=midPoint,animation='keys')\n        print eachCurve\n    #And re-select everything we had in the beginning, incase we want to repeat.\n    cmds.selectKey(curves,t=(minTime,maxTime))\n\n\n#Get floatslider value from GUI\ndef getValue(slider):\n    value = cmds.floatSliderGrp(slider,q=1,v=1)\n    return value\n\n\n#Make GUI\ndef GUI():\n    #If window exists, delete it.\n    if cmds.window(\"animationAmplifyMute\", exists=True):\n        cmds.deleteUI(\"animationAmplifyMute\")\n    #Make new window\n    cmds.window(\"animationAmplifyMute\",title=\"Animation Amplify/Mute\")\n    #Create layout\n    cmds.frameLayout(marginHeight=5, marginWidth=5, labelVisible=False)\n    cmds.columnLayout()   \n    #Title!\n    img2=cmds.text(label = '                         Animation Amplify/Mute')\n    cmds.separator()\n    #More layout\n    FL2 = cmds.frameLayout(marginHeight=5, marginWidth=5, labelVisible=False)\n    #Slider!\n    valueSlider = cmds.floatSliderGrp('Amount',field=1, min=0, max=2, value=1, step=1, p=FL2 )\n    #Button!\n    cmds.button(label=\"Amplify/Mute\", height=25, width=150,\n                command=\"amplifyMute(getValue('Amount'))\")\n    #Gimme my GUI\n    cmds.showWindow()\n\nGUI()\n" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "#matchpos\n\nimport maya.cmds as cmds\n\nsl  =cmds.ls(sl=1)\n\nsource = sl[0]\ndest = sl[1]\n\ncmds.delete(cmds.parentConstraint(source,dest,mo=0))" 
+        -enableBackground 0
+        -align "center" 
+        -label "#matchpos\n\nimport maya.cmds as cmds\n\nsl  =cmds.ls(sl=1)\n\nsource ..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "MATCHPOS" 
+        -overlayLabelColor 1 1 1 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "#matchpos\n\nimport maya.cmds as cmds\n\nsl  =cmds.ls(sl=1)\n\nsource = sl[0]\ndest = sl[1]\n\ncmds.delete(cmds.parentConstraint(source,dest,mo=0))" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "#Breaker UI code\nimport maya.cmds as cmds\n\ndef breakOut_loadRigGroups():   \n    global breakout_rigGroups\n    breakout_rigGroups = cmds.ls(sl=1)\n    cmds.textScrollList('objListField',e=1, ra=1)\n    cmds.textScrollList('objListField', e = True ,append=[\"\"+str(breakout_rigGroups)+\"\"])\n\ndef breakOut_loadModelGroups():   \n    global breakout_modelGroups\n    breakout_modelGroups = cmds.ls(sl=1)\n    cmds.textScrollList('objListField_2',e=1, ra=1)\n    cmds.textScrollList('objListField_2', e = True ,append=[\"\"+str(breakout_modelGroups)+\"\"])\n\ndef breakOut_UI():\n    #if window exists, delete\n    if (cmds.window('breakOutUI', exists=True)):\n        cmds.deleteUI('breakOutUI')\n    \n    #loadUI\n    breakOut_UI_window = cmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/breakOutUI.ui')\n    cmds.showWindow(breakOut_UI_window)\n\n\ndef breakOut_break():\n    #USER INPUT:\n    rootGroup = breakout_rigGroups\n    modelGroup = breakout_modelGroups\n    \n    #Import any references\n    for i in range(0,2):\n        refs = cmds.ls(type='reference')\n        for i in refs:\n            try:\n                rFile = cmds.referenceQuery(i, f=True)\n                cmds.file(rFile, importReference=True)\n            except:\n                pass\n    \n    #Get all joint related items in heirarchy and bake them all at once.\n    jntList = []\n    for groups in rootGroup:\n        cmds.select(groups)\n        cmds.select(groups,hi=1,add=1)\n        cmds.select(groups,d=1)\n        \n        hierarchy = cmds.ls(sl=1)\n        otherList = []\n        \n        for obj in hierarchy:\n            if cmds.objectType(obj,i='joint'):\n                jntList.append(obj)\n            else:\n                otherList.append(obj)\n        \n        start = cmds.playbackOptions(q=1, minTime=1)\n        end = cmds.playbackOptions(q=1, maxTime=1)\n        \n    cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)\n    \n    keepList = []\n    for groups in rootGroup:\n        #find all non-joint items in rootGroup\n        cmds.select(groups,add=1,hi=1)\n        hi = cmds.ls(sl=1)\n        \n        #get all joints items\n        noChild = []\n        for item in hi:\n            if cmds.objectType(item) == 'joint':\n                noChild.append(item)\n                \n        #Drill up from joint and append all parents to keepList\n        incr = 0\n        for item in noChild:\n            if cmds.objectType(item,i='joint'):\n                keepList.append(item)\n                print item\n                par = cmds.listRelatives(item,p=1)\n                while par != groups:\n                    print item,par,incr\n                    keepList.append(par)\n                    par = cmds.listRelatives(par,p=1)\n                    incr += 1\n                    if incr > 1000:\n                        break\n    \n    #Delete everything under rootGroup that is not a joint, or a relative/parent of a joint\n    for i in keepList:\n        cmds.select(i,d=1)\n    \n    cmds.select(rootGroup,d=1)\n    cmds.delete()\n    \n    #Delete everything other than rootGroup and modelGroup\n    cmds.select(ado = 1)\n    cmds.select(rootGroup,modelGroup,d=1)\n    cmds.delete()\n    \n    \n    \n    mel.eval('hyperShadePanelMenuCommand(\"hyperShadePanel1\", \"deleteUnusedNodes\");')\n    \n\nbreakOut_UI()" 
+        -enableBackground 0
+        -align "center" 
+        -label "#Breaker UI code\nimport maya.cmds as cmds\n\ndef breakOut_loadRigG..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "BREAK" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "#Breaker UI code\nimport maya.cmds as cmds\n\ndef breakOut_loadRigGroups():   \n    global breakout_rigGroups\n    breakout_rigGroups = cmds.ls(sl=1)\n    cmds.textScrollList('objListField',e=1, ra=1)\n    cmds.textScrollList('objListField', e = True ,append=[\"\"+str(''.join(breakout_rigGroups))+\"\"])\n\ndef breakOut_loadModelGroups():   \n    global breakout_modelGroups\n    breakout_modelGroups = cmds.ls(sl=1)\n    cmds.textScrollList('objListField_2',e=1, ra=1)\n    cmds.textScrollList('objListField_2', e = True ,append=[\"\"+str(''.join(breakout_modelGroups))+\"\"])\n\ndef breakOut_UI():\n    #if window exists, delete\n    if (cmds.window('breakOutUI', exists=True)):\n        cmds.deleteUI('breakOutUI')\n    \n    #loadUI\n    breakOut_UI_window = cmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/breakOutUI.ui')\n    cmds.showWindow(breakOut_UI_window)\n\n\ndef breakOut_break():\n    #USER INPUT:\n    rootGroup = breakout_rigGroups\n    modelGroup = breakout_modelGroups\n    \n    #Import any references\n    for i in range(0,2):\n        refs = cmds.ls(type='reference')\n        for i in refs:\n            try:\n                rFile = cmds.referenceQuery(i, f=True)\n                cmds.file(rFile, importReference=True)\n            except:\n                pass\n    \n    #Get all joint related items in heirarchy and bake them all at once.\n    jntList = []\n    for groups in rootGroup:\n        cmds.select(groups)\n        cmds.select(groups,hi=1,add=1)\n        cmds.select(groups,d=1)\n        \n        hierarchy = cmds.ls(sl=1)\n        otherList = []\n        \n        for obj in hierarchy:\n            if cmds.objectType(obj,i='joint'):\n                jntList.append(obj)\n            else:\n                otherList.append(obj)\n        \n        start = cmds.playbackOptions(q=1, minTime=1)\n        end = cmds.playbackOptions(q=1, maxTime=1)\n        \n    cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)\n    \n    keepList = []\n    for groups in rootGroup:\n        #find all non-joint items in rootGroup\n        cmds.select(groups,add=1,hi=1)\n        hi = cmds.ls(sl=1)\n        \n        #get all joints items\n        noChild = []\n        for item in hi:\n            if cmds.objectType(item) == 'joint':\n                noChild.append(item)\n                \n        #Drill up from joint and append all parents to keepList\n        incr = 0\n        for item in noChild:\n            if cmds.objectType(item,i='joint'):\n                keepList.append(item)\n                print item\n                par = cmds.listRelatives(item,p=1)\n                while par != groups:\n                    print item,par,incr\n                    keepList.append(par)\n                    par = cmds.listRelatives(par,p=1)\n                    incr += 1\n                    if incr > 1000:\n                        break\n    \n    #Delete everything under rootGroup that is not a joint, or a relative/parent of a joint\n    for i in keepList:\n        cmds.select(i,d=1)\n    \n    cmds.select(rootGroup,d=1)\n    cmds.delete()\n    \n    #Delete everything other than rootGroup and modelGroup\n    cmds.select(ado = 1)\n    cmds.select(rootGroup,modelGroup,d=1)\n    cmds.delete()\n    \n    \n    \n    mel.eval('hyperShadePanelMenuCommand(\"hyperShadePanel1\", \"deleteUnusedNodes\");')\n    \n\nbreakOut_UI()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import maya.cmds as cmds\n\n##########################\n###         GUI        ###\n##########################\n\ndef batchFBX_UI():\n    if (cmds.window('batchFBX_UI', exists=True)):\n        cmds.deleteUI('batchFBX_UI')\n    \n    batchFBX_UI = cmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/batchFBXexportGUI4.ui')\n    cmds.showWindow(batchFBX_UI)\n\ndef batchFBX_loadSourcePath():   \n    global batchFBX_sourcePath\n    global batchFBX_files\n    multipleFilters = \"Maya Files (*.ma *.mb);;Maya ASCII (*.ma);;Maya Binary (*.mb);\"\n    batchFBX_sourcePath = cmds.fileDialog2(fm=4,okc='Set Files To Export', dialogStyle=2,ff=multipleFilters)\n    \n    batchFBX_files = []\n    for i in batchFBX_sourcePath:\n        print i.rsplit('/', 1)[-1]\n        batchFBX_files.append(i.rsplit('/', 1)[-1])\n    \n    cmds.textScrollList('listWidget',e=1, ra=1)\n    cmds.textScrollList('listWidget', e = True ,append=[\"\"+str(','.join(batchFBX_files))+\"\"])\n\ndef batchFBX_loadExportPath():   \n    global batchFBX_exportPath\n    batchFBX_exportPath = cmds.fileDialog2(fm=3,okc='Set Export Path', dialogStyle=2)[0]\n    #Update export path list\n    cmds.textScrollList('listWidget_2',e=1, ra=1)\n    cmds.textScrollList('listWidget_2', e = True ,append=[\"\"+str(batchFBX_exportPath)+\"\"])\n\n\ndef batchFBX_loadRigRef():   \n    global batchFBX_rigRef\n    batchFBX_rigRef = cmds.fileDialog2(fm=0,okc='Set Rig Reference', dialogStyle=2)[0]\n    #Update export path list\n    cmds.textScrollList('listWidget_5',e=1, ra=1)\n    cmds.textScrollList('listWidget_5', e = True ,append=[\"\"+str(batchFBX_rigRef)+\"\"])\n\ndef batchFBX_loadBakeGroups():\n    global batchFBX_bakeGroups\n    batchFBX_bakeGroups = cmds.ls(sl=1)\n    #Update export path list\n    cmds.textScrollList('listWidget_3',e=1, ra=1)\n    cmds.textScrollList('listWidget_3', e = True ,append=[\"\"+str(', '.join(batchFBX_bakeGroups))+\"\"])\n\ndef batchFBX_loadKeepGroups():\n    global batchFBX_keepGroups\n    batchFBX_keepGroups = cmds.ls(sl=1)\n    #Update export path list\n    cmds.textScrollList('listWidget_4',e=1, ra=1)\n    cmds.textScrollList('listWidget_4', e = True ,append=[\"\"+str(', '.join(batchFBX_keepGroups))+\"\"])\n\n\n##########################\n###    MAIN FUNCTION   ###\n##########################\n\ndef batchFBX_function():\n    modelGroup = batchFBX_keepGroups\n    rigGroup = batchFBX_rigRef\n    rootGroup = batchFBX_bakeGroups\n    exportPath = batchFBX_exportPath\n    filepath = batchFBX_sourcePath\n        \n    #Make sure all slashes are forward facing\n    exportPath = exportPath.replace('\\\\' , '/')\n    #Make new variable for writing out text file (it requires double slash for whatever reason.)\n    exportPath_doubleSlash = exportPath.replace('/','//')\n    \n    #Get files in filePath\n    files = batchFBX_files\n    \n    mayaFiles = []\n    ab = 0\n    for i in files:\n        if '.mb' in i or '.ma' in i:\n            mayaFiles.append(i)\n    \n    mayaFilesConfirm = mayaFiles\n    if len(mayaFiles) > 50:\n        mayaFilesConfirm = mayaFiles[0:50]\n        mayaFilesConfirm.append('\\n...had to omit '+str((len(mayaFiles)-50))+' files from this message for display purposes\\n')\n    \n    confirmSelection = cmds.confirmDialog(title='Confirm Selection', m = 'You are about to batch export these files:\\n\\n'+('\\n'.join(mayaFilesConfirm))+'\\n\\n To: '+ exportPath +'\\nConfirm selection?', ma='center', button=['Ok','Cancel'],icn='question')\n    \n    \n    if confirmSelection == 'Ok':    \n        ###Progress Bar stuff###\n        incr = 1.0\n        fileIncr = 0\n        progNum = float(len(mayaFiles))\n        cmds.progressWindow( title='FBX Export', progress=0, status='Batch FBX Exporting: '+ str(int(incr/progNum*100))+'%', isInterruptable=True )\n        while True:\n            # Check if the dialog has been cancelled\n            if cmds.progressWindow( query=True, isCancelled=True ) :\n                break\n        \n            # Check if end condition has been reached\n            if cmds.progressWindow( query=True, progress=True ) >= 100 :\n                break\n        \n        \n            #######################\n            #### Main function ####\n            #######################\n            for i in mayaFiles:\n                if fileIncr >= len(filepath):\n                    break\n                #import file\n                cmds.file(filepath[fileIncr],f=1,o=1)\n                    \n                #delete usless shaders\n                #for num in (0,10):\n                #    if cmds.objExists('initialShadingGroup'+str(num)):\n                #        cmds.delete('initialShadingGroup'+str(num))\n                #if cmds.objExists('ATOnion*'):\n                #    cmds.delete('ATOnion*')\n                \n                #Import model and rig references\n                refs = cmds.ls(type='reference')\n                refRig = []\n                refModel = []\n                \n                try:\n                    refRigGrp = cmds.referenceQuery(rigGroup,rfn=1)\n                    if refRigGrp:\n                        #Change reference from current to new\n                        maya.mel.eval('file -loadReference '+refRigGrp+' -type \"mayaBinary\" -options \"v=0;\" \"'+rigPath+'\";')\n                except:\n                    pass\n                \n                for y in range(0,2):\n                    refs = cmds.ls(type='reference')\n                    for x in refs:\n                        try:\n                            rFile = cmds.referenceQuery(x, f=True)\n                            cmds.file(rFile, importReference=True)\n                        except:\n                            pass\n                \n                for groups in rootGroup:\n                    cmds.select(groups)\n                    cmds.select(groups,hi=1,add=1)\n                    cmds.select(groups,d=1)\n                    \n                    hierarchy = cmds.ls(sl=1)\n                    jntList = []\n                    otherList = []\n                    \n                    for obj in hierarchy:\n                        if cmds.objectType(obj,i='joint'):\n                            jntList.append(obj)\n                        else:\n                            otherList.append(obj)\n                    \n                    start = cmds.playbackOptions(q=1, minTime=1)\n                    end = cmds.playbackOptions(q=1, maxTime=1)\n                    \n                    cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)\n                    \n                \n                #find all non-joint items in rootGroup\n                cmds.select(rootGroup[0],add=1,hi=1)\n                hi = cmds.ls(sl=1)\n                \n                #get all joints items\n                noChild = []\n                for item in hi:\n                    if cmds.objectType(item) == 'joint':\n                        noChild.append(item)\n                        \n                #Drill up from joint and append all parents to keepList\n                keepList = []\n                incr = 0\n                for item in noChild:\n                    if cmds.objectType(item,i='joint'):\n                        keepList.append(item)\n                        print item\n                        par = cmds.listRelatives(item,p=1)\n                        while par != rootGroup:\n                            print item,par,incr\n                            keepList.append(par)\n                            par = cmds.listRelatives(par,p=1)\n                            incr += 1\n                            if incr > 1000:\n                                break\n                \n                #Delete everything under rootGroup that is not a joint, or a relative/parent of a joint\n                for keepies in keepList:\n                    cmds.select(keepies,d=1)\n                \n                cmds.select(rootGroup,d=1)\n                cmds.delete()\n                \n                #Delete everything other than rootGroup and modelGroup\n                cmds.select(ado = 1)\n                cmds.select(rootGroup,modelGroup,d=1)\n                cmds.delete()\n                \n                #remove redundant nodes.\n                mel.eval('hyperShadePanelMenuCommand(\"hyperShadePanel1\", \"deleteUnusedNodes\");')\n                \n                #fbx export\n                #maya.mel.eval('file -force -options \"precision=8;statics=1;baked=1;sdk=0;constraint=0;animLayers=0;selected=selectedOnly;whichRange=1;range=1:31;hierarchy=none;controlPoints=0;useChannelBox=1;options=keys;copyKeyCmd=-animation objects -option keys -hierarchy none -controlPoints 0 \" -typ \"atomExport\" -es \"'+exportPath+'/'+str(i[:-3])+'.atom\";')\n                maya.mel.eval('file -force -options \"v=0;\" -type \"FBX export\" -pr -ea \"'+exportPath+'/'+str(i[:-3])+'.fbx\";')\n                \n                cmds.progressWindow( edit=True, progress=(incr/progNum*100), status=('Exporting: ' + str(i[:-3]) ))\n                incr += 1\n                fileIncr += 1\n                \n                if i == mayaFiles[-1]:\n                    break\n            if fileIncr >= len(filepath):\n                break\n        \n        cmds.progressWindow(endProgress=1)\n        cmds.confirmDialog(title='Export Complete', m = 'Batch FBX export sucessful.\\n'+exportPath, ma='center', button=['Ok'])\n\nbatchFBX_UI()" 
+        -enableBackground 0
+        -align "center" 
+        -label "import maya.cmds as cmds\n\n##########################\n###        ..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "B_FBX" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import maya.cmds as cmds\n\n##########################\n###         GUI        ###\n##########################\n\ndef batchFBX_UI():\n    if (cmds.window('batchFBX_UI', exists=True)):\n        cmds.deleteUI('batchFBX_UI')\n    \n    batchFBX_UI = cmds.loadUI(f='C:/Users/HotDesk 1/Documents/Impact Winter/Scripts/batchFBXexportGUI4.ui')\n    cmds.showWindow(batchFBX_UI)\n\ndef batchFBX_loadSourcePath():   \n    global batchFBX_sourcePath\n    global batchFBX_files\n    multipleFilters = \"Maya Files (*.ma *.mb);;Maya ASCII (*.ma);;Maya Binary (*.mb);\"\n    batchFBX_sourcePath = cmds.fileDialog2(fm=4,okc='Set Files To Export', dialogStyle=2,ff=multipleFilters)\n    \n    batchFBX_files = []\n    for i in batchFBX_sourcePath:\n        print i.rsplit('/', 1)[-1]\n        batchFBX_files.append(i.rsplit('/', 1)[-1])\n    \n    cmds.textScrollList('listWidget',e=1, ra=1)\n    cmds.textScrollList('listWidget', e = True ,append=[\"\"+str(','.join(batchFBX_files))+\"\"])\n\ndef batchFBX_loadExportPath():   \n    global batchFBX_exportPath\n    batchFBX_exportPath = cmds.fileDialog2(fm=3,okc='Set Export Path', dialogStyle=2)[0]\n    #Update export path list\n    cmds.textScrollList('listWidget_2',e=1, ra=1)\n    cmds.textScrollList('listWidget_2', e = True ,append=[\"\"+str(batchFBX_exportPath)+\"\"])\n\n\ndef batchFBX_loadRigRef():   \n    global batchFBX_rigRef\n    batchFBX_rigRef = cmds.fileDialog2(fm=0,okc='Set Rig Reference', dialogStyle=2)[0]\n    #Update export path list\n    cmds.textScrollList('listWidget_5',e=1, ra=1)\n    cmds.textScrollList('listWidget_5', e = True ,append=[\"\"+str(batchFBX_rigRef)+\"\"])\n\ndef batchFBX_loadBakeGroups():\n    global batchFBX_bakeGroups\n    batchFBX_bakeGroups = cmds.ls(sl=1)\n    #Update export path list\n    cmds.textScrollList('listWidget_3',e=1, ra=1)\n    cmds.textScrollList('listWidget_3', e = True ,append=[\"\"+str(', '.join(batchFBX_bakeGroups))+\"\"])\n\ndef batchFBX_loadKeepGroups():\n    global batchFBX_keepGroups\n    batchFBX_keepGroups = cmds.ls(sl=1)\n    #Update export path list\n    cmds.textScrollList('listWidget_4',e=1, ra=1)\n    cmds.textScrollList('listWidget_4', e = True ,append=[\"\"+str(', '.join(batchFBX_keepGroups))+\"\"])\n\n\n##########################\n###    MAIN FUNCTION   ###\n##########################\n\ndef batchFBX_function():\n    modelGroup = batchFBX_keepGroups\n    rigGroup = batchFBX_rigRef\n    rootGroup = batchFBX_bakeGroups\n    exportPath = batchFBX_exportPath\n    filepath = batchFBX_sourcePath\n        \n    #Make sure all slashes are forward facing\n    exportPath = exportPath.replace('\\\\' , '/')\n    #Make new variable for writing out text file (it requires double slash for whatever reason.)\n    exportPath_doubleSlash = exportPath.replace('/','//')\n    \n    #Get files in filePath\n    files = batchFBX_files\n    \n    mayaFiles = []\n    ab = 0\n    for i in files:\n        if '.mb' in i or '.ma' in i:\n            mayaFiles.append(i)\n    \n    mayaFilesConfirm = mayaFiles\n    if len(mayaFiles) > 50:\n        mayaFilesConfirm = mayaFiles[0:50]\n        mayaFilesConfirm.append('\\n...had to omit '+str((len(mayaFiles)-50))+' files from this message for display purposes\\n')\n    \n    confirmSelection = cmds.confirmDialog(title='Confirm Selection', m = 'You are about to batch export these files:\\n\\n'+('\\n'.join(mayaFilesConfirm))+'\\n\\n To: '+ exportPath +'\\nConfirm selection?', ma='center', button=['Ok','Cancel'],icn='question')\n    \n    \n    if confirmSelection == 'Ok':    \n        ###Progress Bar stuff###\n        incr = 1.0\n        fileIncr = 0\n        progNum = float(len(mayaFiles))\n        cmds.progressWindow( title='FBX Export', progress=0, status='Batch FBX Exporting: '+ str(int(incr/progNum*100))+'%', isInterruptable=True )\n        while True:\n            # Check if the dialog has been cancelled\n            if cmds.progressWindow( query=True, isCancelled=True ) :\n                break\n        \n            # Check if end condition has been reached\n            if cmds.progressWindow( query=True, progress=True ) >= 100 :\n                break\n        \n        \n            #######################\n            #### Main function ####\n            #######################\n            for i in mayaFiles:\n                if fileIncr >= len(filepath):\n                    break\n                #import file\n                cmds.file(filepath[fileIncr],f=1,o=1)\n                    \n                #delete usless shaders\n                #for num in (0,10):\n                #    if cmds.objExists('initialShadingGroup'+str(num)):\n                #        cmds.delete('initialShadingGroup'+str(num))\n                #if cmds.objExists('ATOnion*'):\n                #    cmds.delete('ATOnion*')\n                \n                #Import model and rig references\n                refs = cmds.ls(type='reference')\n                refRig = []\n                refModel = []\n                \n                try:\n                    refRigGrp = cmds.referenceQuery(rigGroup,rfn=1)\n                    if refRigGrp:\n                        #Change reference from current to new\n                        maya.mel.eval('file -loadReference '+refRigGrp+' -type \"mayaBinary\" -options \"v=0;\" \"'+rigPath+'\";')\n                except:\n                    pass\n                \n                for y in range(0,2):\n                    refs = cmds.ls(type='reference')\n                    for x in refs:\n                        try:\n                            rFile = cmds.referenceQuery(x, f=True)\n                            cmds.file(rFile, importReference=True)\n                        except:\n                            pass\n                \n                for groups in rootGroup:\n                    cmds.select(groups)\n                    cmds.select(groups,hi=1,add=1)\n                    cmds.select(groups,d=1)\n                    \n                    hierarchy = cmds.ls(sl=1)\n                    jntList = []\n                    otherList = []\n                    \n                    for obj in hierarchy:\n                        if cmds.objectType(obj,i='joint'):\n                            jntList.append(obj)\n                        else:\n                            otherList.append(obj)\n                    \n                    start = cmds.playbackOptions(q=1, minTime=1)\n                    end = cmds.playbackOptions(q=1, maxTime=1)\n                    \n                    cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)\n                    \n                \n                #find all non-joint items in rootGroup\n                cmds.select(rootGroup[0],add=1,hi=1)\n                hi = cmds.ls(sl=1)\n                \n                #get all joints items\n                noChild = []\n                for item in hi:\n                    if cmds.objectType(item) == 'joint':\n                        noChild.append(item)\n                        \n                #Drill up from joint and append all parents to keepList\n                keepList = []\n                incr = 0\n                for item in noChild:\n                    if cmds.objectType(item,i='joint'):\n                        keepList.append(item)\n                        print item\n                        par = cmds.listRelatives(item,p=1)\n                        while par != rootGroup:\n                            print item,par,incr\n                            keepList.append(par)\n                            par = cmds.listRelatives(par,p=1)\n                            incr += 1\n                            if incr > 1000:\n                                break\n                \n                #Delete everything under rootGroup that is not a joint, or a relative/parent of a joint\n                for keepies in keepList:\n                    cmds.select(keepies,d=1)\n                \n                cmds.select(rootGroup,d=1)\n                cmds.delete()\n                \n                #Delete everything other than rootGroup and modelGroup\n                cmds.select(ado = 1)\n                cmds.select(rootGroup,modelGroup,d=1)\n                cmds.delete()\n                \n                #remove redundant nodes.\n                mel.eval('hyperShadePanelMenuCommand(\"hyperShadePanel1\", \"deleteUnusedNodes\");')\n                \n                #fbx export\n                #maya.mel.eval('file -force -options \"precision=8;statics=1;baked=1;sdk=0;constraint=0;animLayers=0;selected=selectedOnly;whichRange=1;range=1:31;hierarchy=none;controlPoints=0;useChannelBox=1;options=keys;copyKeyCmd=-animation objects -option keys -hierarchy none -controlPoints 0 \" -typ \"atomExport\" -es \"'+exportPath+'/'+str(i[:-3])+'.atom\";')\n                maya.mel.eval('file -force -options \"v=0;\" -type \"FBX export\" -pr -ea \"'+exportPath+'/'+str(i[:-3])+'.fbx\";')\n                \n                cmds.progressWindow( edit=True, progress=(incr/progNum*100), status=('Exporting: ' + str(i[:-3]) ))\n                incr += 1\n                fileIncr += 1\n                \n                if i == mayaFiles[-1]:\n                    break\n            if fileIncr >= len(filepath):\n                break\n        \n        cmds.progressWindow(endProgress=1)\n        cmds.confirmDialog(title='Export Complete', m = 'Batch FBX export sucessful.\\n'+exportPath, ma='center', button=['Ok'])\n\nbatchFBX_UI()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+
+} 

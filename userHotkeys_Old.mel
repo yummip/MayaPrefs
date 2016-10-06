@@ -1,0 +1,10 @@
+//Maya Preference 2015 (Release 1)
+//
+//
+
+hotkey -keyShortcut "1" -alt -name ("showGeoNameCommand");
+hotkey -keyShortcut "2" -alt -name ("showJointsNameCommand");
+hotkey -keyShortcut "3" -alt -name ("showJointsGeoNameCommand");
+hotkey -keyShortcut "4" -alt -name ("showCurvesNameCommand");
+hotkey -keyShortcut "0" -releaseName ("HfAttrSelect_Menu_revert");
+hotkey -keyShortcut "0" -name ("HfAttrSelect_Menu");

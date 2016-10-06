@@ -1,0 +1,58 @@
+//============================GMH2_ApplySecondaryGMHSurface.mel==================
+
+
+global proc int applySecondaryGMHHairSystem(string $object,string $GMHHairSystem,int $debugFlag)
+{
+
+    
+    PDD_debug($debugFlag,$object,"START: OBJECT CHECK");
+            select $object;
+            string $object = PDD_currentSelectionShapeName($debugFlag);
+            select $object;
+            string $follicles[] = PDD_NodesFromConnection("GMH_Braid","out",$debugFlag);
+            
+            if ( $follicles[0] =="")
+            {
+                warning ($object +" is not a valid GMH Surface to add secondary GMH Hair System on, ignored \n");
+                return 0;
+            }   
+    PDD_debug($debugFlag,$object,"PASSED: OBJECT CHECK ");    
+            
+            
+            
+    PDD_debug($debugFlag,"","START: GET MAYA HAIR SYSTEM NODE ");
+            select $GMHHairSystem;
+            string $MayaHairSystem = PDD_NodeFromConnection("MayaHairSystem","out",$debugFlag);
+          
+    PDD_debug($debugFlag,$MayaHairSystem,"PASSED: GET MAYA HAIR SYSTEM NODE");
+    
+    
+    
+    
+    
+    PDD_debug($debugFlag,"","START: CONNECTING FOLLICLES TO SECONDARY MAYA HAIR SYSTEM ");
+                for ($eachFollicle in $follicles)
+            {
+                int $next = getNextAvailableIndexOfMultiAttr($MayaHairSystem,"inputHair");
+                select $eachFollicle;
+                string $currentConnectHairSYstems[] = PDD_NodesFromConnection("outHair","out",$debugFlag);
+
+                int $containtResult = stringArrayContains($MayaHairSystem,$currentConnectHairSYstems);
+                if ($containtResult==0)
+                {
+
+                connectAttr -f ($eachFollicle+".outHair") ($MayaHairSystem+(".inputHair["+$next+"]"));  
+                }
+                else
+                {
+                    warning ($object+" already has secondary GMH style :" +$MayaHairSystem +" assigned to it , ignored\n");
+                }
+                 //connectAttr -f ($eachFollicle+".outHair") ($MayaHairSystem+(".inputHair"));
+            }
+            
+    PDD_debug($debugFlag,"","PASSED: CONNECTING FOLLICLES TO SECONDARY MAYA HAIR SYSTEM ");
+    
+    
+return 1;
+}
+

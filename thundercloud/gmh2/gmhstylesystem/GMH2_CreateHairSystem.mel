@@ -1,0 +1,64 @@
+//=======================GMH2_CreateHairSystem.mel===================
+
+global proc string[] create_hair_system(string $name)
+{
+
+/*================================     create hairSystem Node     ================================*/
+
+        string $hairSystem = `createNode hairSystem`;
+        pickWalk -d up;
+        rename ($name+"_MayaHairSystem");        //rename the hair system
+        pickWalk -d down;                        //go to shape node
+        $hairSystem = PDD_currentSelectionName(1);    //initiate hairsystem variable
+
+
+
+/*================================     add attributes     ================================*/
+        select $hairSystem;
+        connectAttr time1.outTime ($hairSystem+".currentTime");    //connect to time
+        PDD_addUserAttribute("GMH_MayaHairSystem",1,0,1,0);
+        PDD_addUserAttribute("GMH_InStrokeCurves",1,0,1,0);
+        PDD_addUserAttribute("in_GMH_styleMainGroup",1,0,1,0);
+        
+     /*   //add the global Scale to hairSystem
+        PDD_addUserAttribute("GMH_globalScale",1,0,100,0);
+        string $connectionLists[] ={"hairWidth","clumpWidth"};
+    for ($eachattr in $connectionLists)
+    {
+
+          string $expressionString = (($hairSystem+"."+$eachattr) +" = "+($hairSystem+"."+$eachattr)+" * "+($hairSystem+".GMH_globalScale"));
+          expression  -s $expressionString  -o $hairSystem -ae 1 -uc all  ;            
+    }
+    */
+
+/*================================     create PFX Hair node to display hair system     ================================*/
+        string $pfxHair = `createNode pfxHair -n($name+"_pfxHair")`;
+        select $pfxHair;
+        pickWalk -d up ; rename ($name+"_pfxHair");    //rename
+        pickWalk -d down;
+        $pfxHair = PDD_currentSelectionName(1);
+        
+
+        connectAttr ($hairSystem +".outputRenderHairs") ($pfxHair+".renderHairs");    //connect PFX hair to hairSystem
+
+/*================================     set attributes     ================================*/
+        
+        //=========== PFX hair attribute ========
+        setAttr ($pfxHair+".overrideEnabled") 1;
+        setAttr ($pfxHair+".overrideDisplayType") 2;
+        PDD_addUserAttribute("in_GMH_styleMainGroup",1,0,1,0);
+        setAttr ($pfxHair+".drawAsMesh") 0;
+
+
+        //=========== hair system attribute ========
+       setHairSystemAttr($hairSystem);
+
+//PARENT TO PARENT GROUP
+select $pfxHair; select -add $hairSystem; 
+
+string $HairSystemResult[1];
+$HairSystemResult[0] = $hairSystem;
+$HairSystemResult[1] = $pfxHair;
+
+return $HairSystemResult;
+}

@@ -1,0 +1,68 @@
+//================GMH_CreateBrush.mel.mel======================
+
+
+//creating a PFX brush node to connect to GMH style System
+global proc string GMH_CreateBrush(string $name)
+{
+    
+    
+/*==================== Create Brush Node ==========================*/
+        
+        createNode brush;
+        rename ($name+"_PFXBrush");
+        string $brush[] = `ls-sl`;
+
+//connect Time to brush
+//connectAttr time1.outTime ($brush[0]+".time");
+
+
+/*==================== Create attribute ==========================*/
+
+PDD_addUserAttribute("in_GMH_styleMainGroup",1,0,1,0);
+
+//create dummy stroke to connect to brush , so that prevent brush from being destroyed when user manually delete the Surface Maingroups
+createNode stroke -n($name+"_stroke");
+
+pickWalk -d up; rename ($name+"_stroke");
+ string $strokeDagNode = PDD_currentSelectionName(1);
+setAttr ($strokeDagNode+".scaleX") 0;        //scale down stroke to fix "frame all" function 
+setAttr ($strokeDagNode+".scaleY") 0;
+setAttr ($strokeDagNode+".scaleZ") 0; 
+
+pickWalk -d down;
+string $stroke = PDD_currentSelectionName(1);
+
+
+PDD_addUserAttribute("in_GMH_styleMainGroup",1,0,1,0);
+
+    if ( `isConnected ($brush[0]+".outBrush")($stroke+".brush")` == 0)
+    connectAttr  ($brush[0]+".outBrush")($stroke+".brush");
+    
+    
+    
+/*==================== edit  Brush ==========================*/
+
+setAttr ($brush[0] +".tubes") 1;
+setAttr ($brush[0] +".tubeRand") 0;
+setAttr ($brush[0] +".lengthMin") 0.8;
+setAttr ($brush[0] +".tubesPerStep") 0.1; // so that only 3 curve per edge span
+setAttr ($brush[0] +".tubeWidth1") 0.2;
+setAttr ($brush[0] +".tubeWidth2") 0.02;
+
+//set Default PATH
+setAttr ($brush[0] +".momentum") 1;
+setAttr ($brush[0] +".lengthFlex") 1;
+setAttr ($brush[0] +".curveFollow") 1;
+setAttr ($brush[0] +".curveMaxDist") 0;
+setAttr ($brush[0] +".spiralMin") 0;
+setAttr ($brush[0] +".spiralMax") 1;
+setAttr ($brush[0] +".bendBias") 0;
+setAttr ($brush[0] +".bend") 0;
+    
+
+/*==================== return Brush ==========================*/
+    
+string $Brush = $brush[0];
+
+    return $Brush;
+}

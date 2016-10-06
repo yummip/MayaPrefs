@@ -1,0 +1,67 @@
+
+global proc int GMH2_connectNucleus(string $GMHStyleSystems)
+{
+    
+    //get Maya Hair System node
+    select $GMHStyleSystems;
+    string $mayaHairSystem = PDD_NodeFromConnection("MayaHairSystem","out",1);
+    select $mayaHairSystem;
+    
+    
+    
+    // Assign a new Nsolver
+        //test if Maya Hair system is already connected to a existed nucleus
+        string $des =PDD_NodeFromConnection("startFrame","in",1);
+         if ($des!="")
+         {
+        if (`objectType $des`=="nucleus")
+        {
+            warning( "GMH Style System: < "+$GMHStyleSystems +" > is already connected to nucleus: < " +$des +" >\n");
+            return 0;
+            
+        }
+        }
+     
+     //disconnect time from Maya Hair SYstem to connect Nucleus   
+     string $time = PDD_NodeFromConnection("currentTime","in",1);
+     if (`isConnected ($mayaHairSystem+".currentTime") ($time+".outTime")`== 1)
+     disconnectAttr  ($mayaHairSystem+".currentTime") ($time+".outTime");
+     
+    select $mayaHairSystem;  
+    assignNSolver "";
+    rename "GMH_nucleus";
+    string $nucleus = PDD_currentSelectionName(1);
+    parent $nucleus $GMHStyleSystems;
+    return 1;
+    
+}
+
+
+global proc int GMH_disconnectNucleus(string $GMHStyleSystem)
+{
+     select $GMHStyleSystem;
+    string $mayaHairSystem = PDD_NodeFromConnection("MayaHairSystem","out",1);
+    select $mayaHairSystem;
+    
+        // Assign a new Nsolver
+        //test if Maya Hair system is already connected to a existed nucleus
+        string $des =PDD_NodeFromConnection("startFrame","in",1);
+         if ($des=="")
+         {
+             warning (" no nucleus is currently connected to GMH Style System: < "+$GMHStyleSystem+" > \n");
+             return 0;
+            }
+        if (`objectType $des`=="nucleus")
+        {
+            
+           delete $des; 
+           setAttr ($mayaHairSystem+".active") 0;
+        }
+        else
+        {
+            warning (" no nucleus is currently connected to GMH Style System: < "+$GMHStyleSystem+" > \n");
+            return 0;
+        }
+      
+      return 1;
+}

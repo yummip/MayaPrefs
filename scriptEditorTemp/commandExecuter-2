@@ -1,0 +1,28 @@
+#The Match shit script. Will match transforms in world space from 1 keyframe to the next.
+#Select either 1 or 2 controls. 
+
+
+### INPUT SOURCE AND DESTINATION FRAMES ###
+#sourceFrame = 1
+#destFrame = 2
+
+sourceFrame = cmds.currentTime(q=1)
+destFrame = sourceFrame - 1
+
+
+sl = cmds.ls(sl=1)
+if len(sl) ==1:
+    sl.append(sl[0])
+
+for i in range(0,2):
+    cmds.currentTime(sourceFrame)
+    matchLoc = cmds.spaceLocator(n='matchLoc')
+    cmds.delete(cmds.parentConstraint(sl[0],matchLoc,mo=0))
+    cmds.currentTime(destFrame)
+    
+    PC = cmds.parentConstraint(matchLoc,sl[1])
+    cmds.setKeyframe(sl[1])
+    cmds.delete(PC)
+    cmds.delete(matchLoc)
+    
+    cmds.filterCurve(sl[1]+'_rotateX',sl[1]+'_rotateY', sl[1]+'_rotateZ')

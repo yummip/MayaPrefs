@@ -1,0 +1,28 @@
+//Maya Preference 2016 (Release 1)
+//
+//
+
+//
+// The hotkey set
+//
+hotkeySet -source "Maya_Default" -current Maya_Default_Duplicate;
+//
+// The hotkey contexts and hotkeys
+//
+hotkey -keyShortcut "1" -alt -name ("showGeoNameCommand");
+hotkey -keyShortcut "2" -alt -name ("showJointsNameCommand");
+hotkey -keyShortcut "3" -alt -name ("showJointsAndGeoNameCommand");
+hotkey -keyShortcut "4" -alt -name ("showCurvesAndGeoNameCommand");
+hotkey -keyShortcut "5" -alt -name ("showCurvesNameCommand");
+hotkeyCtx -type "Editor" -addClient "hyperShadePanel";
+hotkeyCtx -type "Editor" -addClient "polyTexturePlacementPanel";
+hotkeyCtx -type "Editor" -addClient "nodeEditorPanel";
+hotkeyCtx -type "Editor" -addClient "outlinerPanel";
+hotkeyCtx -type "Editor" -addClient "cteEditor";
+hotkeyCtx -type "Editor" -addClient "profilerPanel";
+hotkeyCtx -type "Editor" -addClient "hyperGraphPanel";
+hotkeyCtx -type "Editor" -addClient "graphEditor";
+hotkeyCtx -type "Tool" -addClient "texCutContext";
+hotkeyCtx -type "Tool" -addClient "sculptMeshCache";
+hotkeyCtx -type "Tool" -addClient "texSculptCacheContext";
+hotkeyCtx -type "Tool" -addClient "Unfold3DBrush";

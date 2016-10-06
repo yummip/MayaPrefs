@@ -1,0 +1,208 @@
+
+global proc string CreateGMHSurface(string $GMHStyleSystem,int $debugFlag)
+{
+
+//int $debugFlag = 1;
+                                               PDD_debug($debugFlag,"","check available for currentSelection");
+/*======================= check available for currentSelection ======================*/
+            if (`PDD_currentSelectionName($debugFlag)` =="")
+            {
+                warning "no Valid surface selected to asign GMH Style";return 0;  
+            }  
+                  
+            string $mainGroup = getMainGroup(PDD_currentSelectionName($debugFlag));
+            string $baseSurface =PDD_currentSelectionName($debugFlag) ;
+            string $mainGroupParent = "";
+
+
+                                               PDD_debug($debugFlag,"","evaluate state of current surfaces");
+/*======================= evaluate state of current surfaces ======================*/  
+            // if polysurface already asigned a GMH MainGroup then delete the existed one          
+            if($mainGroup !="")
+            {
+                // GET THE PARENT OF MAIN GROUP 
+                select $mainGroup;
+                pickWalk - d up;
+               $mainGroupParent = PDD_currentSelectionName($debugFlag);
+                // if there is no parent above main group then asign null string to maingroupParent to compare later
+                       if ( $mainGroupParent == $mainGroup)
+                       {
+                           $mainGroupParent = "WORLD";
+                       }
+                       deleteGMHMainGroup($mainGroup); // delete the existing mainGroup
+            }
+
+ 
+              
+              
+              
+              
+                                               PDD_debug($debugFlag,"","check avaibility of current GMH Style System");
+/*======================= check avaibility of current GMH Style System ======================*/ 
+              
+
+//check if it's existed
+select $GMHStyleSystem;
+string $GMHStyleSystemShape = PDD_currentSelectionShapeName(1);
+                if ( `objExists $GMHStyleSystemShape`==0)  // check if the Hair system actually exist
+                {
+                    warning "GMH Style System doesnt exist ";
+                   return 0;
+                }
+                if (`attributeExists"GMH_styleMainGroup" $GMHStyleSystemShape`==0) //if exist check if it 's GMH system
+                {
+                    warning "No valid GMH Style System specified\n";
+                    return 0;
+                }
+                
+                
+  
+              
+                                               PDD_debug($debugFlag,"","get Brush and HairSystem node from GMHSystem");
+/*======================= get Brush and HairSystem node from GMHSystem ======================*/               
+                // "get PFX style and Hair system from GMH system \n";
+                    select $GMHStyleSystemShape;
+                    string $brush = PDD_NodeFromConnection("PFXStyle","out",$debugFlag);
+                    string $HairSystem = PDD_NodeFromConnection("MayaHairSystem","out",$debugFlag);
+
+
+
+
+                                               PDD_debug($debugFlag,"","start creating GMHSurface");
+/*======================= start creating GMHSurface ======================*/ 
+         
+                                               PDD_debug($debugFlag,"","check availability of baseSurface");
+            /*======================= check availability of baseSurface ======================*/      
+            select $baseSurface;
+            string $name = PDD_removeInvalidCharactersFromName(PDD_currentSelectionName($debugFlag),"_",0); 
+            if (PDD_currentSelectionName($debugFlag) !="")
+            {
+                    string $shape = PDD_currentSelectionShapeName($debugFlag);
+                    if (`objectType $shape` == "mesh"){} // pass the check , carry on
+                    else {warning "no Valid surface selected to asign GMH Style";return 0;}
+            }
+            else
+            {
+                warning "no Valid surface selected to asign GMH Style";return 0;
+                
+            }
+            string $baseMeshShape = PDD_currentSelectionShapeName($debugFlag);
+   
+            
+                                               PDD_debug($debugFlag,"","setup attrs for GMH Base Surface");
+            /*======================= setup attrs for GMHBaseSurface ======================*/ 
+
+            float $attr[] = GMH_setBaseSurfaceAttrs($baseMeshShape,$debugFlag);   
+
+            
+            
+            
+                                               PDD_debug($debugFlag,"","creating GMHMainGroup");
+            /*======================= creat GMHMainGroup ======================*/   
+            string $mainGroup = CreateGMHMainGroup($name,$debugFlag);
+            
+            
+                                               PDD_debug($debugFlag,"","baseMesh To NURBS");
+            /*======================= baseMesh To NURBS ======================*/   
+            string $NURBSurfaceShape = GMH_baseMeshToNURB($mainGroup,$baseMeshShape,$debugFlag);
+       
+
+                                               PDD_debug($debugFlag,"","NURB TO CURVES");
+            /*======================= NURB TO CURVES======================*/  
+            string $Curves[]= ConvertNurbsToCurves($mainGroup,$NURBSurfaceShape,($attr[0]),$debugFlag);
+            
+            
+
+
+                                               PDD_debug($debugFlag,"","CURVES TO STROKE");
+            /*======================= CURVES TO STROKE ======================*/  
+            string $stroke = CurvesToPFXStroke($mainGroup,$Curves,$brush,$debugFlag);
+            
+
+
+
+                                               PDD_debug($debugFlag,"","STROKE TO CURVE");
+            /*======================= STROKE TO CURVE ======================*/  
+           string $strokeCurves[] = PFXStrokeToCurves($mainGroup,$stroke,$debugFlag);
+           
+
+                                               PDD_debug($debugFlag,"","CURVE TO MAYA HAIR");
+            /*======================= CURVE TO MAYA HAIR ======================*/  
+           string $follicles[]= ConvertPFXCurvesToMayaHair($mainGroup,$strokeCurves,$HairSystem,$debugFlag);
+            
+            //lock the rotate attr
+                                               PDD_debug($debugFlag,"","lock baseMeshShape rotation");
+            /*======================= lock baseMeshShape rotation ======================*/  
+            setAttr -l true ($baseMeshShape+".PDD_GMH_rotateID");
+            
+            
+            
+            
+                                               PDD_debug($debugFlag,"","connect GMHSurface to GMHStyleMainGroup");
+            /*======================= connect GMHSurface to GMHStyleMainGroup" ======================*/ 
+            // get MAIN GROUP 
+           //CONNECT MAIN GROUP TO STYLE MAIN GROUP
+          PDD_ConnectAttribute($GMHStyleSystemShape,"GMH_OutMainGroup",$mainGroup,"GMH_StyleMainGroupIn",$debugFlag) ;
+         
+         
+         
+         
+         
+                                               PDD_debug($debugFlag,"","set up display states of GMHMainGroup");
+            /*======================= set up display states of GMHMainGroup ======================*/  
+            GMH_display($mainGroup);
+
+                   
+                   
+                   
+                   
+            /*======================= apply a deformer then delete history to fix the reference bug when polygon keep jumping aounr ======================*/  
+            select $baseMeshShape;CreateLattice;select $baseMeshShape;DeleteHistory;
+
+            
+
+
+                                               PDD_debug($debugFlag,"","organizing GMHMainGroup");
+            /*======================= organizing GMHMainGroup ======================*/ 
+
+
+//get new polySurface name and preserve the selection and reparent maingroup
+select $mainGroup;
+if ( $mainGroupParent != "WORLD")
+    {
+        if ( $mainGroupParent != "")
+            {
+               select $mainGroup;
+               select -add $mainGroupParent;
+               parent;
+            }
+        
+    }
+$mainGroup = PDD_currentSelectionName($debugFlag);
+
+
+                                               PDD_debug($debugFlag,"","putting in to asset");
+            /*======================= putting in to asset ======================*/ 
+            
+select $GMHStyleSystem;
+string $GMHsurfaceAsset  = PDD_NodeFromConnection("GMH_OutMainGroupAsset","out",1);
+
+
+int $parentCheck = isParentOf($GMHsurfaceAsset, $mainGroup);
+if ( $parentCheck !=1)
+{
+select $mainGroup;
+select -add $GMHsurfaceAsset;
+parent;
+
+    
+}
+
+                                               PDD_debug($debugFlag,"","DONE");
+            /*======================= DONE ======================*/ 
+
+
+
+select $baseSurface;
+return $mainGroup;
+}

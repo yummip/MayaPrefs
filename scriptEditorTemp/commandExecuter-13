@@ -1,0 +1,4 @@
+sl = cmds.ls(sl=1)
+
+for i in sl:
+    cmds.setAttr(i+".displayHandle", 0)

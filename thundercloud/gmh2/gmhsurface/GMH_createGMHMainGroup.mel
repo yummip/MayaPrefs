@@ -1,0 +1,65 @@
+//=======================GMH_createGMHMainGroup.mel
+global proc string CreateGMHMainGroup(string $name,int $debugFlag)
+{
+    
+                   /* ================ CREATE NULL STROKE NODE - $NULLMainGroupNode =============*/
+               
+                         createNode "stroke" -n NULL; 
+                         string $NULLMainGroupNode = PDD_currentSelectionName($debugFlag); 
+                                                                                                                 PDD_debug($debugFlag,$NULLMainGroupNode,"creating stroke NULL");
+               /* ================ CREATE NULL STROKE NODE - $NULLMainGroupNode =============*/
+                    	select $NULLMainGroupNode;
+                                                                                                                PDD_debug($debugFlag,"","Set attr of NULLNode");
+ 
+                        // lock and hide all attributes of the NULLPFX - MainGroup
+                    	string $nullAttrs[] = {($NULLMainGroupNode+".dpc"),($NULLMainGroupNode+".dam"),($NULLMainGroupNode+".sed"),($NULLMainGroupNode+".dro"),($NULLMainGroupNode+".sof"),($NULLMainGroupNode+".mblr"),($NULLMainGroupNode+".pvs"),($NULLMainGroupNode+".cpx"),($NULLMainGroupNode+".cpy"),($NULLMainGroupNode+".cpz"),($NULLMainGroupNode+".cmd"),($NULLMainGroupNode+".lcm"),($NULLMainGroupNode+".fcm"),($NULLMainGroupNode+".dgr"),($NULLMainGroupNode+".cva"),($NULLMainGroupNode+".sdn"),($NULLMainGroupNode+".smo"),($NULLMainGroupNode+".per"),($NULLMainGroupNode+".usn"),($NULLMainGroupNode+".nmx"),($NULLMainGroupNode+".nmy"),($NULLMainGroupNode+".nmz"),($NULLMainGroupNode+".mnc"),($NULLMainGroupNode+".mxc"),($NULLMainGroupNode+".spm1"),($NULLMainGroupNode+".ps1"),($NULLMainGroupNode+".px1"),($NULLMainGroupNode+".spm2"),($NULLMainGroupNode+".ps2"),($NULLMainGroupNode+".px2"),($NULLMainGroupNode+".spm3"),($NULLMainGroupNode+".ps3"),($NULLMainGroupNode+".px3")};
+
+                        for ($eachAttr in $nullAttrs)
+                            {
+                            setAttr -lock true -keyable false -channelBox false $eachAttr;
+                            }
+    	        
+    	
+                                                                                                                 PDD_debug($debugFlag,$NULLMainGroupNode,"rename transform node to mainGroup name");
+               /* ================ rename transform node to mainGroup name =============*/
+    	    pickWalk -d up;rename ($name+"_GMHSurface");
+			string $GMHMainGroup = `PDD_currentSelectionName($debugFlag)`;
+			
+		
+			
+			
+			PDD_addUserAttribute("GMH_StyleMainGroupIn",1,0,1,$debugFlag);    //add attribute to Main Group
+			PDD_addUserAttribute("GMH_MainGroup",1,0,1,$debugFlag);            //add attribute to Main Group
+			
+			addAttr -ln "GMH_outPolySurfaceShape"  -at double $GMHMainGroup;
+			//PDD_addUserAttribute("GMH_outPolySurfaceShape",1,0,1,$debugFlag);					//add attribute to Main group
+			PDD_addUserAttribute("GMH_outSubDSurfaceShape",1,0,1,$debugFlag);                    //add attribute to Main group
+			PDD_addUserAttribute("GMH_outNURBSurfaceShape",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_outLeadingCurves",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_outGrowingCurves",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_outStrokes",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_StrokesCurves",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_Follicles",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_OutputCurves",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_OutputCurvesGroup",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_outBaseSurface",1,0,1,$debugFlag);
+			PDD_addUserAttribute("GMH_outNclothOutputSurface",1,0,1,$debugFlag);
+			
+			
+			
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".tx");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".ty");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".tz");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".rx");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".ry");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".rz");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".sx");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".sy");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".sz");
+			setAttr -lock true -keyable false -channelBox false ($GMHMainGroup+".v");
+			
+			
+            
+            
+    return $GMHMainGroup;
+}

@@ -1,0 +1,26 @@
+// ================ GMH2_initHairSystemAttributesList ===========
+
+// this proc will return a list of attributes that will be pass through and connected to GMH style Main Group 
+
+global proc string[] initHairSystemAttributesList()
+{
+    
+      string $connectAttributes[] =  {       // display attr
+                                  "simulationMethod","displayQuality",
+                                       //Hair model attr
+                                  "hairsPerClump","subSegments","hairWidthScale","hairWidth","thinning","clumpWidthScale","clumpWidth","clumpTwist","subClumping","subClumpRand","clumpInterpolation",
+                                  "interpolationRange","curl","curlFrequency","noise","noiseFrequency","detailNoise","displacementScale",
+                                      // Hair shading Attr
+                                   "hairColorScale","hairColorR","hairColorG","hairColorB","opacity","translucence","specularColorR","specularColorG",
+                                   "specularColorB","specularPower","diffuseRand","specularRand","hueRand","satRand","valRand",
+                                       // hair dynamic
+                                    "attractionScale","startCurveAttract","attractionDamp","stiffness",
+                                       // render Attr
+                                       "multiStreaks","multiStreakSpread1","multiStreakSpread2",
+                                   "castShadows","receiveShadows","visibleInReflections","visibleInRefractions"
+                                   
+                                 };
+                                 
+    
+    return $connectAttributes;
+}

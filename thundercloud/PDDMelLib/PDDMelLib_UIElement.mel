@@ -1,0 +1,181 @@
+//================PDDMelLib__UIElement.mel
+
+//check box
+global proc makeCheckBox(string $layout,string $label,string $objectUniqueName,int $value, string $onCommand, string $offCommand,string $changeCommand, int $top,int $left)
+{
+      int $i=0;  
+    string $object = $label+$i;
+    //if check box is existed with that name
+
+    checkBox -label $label -onc $onCommand -ofc $offCommand -cc $changeCommand -v $value $objectUniqueName;
+    
+    
+    
+    positioning($layout,$objectUniqueName,$top,$left);
+    
+}
+
+//button
+global proc string makeButton(string $uniqueObjectName,string $layout,string $label,int $top,int $left,string $command)
+{
+
+
+						string $button =  `button -label $label -command $command $uniqueObjectName`;
+
+						 formLayout -edit
+				        		-attachForm $button "top" $top
+				          		-attachForm $button "left" $left
+						 $layout;
+						 
+						 return $button;
+}
+
+
+//text
+global proc string makeText(string $layout,string $label,int $top,int $left)
+{
+        int $ID = 0;
+
+		while (`text -ex ("my_text"+$ID)`==1)
+		{
+				$ID ++;
+				if (`text -ex ("my_text"+$ID )`==0) break;		
+		}
+		string $name = ("my_text"+$ID );
+						text -label $label $name;
+
+						 formLayout -edit
+				        		-attachForm $name "top" $top
+				          		-attachForm $name "left" $left
+						 $layout;
+						 
+return $name;
+}
+
+global proc string querryText(string $objectName)
+{
+    string $value = `text -q -l $objectName`;
+    return $value;
+}
+
+global proc string makeTextScrollField(string$objectUniqueName,string $layout,string $label,int $width , int $height,int $top,int $left)
+{
+		
+			string $name = `scrollField -w $width -h $height -wordWrap true -fn "plainLabelFont" $objectUniqueName`;
+						
+							 formLayout -edit
+				        		-attachForm $name "top" ($top+15)
+				          		-attachForm $name "left" ($left)
+						     $layout;
+						 
+		makeText($layout,$label,$top,$left);
+						 					
+
+						 
+return $name;
+}
+
+global proc string makeTextField(string$objectUniqueName,string $layout,string $label,int $width , int $height,int $top,int $left)
+{
+		
+			string $name = `textField -w $width -h $height  -fn "plainLabelFont" $objectUniqueName`;
+						
+							 formLayout -edit
+				        		-attachForm $name "top" ($top+15)
+				          		-attachForm $name "left" ($left)
+						     $layout;
+						 
+		makeText($layout,$label,$top,$left);
+						 					
+
+						 
+return $name;
+}
+
+global proc editTextScrollField(string $textFieldName,string $content,int $editable,int $visible)
+{
+    scrollField -e -text $content -en $editable -vis $visible $textFieldName;
+    
+}
+
+global proc string makeUniqueText(string $layout,string $uniqueName,string $label,int $top,int $left)
+{
+
+						text -label $label $uniqueName;
+
+						 formLayout -edit
+				        		-attachForm $uniqueName "top" $top
+				          		-attachForm $uniqueName "left" $left
+						 $layout;
+						 
+return $uniqueName;
+}
+
+//positioning
+global proc positioning(string $layout,string $object,int $top, int $left)
+{
+						 formLayout -edit
+				        		-attachForm $object "top" $top
+				          		-attachForm $object "left" $left
+						 $layout;
+
+}
+
+
+
+//text scroll list
+global proc makeTextScrollList(string $layout, string $object,string $selectCommand,string $doubleClickCommand,int $config[])
+{
+            textScrollList -numberOfRows $config[4] -allowMultiSelection true -w $config[0] -h $config[1]
+        -sc $selectCommand
+        -dcc $doubleClickCommand
+        $object;
+        
+        positioning($layout,$object,$config[2],$config[3]);
+}
+
+
+//make tree lister
+global proc string makeTreeLister(string $name,string $layout,float $top,float $left,float $width, float $height)
+{    
+
+string $treeLister = `nodeTreeLister $name`;
+formLayout -e
+        -af $treeLister top $top
+        -af $treeLister left $left
+        $layout;
+
+nodeTreeLister -e -w $width -h $height $treeLister;
+
+//make the text slot to go along with the tree lister and update the selected Item name
+string $textName = $name+"_currentSelectedItemText";
+text -l"nothing selected" $textName;
+positioning($layout, $textName,$top+$height+5, $left+100);
+
+
+return $treeLister;
+}
+
+//add item and command to tree lister 
+global proc addItemTreeLister(string $name,string $path,string $icon,string $command)
+{
+   // string $textName = $name+"_currentSelectedItemText";
+   // string $textCommand = ("text -e -l \""+$path+"\" \""+ $textName + "\"");
+    
+    
+    nodeTreeLister -e -add $path $icon ($command) $name;
+    
+}            
+              
+global proc string confirmWindow(string $label,string $message, string $command)
+{
+
+    $result = `confirmDialog -title $label -message $message
+    -button "Yes" -button "No" -defaultButton "Yes"
+    -cancelButton "No" -dismissString "No"`;
+    if ($result == "Yes")
+    {
+        eval $command;
+    }
+    return $result;
+}

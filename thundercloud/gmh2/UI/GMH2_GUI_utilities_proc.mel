@@ -1,0 +1,182 @@
+//GUI_utilitiesProc
+global proc updateGUI(int $debugFlag)
+{
+//preserve the current selection 
+string $currentSelections[] = `ls-sl`;
+
+        // get the current GMH STYLE SYSTEM
+         string $CurrentGMHStyleSystem[] = {};
+         $CurrentGMHStyleSystem = `textScrollList -query -selectItem "GMHStyleList"`;
+         
+
+         
+    //UPDATE GMH STYLE SCROLL LIST'
+
+       // get the list
+                   string $GMHStyleList[] = {};
+                    string $allOjbs[] = `ls-type"dagContainer"`;
+                    for ( $obj in $allOjbs)
+                    { if ( `attributeExists "GMH_styleMainGroup" $obj ` == 1)
+                        {
+                                select $obj; 
+                                $obj = PDD_currentSelectionName(1);
+                                string $tmp[];$tmp[0] = $obj;
+                            appendStringArray ( $GMHStyleList,$tmp,1);
+                            
+                         } 
+                     }
+                    $GMHStyleList= stringArrayRemoveDuplicates($GMHStyleList);
+
+                    //clear the list
+                    textScrollList -e -ra "GMHStyleList";
+                    
+                    //append the new GMHStyle lists to the list
+
+                    for ( $obj in $GMHStyleList)
+                    {if ( `objExists $obj`==1) {textScrollList -e -a $obj "GMHStyleList";}}
+                    
+                    // select the previous selected item if available 
+                    
+                        if ( `objExists $CurrentGMHStyleSystem[0]` == 1)
+                        {
+                       textScrollList -e -selectItem ($CurrentGMHStyleSystem) "GMHStyleList";
+                        }
+
+    //UPDATE GMH SURFACE SCROLL LIST base on current GMH Style SYsTEM
+                    //clear the list
+                    textScrollList -e -ra "GMHSurfaceList";
+                    
+                    
+                    // get the list of GMH Surface from selected GMH style System
+                            string $GMHBaseSurfaceLists[];clear ($GMHBaseSurfaceLists);
+                    if (`objExists $CurrentGMHStyleSystem[0]` ==1)
+                    {
+                            select $CurrentGMHStyleSystem[0];
+                            string $GMHMainGroupLists[] = PDD_NodesFromConnection("GMH_OutMainGroup","out",$debugFlag);
+
+                            //get poly surface lists from GMH Surface list
+                            for ( $eachMainGroup in $GMHMainGroupLists)
+                            {
+                                string $tmp[];
+                                select $eachMainGroup;
+                                select (PDD_NodesFromConnection("GMH_outPolySurfaceShape","out",$debugFlag));
+                                pickWalk - d up;
+                                $tmp[0] = PDD_currentSelectionName(1);
+                                appendStringArray($GMHBaseSurfaceLists,$tmp,1);
+                            }
+                            $GMHBaseSurfaceLists = stringArrayRemoveDuplicates($GMHBaseSurfaceLists);
+                            for ( $obj in $GMHBaseSurfaceLists)                   
+                            { textScrollList -edit -a $obj GMHSurfaceList;}
+                    
+                            if (`objExists $currentSelections[0]`==1)
+                            {
+                                    for ( $allSurface in $currentSelections)
+                                    {
+                                    if ( stringArrayContains($allSurface,$GMHBaseSurfaceLists)==1)
+                                   textScrollList -e -selectItem $allSurface "GMHSurfaceList";   
+        
+                                    } 
+                            }
+
+                    
+                    }
+
+
+    // preserve the selection 
+    if ( `objExists $currentSelections[0]` ==1)
+    select $currentSelections;
+    else
+    {
+        select -cl;
+    }
+            //UPDATE GMH STYLE TEXT
+             if ( `objExists $CurrentGMHStyleSystem[0]` ==0)
+         {
+            text -edit -label "[ Please create/select a GMH Style ]" GMHStyleNameText;
+         }
+         else
+         {
+            text -edit -label ("[ "+$CurrentGMHStyleSystem[0]+" ]") GMHStyleNameText;
+         }       
+}
+    
+
+
+global proc createNameWindow(string $object, string $title)
+{
+        //create a window to querry new name for object  // OK button behavior will base on content of $object string ) 
+        
+        
+        //Create window
+        string $namewindow = $object;
+        int $width = 250;
+        int $height = 70;
+        
+        if (`window -exists $namewindow`) deleteUI $namewindow;
+        
+        
+        window -title $title -widthHeight $width $height -s false $namewindow;
+    
+        
+        //Layout
+        string $form_name = ($object + "Form");
+        formLayout -numberOfDivisions 1 $form_name;
+        int $top = 10 ;
+        int $left = 10; 
+        int $ver_space = 10;
+        int $button_space = 20;
+        
+        
+        //Text
+        makeText($form_name,"Name",$top+5,$left);
+        
+        
+        // Text field
+        textField -w 200 -h 25 GMH_text_field;
+        positioning($form_name,"GMH_text_field",($top),45);
+        
+        
+          //button
+            $top = $top + $ver_space+20;
+            $left = $width - 75;
+        
+        //OK BUTTON
+        //Command base on what type of window is being called
+        string $command;
+      
+        if ($object == "CreateNewGMHStyleWindow")   // case creating NEW GMH Style base on valid name of text Field
+        {
+        $command = ("string $name = `textField -query -text GMH_text_field` ;"+ //get the name
+                    "if ( $name  != \"\" ){createGMHStyleSystem($name);deleteUI "+ $namewindow +   //command
+                    ";} else { warning \"Please enter a valid name.\\n\"; };updateGUI(0);"
+                    );
+        }      
+        
+
+          if ($object == "RenameGMHStyleWindow")   // case rename GMH Style base on valid name of text Field
+        {
+        $command = ( "string $GMHsystem[] =`textScrollList -query -selectItem  GMHStyleList`; if ( $GMHsystem[0] !=\"\")"
+                    +" {"
+                    +"select $GMHsystem[0]; string $name = `textField -query -text GMH_text_field` ;"+//get the name
+                    "if ( $name  != \"\" ){ renameGMHSystem($GMHsystem[0],$name ) ;print\"rename done\\n\";deleteUI "+ $namewindow +    //command
+                    ";} else { warning \"Please enter a valid name.\\n\"; };updateGUI(0);"                   
+                    +"}"
+                    +"else"
+                    +"{"
+                    +    "warning \"please select a GMH Style System \\n \";"
+                    +"}");
+        }
+        
+        makeButton("OKButton",$form_name,"OK",$top,$left,$command);
+        
+        
+        
+        //Cancel Button
+        $left = $left + 30;
+        string $command =( "deleteUI "+ $namewindow );
+        makeButton("cancelButton",$form_name,"cancel",$top,$left,$command);
+        
+        
+    showWindow $namewindow;
+    
+}

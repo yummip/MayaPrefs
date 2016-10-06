@@ -1,0 +1,97 @@
+//==============================GMH2_GUI.mel======================
+//this is the main proc to create GMH2 UI main window. 
+
+
+
+global proc create_GMHwindow()
+{
+ string $version = "v2.5";
+            int $debugFlag = 0;
+            //Window
+            string $window = "GMH2Window";
+            int $width = 445;
+            int $height = 750;
+        
+                
+         if (`window -exists $window`) deleteUI $window;
+            window -title ("TCS - GMH2 "+$version) $window;
+
+          frameLayout -lv 0;
+         rowLayout -numberOfColumns 3;
+           string $imagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/GMH2_banner.png");
+           symbolButton -image $imagePath -c"showHelp -absolute \"http:\/\/www.thundercloud-studio.com\";";
+         setParent ..;  
+           string $imagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/online_tut.png");
+           symbolButton -image $imagePath -c"showHelp -absolute \"http:\/\/www.thundercloud-studio.com/main.php?page=mainGallery.php&Dir=tutorial/#GMH\";";
+        checkBox -l "Debug Mode" -vis 0 "debugCheckBox";
+        setParent ..;
+        
+        
+        
+        
+        string $tabs = `tabLayout -innerMarginWidth 5 -innerMarginHeight 5`;
+        
+        
+        
+                //GMH CREATION LAYOUT
+                setParent $tabs;
+                string $GMHCreationScrollLayout = `scrollLayout
+                -horizontalScrollBarThickness 16
+                -verticalScrollBarThickness   16 "GMHCreationScrollLayout"`;
+                
+                string $form = `formLayout "creationFormLayout"`;
+                
+                int $top =  create_GMHStyleTable($form,0,0);
+                
+                int $top = create_GMHSurfaceTable($form,$top,0);
+            
+        tabLayout -e -tl $GMHCreationScrollLayout "GMH Creation" $tabs;
+        
+        
+              
+              
+              
+              
+               
+                //GMH EDIT            
+                setParent $tabs;    
+ 
+                string $GMHEditScrollLayout = `scrollLayout
+                -horizontalScrollBarThickness 16
+                -verticalScrollBarThickness   16 "GMHEditScrollLayout"`;
+                 
+                string $form = `formLayout "editFormLayout"`;
+              int $top = createGMHSurfaceEditButtons();
+                 
+                
+        tabLayout -e -tl $GMHEditScrollLayout "GMH Surfaces Edit" $tabs;
+                     
+                  // GMH DYNAMIC
+                setParent $tabs; 
+                 string $GMHDynamicScrollLayout = `scrollLayout
+                -horizontalScrollBarThickness 16
+                -verticalScrollBarThickness   16 "GMHDynamicScrollLayout"`;
+                 createGMHDynamicButtons();
+         
+        tabLayout -e -tl $GMHDynamicScrollLayout "GMH Dynamic" $tabs;
+        
+        /*
+                    //GMH CACHING
+                setParent $tabs; 
+                 string $GMHCacheScrollLayout = `scrollLayout
+                -horizontalScrollBarThickness 16
+                -verticalScrollBarThickness   16 "GMHCacheScrollLayout"`;
+         
+        tabLayout -e -tl $GMHCacheScrollLayout "GMH Cache" $tabs;
+        */
+        
+        
+        
+        //update all the scroll List
+        updateGUI($debugFlag);
+        
+         window -e -widthHeight $width $height -s true $window;
+        showWindow $window;
+
+}
+

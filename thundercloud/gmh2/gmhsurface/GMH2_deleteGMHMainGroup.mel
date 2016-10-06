@@ -1,0 +1,45 @@
+
+global proc int deleteGMHMainGroup(string $GMHMainGroup)
+{
+    
+    //check if GMH style exist or nor
+    if ( `objExists ($GMHMainGroup)` == 0 )
+    {
+        warning ("no GMH style is being asigned to selected surfaces \n");
+        return 0;
+    }
+    
+    
+    
+    // get  base surface from GMH style 
+    
+    select $GMHMainGroup;
+    string $baseSurface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",1);
+    
+    //get the stroke and disconnect it from the brush to prevent delete brush when deleting GMHMainGroup surface
+    string $outStroke = PDD_NodeFromConnection("GMH_outStrokes","out",1);
+    select $outStroke;
+    string $brush =  PDD_NodeFromConnection("brush","in",1);
+    if ( `isConnected ($brush+".outBrush")($outStroke+".brush")`)
+    disconnectAttr  ($brush+".outBrush")($outStroke+".brush");
+    
+    
+    delete $GMHMainGroup;
+    
+    select $baseSurface;
+    
+	setAttr ($baseSurface+".overrideEnabled") 0;				// set MESH SURFACE become wire
+	setAttr ($baseSurface+".overrideShading") 1;
+    setAttr ($baseSurface+".castsShadows") 1;
+    setAttr ($baseSurface+".receiveShadows") 1;
+    setAttr ($baseSurface+".motionBlur") 1;
+    setAttr ($baseSurface+".primaryVisibility") 1;
+    setAttr ($baseSurface+".smoothShading") 1;
+    setAttr ($baseSurface+".visibleInReflections") 1;
+    setAttr ($baseSurface+".visibleInRefractions") 1;
+    setAttr ($baseSurface+".doubleSided") 1;
+    
+    
+    return 1;
+    
+}

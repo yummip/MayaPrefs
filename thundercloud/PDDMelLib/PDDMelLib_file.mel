@@ -1,0 +1,267 @@
+//========file: PDDMelLib_file.mel========
+
+
+
+// this file contain all proc to support file  manipulation
+
+
+// this file contain all proc to support file  manipulation
+
+
+//return all available folder given a parent path ( may be under Maya script path )
+
+global proc string[] PDD_getFolderList(string $parentPath)
+{
+ string $path = PDD_getValidScriptPath($parentPath);
+string $folderLists[] =  `getFileList -fld ($path+"/")`;
+string $results[];
+//filter out file without extention ie: mistake for folder
+for ($eachFolder in $folderLists)
+        {
+            string $eachFolderPath = $path+"/"+$eachFolder;
+           int $result = `filetest -d $eachFolderPath`;
+            if ($result ==1)
+            {
+                string $tmps[];$tmp[0]=$eachFolder;
+                appendStringArray($results,$tmp,1);
+            }
+            
+        }
+    return $results;
+}
+ 
+
+
+//return filename only , given a full path with filename
+global proc string PDD_fileNameExtract(string $path)
+{
+     // seperate the path base on "/" 
+        string $paths[];
+        
+        tokenize $path "/" $paths;
+        
+        return $paths[size($paths)-1];
+}
+//return path only, given a full path with filename
+global proc string PDD_pathExtract(string $path)
+{
+    
+        // seperate the path base on "/" 
+        string $paths[];
+        
+        tokenize $path "/" $paths;
+        
+        //print $paths   // debug
+        //put them all together except the last element 
+        
+        string $newPath = "";
+        
+        int $index = 0;
+        for ($index = 0; $index < (size($paths)-1);$index++)
+        {
+            $newPath += $paths[$index] +"/";
+        }
+        
+        //print $newPath //debug
+         
+        return $newPath;
+}
+
+
+// test a path , if it does not exist then create the folder , if not then abort
+global proc PDD_createPath(string $path)
+{
+   if (  `filetest  -d $path` == 0 )
+   {
+       sysFile -md $path;
+   }
+}
+
+global proc appendStringToFile(string $content, string $path)
+{
+    
+string $originalContentTmp[];
+$originalContentTmp[0] = readStringFromFile($path);
+
+string $appendContentTmp[];
+$appendContentTmp[0] = $content;
+
+appendStringArray($originalContentTmp,$appendContentTmp,1);
+
+writeStringsToFile($originalContentTmp,$path);
+}
+
+global proc writeStringToFile(string $string,string $path)
+{   
+    // Open Your File  
+    $fileId = `fopen $path "w"` ;  
+    
+    // Print Array To File  
+    fprint $fileId ($string+"\n") ;  
+      
+    // Close File  
+    fclose $fileId ;  
+}
+
+global proc writeStringsToFile(string $stringArray[],string $path)
+{   
+    // Open Your File  
+    $fileId = `fopen $path "w"` ;  
+    string $string = stringArrayToString($stringArray,"");
+    // Print Array To File  
+    fprint $fileId ($string+"\n") ;  
+      
+    // Close File  
+    fclose $fileId ;  
+}
+
+global proc string readStringFromFile(string $path)
+{    // Open Your File  
+    $fileId = `fopen $path "r"` ;  
+    
+    // Print Array To File  
+    
+    string $data = `fread $fileId $data` ;  
+      
+    // Close File  
+    fclose $fileId ; 
+    return $data;
+}
+
+global proc string readLongStringFromFile(string $path)
+{
+    $fileId=fopen($path,"r");
+    string $content="";
+    
+    
+    string $nextLine = `fgetline $fileId`;
+    int $i = 0 ;
+    while ( size( $nextLine ) > 0 )
+    {    print $fileId;
+        $content += $nextLine;
+    	$nextLine = `fgetline $fileId`;
+    
+    }
+    
+
+
+
+return $content;
+}
+
+
+//read a string from File then tokenize it into String Array and return value at $index array 
+global proc string readStringsIndexFromFile(string $path,int $index)
+{    // Open Your File  
+    $fileId = `fopen $path "r"` ;  
+    
+    // Print Array To File  
+    
+    string $data = `fread $fileId $data` ;  
+      
+    // Close File  
+    fclose $fileId ; 
+    
+    string $dataArrays[]; clear($dataArrays);  
+    tokenizeList $data $dataArrays; 
+      
+    return $dataArrays[$index];
+    
+}
+
+//read a string from File then return string arrays 
+global proc string[] readStringsFromFile(string $path)
+{    // Open Your File  
+    $fileId = `fopen $path "r"` ;  
+    
+    // Print Array To File  
+    
+    string $data = `fread $fileId $data` ;  
+      
+    // Close File  
+    fclose $fileId ; 
+    
+    string $dataArrays[]; clear($dataArrays);  
+    tokenizeList $data $dataArrays; 
+      
+    return $dataArrays;
+    
+}
+
+global proc int PDD_executeMelFromFile(string $path)
+{
+  string $path = PDD_getValidScriptPath($path);
+eval ("source \""+$path+"\"");
+
+return 1;
+
+}
+
+
+// get a valid dir path from Maya ENV file
+global proc string PDD_getValidEnvPath(string $path,string $envType)
+{
+    
+    //test if the path is already valid
+    int $result = `filetest -e $path`;
+           if ($result ==1)
+           return $path;
+           
+// get all the script path available  
+string $scriptPath = `getenv ("MAYA_"+$envType+"SCRIPT_PATH")`;
+string $scriptPaths[];
+tokenize ($scriptPath,";",$scriptPaths);
+
+//buidl the full path 
+for ( $eachScriptPath in $scriptPaths)
+    {
+           string $fullPath = $eachScriptPath+"/"+$path;
+           int $result = `filetest -d $fullPath`;
+           if ($result ==1)
+           return $fullPath;
+    }
+return 0;
+}
+
+
+
+global proc string PDD_getValidScriptPath(string $path)
+{
+    
+    //test if the path is already valid
+    int $result = `filetest -e $path`;
+           if ($result ==1)
+           return $path;
+           
+// get all the script path available  
+string $scriptPath = `getenv MAYA_SCRIPT_PATH`;
+string $scriptPaths[];
+tokenize ($scriptPath,";",$scriptPaths);
+
+//buidl the full path 
+for ( $eachScriptPath in $scriptPaths)
+    {
+           string $fullPath = $eachScriptPath+"/"+$path;
+           int $result = `filetest -e $fullPath`;
+           if ($result ==1)
+           return $fullPath;
+    }
+return 0;
+}
+
+
+
+global proc string[] getFileListFullPath(string $path, string $fileFilter)
+{
+        string $files[] = `getFileList -folder ($path+"/") -fs $fileFilter`;
+        string $results[];clear($results);
+        int $index = 0;
+        for ( $index =0;$index <(size($files));$index++)
+            {
+                $results[$index]= ($path+"/"+$files[$index]);
+            }
+            
+            return $results;
+}
+
+

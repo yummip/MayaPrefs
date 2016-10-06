@@ -1,0 +1,60 @@
+global proc shelf_assad () {
+    global string $gBuffStr;
+    global string $gBuffStr0;
+    global string $gBuffStr1;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "//Get some info\n$img = `internalVar -uad`;\n$img += \"scripts/na_cbsHelper.png\";\n$imgDir = `internalVar -ubd`;\n\n//move the icon to the proper folder\nsysFile -ren ($imgDir+\"na_cbsHelper.png\") $img;\n\n//find the current shelf\n$shelfName = `tabLayout -q -st $gShelfTopLevel`;\n$shelf = ($gShelfTopLevel+\"|\"+$shelfName);\n\n//Check with user\n$conf = `confirmDialog -t \"Installing Corrective Blendshape Model Helper\" -ma \"center\" -b \"Continue\" -b \"Cancel\"\n    -m (\"The shelf button to launch the corrective blendshape helper \\non the \\\"\" +$shelfName+\n    \"\\\" (currently selected) shelf. Continue?\")`;\n\nif ($conf == \"Cancel\"){\n    error \"User Aborted\";\n}\n\n//Add shelf button\nshelfButton -p $shelf -i1 ($imgDir+\"na_cbsHelper.png\") -l \"Corrective Blendshape Model Helper\" \n    -c \"import na_bsCorrectiveSculptUI\\nna_bsCorrectiveSculptUI.win()\" -stp \"python\";\nprint \"Corrective Blendshape Model Helper successfully installed\";" 
+        -enableBackground 0
+        -align "center" 
+        -label "//Get some info\n$img = `internalVar -uad`;\n$img += \"scripts/na_c..." 
+        -labelOffset 0
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "commandButton.png" 
+        -image1 "commandButton.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "//Get some info\n$img = `internalVar -uad`;\n$img += \"scripts/na_cbsHelper.png\";\n$imgDir = `internalVar -ubd`;\n\n//move the icon to the proper folder\nsysFile -ren ($imgDir+\"na_cbsHelper.png\") $img;\n\n//find the current shelf\n$shelfName = `tabLayout -q -st $gShelfTopLevel`;\n$shelf = ($gShelfTopLevel+\"|\"+$shelfName);\n\n//Check with user\n$conf = `confirmDialog -t \"Installing Corrective Blendshape Model Helper\" -ma \"center\" -b \"Continue\" -b \"Cancel\"\n    -m (\"The shelf button to launch the corrective blendshape helper \\non the \\\"\" +$shelfName+\n    \"\\\" (currently selected) shelf. Continue?\")`;\n\nif ($conf == \"Cancel\"){\n    error \"User Aborted\";\n}\n\n//Add shelf button\nshelfButton -p $shelf -i1 ($imgDir+\"na_cbsHelper.png\") -l \"Corrective Blendshape Model Helper\" \n    -c \"import na_bsCorrectiveSculptUI\\nna_bsCorrectiveSculptUI.win()\" -stp \"python\";\nprint \"Corrective Blendshape Model Helper successfully installed\";" 
+        -sourceType "mel" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "Corrective Blendshape Model Helper" 
+        -enableBackground 0
+        -align "center" 
+        -label "Corrective Blendshape Model Helper" 
+        -labelOffset 0
+        -font "plainLabelFont" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.25 
+        -image "vacantCell.png" 
+        -image1 "vacantCell.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import na_bsCorrectiveSculptUI\nna_bsCorrectiveSculptUI.win()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+
+} 

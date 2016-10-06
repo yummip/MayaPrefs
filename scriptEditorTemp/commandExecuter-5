@@ -1,0 +1,22 @@
+#Mirror curve CV
+
+#USER INPUT
+prefix = 'LT'
+mirror = 'RT'
+
+#Get source nurbs curve & shape
+object = cmds.ls(sl=1)[0]
+shapes = cmds.listRelatives(s=1)
+for j in shapes:
+    mirrorName = object.replace(prefix,mirror)
+    mirrorShape = cmds.listRelatives(mirrorName,s=1)[0]
+    #Get num of control verts by degree + spans
+    spans = cmds.getAttr( j+'.degree' )
+    degree = cmds.getAttr( j+'.spans' )
+    pointList = []
+    for i in range(0,spans+degree):
+        #Create point pos list for each vert
+        pointPos = cmds.pointPosition(j+'.cv['+str(i)+']',w=1)
+        pointList.append(pointPos)
+        
+        cmds.xform(mirrorShape+'.cv['+str(i)+']',t=[-pointList[i][0],pointList[i][1],pointList[i][2]],ws=1)

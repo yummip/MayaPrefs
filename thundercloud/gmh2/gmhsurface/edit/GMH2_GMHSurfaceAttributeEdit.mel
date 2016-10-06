@@ -1,0 +1,66 @@
+// =================GMH2_GMHSurfaceAttributeEdit.mel==================
+
+
+global proc string GMH2_GMHSurfaceAttributeEdit(string $surface,string $attribute,float $incrementValue,int $debugFlag) 
+{
+// list of attribute that need to rebuild the GMH surface when change
+    string $attrNeedRebuilds[] = {"GMH_Clump_Per_Edge_loop"};
+                                               PDD_debug($debugFlag,"","check available of the surface");
+    //CHECK : if surface does not have a GMH mainGroup hence not a valid GMH surface          
+    string $mainGroup = getMainGroup($surface);                                 
+    if ( $mainGroup =="")        
+    {
+        warning ("object: \""+$surface+"\" is not a valid GMH surface, ignored \n"); 
+        return ""; 
+    }
+                                               PDD_debug($debugFlag,$surface,"surface check passed ");
+                                               PDD_debug($debugFlag,"","checking GMH Style Main Group ");
+                                               
+                                            
+    //CHECK : if surface have a GMHstyle associated with it 
+    select $mainGroup;   
+    string $GMHStyleMainGroup = PDD_NodeFromConnection("GMH_StyleMainGroupIn","out",$debugFlag);                           
+        if ( $GMHStyleMainGroup =="")        
+    {
+        warning ("object: \""+$surface+"\" does not have a valid GMH Style assigned to it, ignored \n"); 
+        return ""; 
+    }
+    
+    
+    select $mainGroup;
+    string $surface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","in",1);
+    
+                                               PDD_debug($debugFlag,"","GMHStyle check passed ");
+                                                    
+     
+                                               PDD_debug($debugFlag,"",("getting" +$attribute+ "value"));
+    // all CHECK is now pass , getting the existing attribute value
+     float $attributeValue = getAttr ($surface+"."+$attribute);  
+     
+                                               PDD_debug($debugFlag,$attribute,("is "+$attributeValue));                        
+    //algorithm to change the attribute value
+            $attributeValue =$attributeValue + $attributeValue*$incrementValue;   
+                                               PDD_debug($debugFlag,$attribute,("increased to "+$attributeValue)); 
+    // set the GMH surface to new attribute value
+            setAttr  ($surface+"."+$attribute)  $attributeValue;        
+                                               PDD_debug($debugFlag,$surface,($attribute +" set to " +$attributeValue));  
+                                               
+                                               
+                                               PDD_debug($debugFlag,$surface,("check if " +$attribute+"need to rebuild the surface"));                               
+    //rebuild the GMH surface to update the new attribute value , depend on which attributes is set to change
+    // check if the current attribute is contained in the rebuild attr list                                                                    
+    int $contain = stringArrayContains($attribute, $attrNeedRebuilds)  ;
+    if ( $contain == 1)
+    {
+                                               PDD_debug($debugFlag,$surface,("contain = "+$contain +" the attribute"+$attribute+" is in the list, rebuild the surface")); 
+                                               PDD_debug($debugFlag,$surface,("rebuilding surface with GMHstyle :"+$GMHStyleMainGroup)); 
+        select $surface;
+        CreateGMHSurface($GMHStyleMainGroup,0);
+    }                                      
+                                                    
+                                                    
+                                                    
+return $surface;
+
+}
+

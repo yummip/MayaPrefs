@@ -1,0 +1,24 @@
+//===============================PDDMelLib_debug.mel===============
+
+
+global proc PDD_debug(int $debugFlag,string $object,string $message)
+{
+    if ($debugFlag == 1)
+    {
+        print "\n====================================\n";
+        if ( $object != "" )print $object;
+        print "\n";
+        print $message;
+        print "\n====================================\n";
+
+    }
+}
+
+
+
+
+
+
+
+
+

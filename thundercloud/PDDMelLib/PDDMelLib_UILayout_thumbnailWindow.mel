@@ -1,0 +1,96 @@
+//==============================================PDD_createThumbnilWindow.mel=======================
+/*
+this proc is to create a small window building up a series of thumbnails and button base on :
+$path to dir to list file 
+$file filter rule 
+$command when click a button 
+
+*/
+//PDD_createThumbnailWindowLoader ("TEST LOADER","GMH2/presets/","*.png","",1);
+
+
+/*
+source "PDDMelLib/PDDMelLib_file.mel";
+string $title = "loader";
+string $path = "GMH2/presets/";
+string $fileFormat = "mel";
+string $command = "print(PDD_getSelectedContextThumbnailWindow(\""+$title+"\",1));print(\"\\n\");";
+PDD_createThumbnailWindow($title,$path, $fileFormat,$command,$debugFlag);
+*/
+
+global  proc int PDD_createThumbnailWindow(string $title,string $path, string $fileFormat,string $command,int $debugFlag)
+{
+     if (`filetest -e $path`==0)
+     {
+     $path = PDD_getValidScriptPath($path);  
+     }
+     if (`filetest -e $path`==0)
+     {
+         warning ("Path: <<"+$path+">> is not a valid path, please input a valid path\n");
+         return 0;
+     }
+     
+     
+     string $itemLists[] = `getFileList -folder ($path+"/") -fs ("*."+$fileFormat)`;
+
+
+    //Window
+    string $window = "thumbNail";
+    int $width = 400;
+    int $height = 650;
+    
+    if (`window -exists $window`) deleteUI $window;
+    window -title $title -widthHeight $width $height -s true $window;
+
+    
+   
+ // create scroll layout    
+ string $scrollLayout = `scrollLayout
+        -horizontalScrollBarThickness 16
+        -verticalScrollBarThickness   16`;
+        rowColumnLayout -numberOfRows 3;
+   
+//create grid layout
+text "Load Preset GMH Style\n ";
+
+string $nameHolderText = $title+"SelectContext";
+text -l "selected HairStyle"  -vis 0 $nameHolderText;
+
+gridLayout -numberOfColumns 4 -cellWidthHeight 100 120 "gridLayout";
+   
+
+
+    for ( $eachItem in $itemLists)
+    {
+       
+        rowColumnLayout -numberOfRows 2 -ro 1 "top" 5 -ro 2 "top" 5;
+        
+        string $itemNames[];
+        tokenize($eachItem,".",$itemNames);
+        string $thumbnailPath = ($path+"/"+$itemNames[0]+"_thumbnail.png");
+        image -image $thumbnailPath;
+        
+        string $command2 =" text -e -l \""+$path+"/"+$eachItem+"\"\""+$nameHolderText+"\";"+ $command;
+        button -l $eachItem -c $command2;
+    
+     setParent "gridLayout";
+    }
+
+
+
+
+showWindow $window;
+return 0;
+}
+    
+ global proc string PDD_getSelectedContextThumbnailWindow(string $title,int $debugFlag)
+ {
+     string $result =  `text -q -l ($title+"SelectContext")`;
+     return $result;
+ }
+    
+    
+    
+    
+    
+       

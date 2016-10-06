@@ -1,0 +1,186 @@
+//===================GMH_CurvesToPFXStrokes.mel============
+global proc string CurvesToPFXStroke(string $mainGroup,string $curvesSet[], string $brush,int $debugFlag)
+{
+    //$debugFlag = 1;
+    //THIS PROC WILL TAKE CURVES SELECTION AS CURRENT SELECTING CURVES  GROUP
+    
+    
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,"","get CURVE list");
+            /*======================= get CURVE list ======================*/  
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+ 
+ 
+           
+               select $curvesSet;
+    //===================================================== 
+    // GET LEADING & GROWING CURVES LIST
+            string $selection[] = `ls -type "nurbsCurve" -sl`;
+            string $GrowingCurves[];
+            string $LeadingCurves[];
+            
+            
+            //filter out grow curves
+            
+            for ($eachcurves in $selection)
+            {
+                int $GMH_curveID = `getAttr ($eachcurves + ".GMH_curveID")` ;
+                if ($GMH_curveID == 0 )
+                $GrowingCurves[0] =  $eachcurves;
+            }
+            
+            //unselect GrowingCUrves then get leading Curves list
+            select $selection; select -d $GrowingCurves[0];
+            $LeadingCurves= `ls-sl`;
+
+
+        //get the number of span of grow curve so that we know the value of tube perstep mutiply
+        select $GrowingCurves[0];
+        float $defaulClumpPerLoop = size($LeadingCurves);
+        $defaulClumpPerLoop = ($defaulClumpPerLoop*0.5)-3; if ($defaulClumpPerLoop < 1 )$defaulClumpPerLoop =1;
+        
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,$mainGroup,"curveToStroke: get mainGroup");
+            /*======================= get mainGroup ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,"","curveToStroke: get mainGroup");
+            /*======================= creating stroke ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //CREATING STROKE   
+    
+    
+    //create new stroke
+createNode "transform" -n ($brush+"_stroke");
+string $parent[] = `ls-sl`;
+createNode "stroke" -n ($brush+"_stroke") -p($parent[0]);
+$Stroke = `ls-sl`;
+setAttr ($Stroke[0]+".pathCurve[0].samples") 48;
+setAttr ($Stroke[0]+".displayPercent") 100;
+
+
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,$Stroke[0],"curveToStroke: connect stroke to growing curves ");
+            /*======================= connect stroke to growing curves ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//connect stroke to grow curves
+if (!`isConnected ($GrowingCurves[0]+".worldSpace[0]") ($Stroke[0]+".pathCurve[0].curve")`)
+connectAttr -f ($GrowingCurves[0]+".worldSpace[0]") ($Stroke[0]+".pathCurve[0].curve");
+
+
+//apply_brush_style;
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,$GrowingCurves[0],"curveToStroke: apply brush to stroke ");
+            /*======================= apply brush to stroke ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+//check if there are already a connection , if not then connect
+if (!`isConnected ($brush+".outBrush") ($Stroke[0]+".brush")`)
+connectAttr -f ($brush+".outBrush") ($Stroke[0]+".brush");
+
+
+
+// CONnect stroke to leading curves
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,$brush,"curveToStroke: connect stroke to leading curves ");
+            /*======================= connect stroke to leading curves ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//rename to MainGroup name to prevent Maya Bug Name crash
+select $LeadingCurves;
+
+select -add $Stroke[0];
+SetStrokeControlCurves;
+
+
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,"","setup stroke attributes");
+            /*======================= setup stroke attributes ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SET UP STROKE ATTRIBUTES
+        //ADD main group attr to strokes
+        select $Stroke[0];
+			PDD_addUserAttribute("GMH_InMainGroup",1,0,1,$debugFlag);
+        PDD_ConnectAttribute ($mainGroup,"GMH_outStrokes",$Stroke[0],"GMH_InMainGroup",$debugFlag) ;
+
+        //setup pressure map
+        setAttr ($Stroke[0]+".pressureScale[0].pressureScale_FloatValue") 0.99;
+        //set first map to Tubes Per Step
+        setAttr ($Stroke[0]+".pressureMap1") 10;
+        
+        //set second map to Elevation
+        setAttr ($Stroke[0]+".pressureMap2") 11;
+        
+        setAttr ($Stroke[0]+".drawAsMesh") 0;
+        
+        
+          
+ ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+                                               PDD_debug($debugFlag,$Stroke[0],"connect stroke to GMH mainGroup");
+            /*======================= connect stroke to GMH mainGroup ======================*/  
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+select $mainGroup;
+select( PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",1));
+pickWalk -d up;
+string $polyName = PDD_currentSelectionName($debugFlag);
+     
+select $Stroke[0];
+pickWalk -d up;
+select -add $mainGroup;
+parent;
+
+string $name = ($mainGroup+"_"+$brush+"_Stroke");
+$name =  PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+rename $name;
+$Stroke[0] = PDD_currentSelectionName($debugFlag);
+
+
+
+//Connect PolySurface Attr to Stroke attr
+
+        select $mainGroup;
+        string $baseSurface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",1);
+        string $PFXStroke = PDD_NodeFromConnection("GMH_outStrokes","out",1);
+        
+        
+        //select $PFXStroke;//
+      //  PDD_addUserAttribute("unKnownBug",1,0,1,$debugFlag);
+     
+      
+        // recanculate the defaulClumpPerLoop value based on existing GMH_Clump_Per_Edge_loop of Base surface Value
+        
+        
+        float $GMH_Clump_Per_Edge_loop = getAttr ($baseSurface+".GMH_Clump_Per_Edge_loop");
+                                                               
+        if (  $GMH_Clump_Per_Edge_loop <= 0.4)  
+        {
+                                                            
+            $GMH_Clump_Per_Edge_loop =  0.4;
+        } 
+        
+        // if there is no override clump per edege value and it = default 0 value then take the default clump per loop value
+        if ( $GMH_Clump_Per_Edge_loop==1)
+        {
+            $GMH_Clump_Per_Edge_loop=$defaulClumpPerLoop;
+        }
+       
+     
+        setAttr ($baseSurface+".GMH_Clump_Per_Edge_loop") ($GMH_Clump_Per_Edge_loop);
+
+        
+        // connect the clump per edge loop value of baseSurface to mainGroup stroke. 
+        PDD_ConnectAttribute($baseSurface,"GMH_Clump_Per_Edge_loop",$PFXStroke,"pressureMax1",$debugFlag) ;
+        
+     print($GMH_Clump_Per_Edge_loop+"\n");
+
+
+ return $Stroke[0];  
+ 
+
+}

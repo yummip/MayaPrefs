@@ -1,0 +1,85 @@
+                                                                print "\n ===================================\n";
+                                                                print "loading GMH2 \n";
+                                                                
+string $studioName = "THUNDERCLOUD"  ;                                               
+string $installPath = $studioName +"/GMH2/";
+                                                                print "loading PDD Mel Library scripts\n";
+eval (" source \""+($studioName+"/PDDMelLib/PDDMelLib_header.mel")+"\";");
+
+//print "header loading \n";
+                                                                print "loading utilities scripts\n";
+                                                                
+eval (" source \""+($installPath+"GMH_utilities_proc.mel")+"\";");
+
+                                                                print "loading GMH2 StyleSystem scripts\n";
+
+// GMH2 create GMH Style system scripts ;
+
+eval (" source \""+($installPath+"GMH_utilities_proc.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_CreateBrush.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_createGMHStyleSystem.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_CreateHairSystem.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_createStyleMainGroup.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_setHairSYstemAttr.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_initHairSystemAttributesList.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_deleteGMHstyleSystem.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_initHairSystemBrushAttributesList.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/GMH2_publishSubAttrToStyleMainGroup.mel")+"\";");
+eval (" source \""+($installPath+"GMHStyleSystem/edit/GMH2_connectNucleus.mel")+"\";");
+
+
+// preset
+eval (" source \""+($installPath+"presetsLoader/GMH2_presetLoader.mel")+"\";");
+eval (" source \""+($installPath+"presetsLoader/GMH2_presetSaver.mel")+"\";");
+
+
+
+
+                                                                print "loading GMH Surface scripts\n";
+// GMH SURFACE
+
+eval (" source \""+($installPath+"GMHSurface/GMH_baseMeshToNURB.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/GMH_NURBToCurves.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/GMH_CurvesToPFXStrokes.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/GMH2_PFXStrokeToCurves.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/GMH2_PFXCurvesToMayaHair.mel")+"\";"); 
+eval (" source \""+($installPath+"GMHSurface/GMH2_CreateGMHSurface.mel")+"\";");   
+eval (" source \""+($installPath+"GMHSurface/GMH_setBaseSurfaceAttrs.mel")+"\";"); 
+eval (" source \""+($installPath+"GMHSurface/GMH_createGMHMainGroup.mel")+"\";"); 
+eval (" source \""+($installPath+"GMHSurface/GMH2_deleteGMHMainGroup.mel")+"\";");  
+eval (" source \""+($installPath+"GMHSurface/GMH_RotateSurface.mel")+"\";");        
+eval (" source \""+($installPath+"GMHSurface/GMH2_ApplySecondaryGMHSurface.mel")+"\";");                                              
+                                          
+                                          
+                                          
+                      
+                                                                print "loading editing scripts\n";                                          
+//editing script
+eval (" source \""+($installPath+"editing/GMH_display.mel")+"\";");
+eval (" source \""+($installPath+"editing/GMH2_refreshGMHHairSystem.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/edit/GMH2_GMHSurfaceAttributeEdit.mel")+"\";"); 
+eval (" source \""+($installPath+"GMHSurface/edit/GMH2_GMHSurfaceAttributeReset.mel")+"\";");  
+eval (" source \""+($installPath+"GMHSurface/edit/GMH2_convertToFolicle.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/edit/GMH2_setGMHSurfaceSimulationState.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/edit/GMH2_editPressureRamp.mel")+"\";");
+eval (" source \""+($installPath+"GMHSurface/edit/GMH_HideShowFolliclesCurves.mel")+"\";");
+
+
+
+
+                                                                print "loading UI scripts\n";
+
+//GUI script
+eval (" source \""+($installPath+"UI/GMH2_GUIcreate_GMHStyleTable.mel")+"\";");
+eval (" source \""+($installPath+"UI/GMH2_GUIcreate_GMHSurfaceTable.mel")+"\";");
+eval (" source \""+($installPath+"UI/GMH2_GUI_utilities_proc.mel")+"\";");
+eval (" source \""+($installPath+"UI/GMH2_createGMHSurfaceEditButtons.mel")+"\";");
+eval (" source \""+($installPath+"UI/GMH2_createGMHDynamicButtons.mel")+"\";");
+eval (" source \""+($installPath+"UI/GMH2_GUI.mel")+"\";");
+
+                                                                print "Starting GMH2 \n";
+
+create_GMHwindow();
+
+
+//print "header loaded \n";

@@ -1,0 +1,102 @@
+//=============================GMH2_PFXStrokeToCurves.mel=====
+
+global proc string[] PFXStrokeToCurves(string $mainGroup,string $stroke,int $debugFlag)
+{
+    // convert GMH PFX system stroke to curves and parent under maingroup
+    
+    
+//===================================================================================================================================
+                                              PDD_debug($debugFlag,$mainGroup,"StrokeToCurves: get child surface nodes");
+               /* ================ get child surface nodes =============*/
+//===================================================================================================================================
+// get polysurface and get objName
+        select $mainGroup;
+        string $baseSurface = PDD_NodeFromConnection("GMH_outPolySurfaceShape","out",$debugFlag);
+       select $baseSurface;
+        pickWalk -d up;
+        string $objName = PDD_currentSelectionName($debugFlag);
+
+// get stroke
+        select $mainGroup;
+        string $stroke = PDD_NodeFromConnection("GMH_outStrokes","out",$debugFlag);
+
+
+//===================================================================================================================================
+                                              PDD_debug($debugFlag,$stroke,"StrokeToCurves: convert stroke to Curve");
+               /* ================ convert stroke to Curve =============*/
+//===================================================================================================================================
+
+//convert Stroke to Curves
+        select $stroke;
+        doPaintEffectsToCurve(1);
+
+//Get ConvertCurve
+        select $stroke;
+        string $convertCurves[] = PDD_NodesFromConnection("outMainCurves","out",$debugFlag);
+
+        
+//Connect to MainGroup
+
+//===================================================================================================================================
+                                              PDD_debug($debugFlag,$convertCurves[0],"StrokeToCurves: connect converted curves to MainGroup");
+               /* ================connect converted curves to MainGroup =============*/
+//===================================================================================================================================
+        for ($eachCurve in $convertCurves)
+        {
+          select $eachCurve;
+		    PDD_addUserAttribute("GMH_InMainGroup",1,0,1,0);
+            
+          PDD_ConnectAttribute ($mainGroup,"GMH_StrokesCurves",$eachCurve,"GMH_InMainGroup",$debugFlag) ;		//connect main group to polygon surface
+
+            
+        }     
+        select $convertCurves;
+        
+
+//===================================================================================================================================
+                                              PDD_debug($debugFlag,$convertCurves[0],"StrokeToCurves: organizing");
+               /* ================ organizing =============*/
+//===================================================================================================================================
+//GET THE CURRENT PARENT GROUP OF THE CONVERTED CURVES
+        //Goto DAG node level
+        pickWalk -d up;
+        //Goto first Parent Group
+        pickWalk -d up;
+        //Goto second Parent Group
+        pickWalk -d up;
+        
+        string $OldParentGroup = PDD_currentSelectionName($debugFlag);
+
+// parent curves to new group and delete the old one . 
+        select $convertCurves;
+        pickWalk -d up;
+        parent -w;
+        group; 
+        string $name = $objName;
+        $name = PDD_removeInvalidCharactersFromName($name,"_",$debugFlag);
+            
+        rename ($name+"follicles_null");
+        string $newParentGroup = PDD_currentSelectionName($debugFlag);
+        delete $OldParentGroup;
+        
+        
+
+//parent the new group of converted curve to the old main group
+        select $newParentGroup;
+        select -add $mainGroup;
+        parent;
+        
+        
+//Get ConvertCurve under new Group
+        select $mainGroup;
+        $convertCurves = PDD_NodesFromConnection("GMH_StrokesCurves","out",$debugFlag);
+       
+        select $convertCurves;
+
+//===================================================================================================================================
+                                              PDD_debug($debugFlag,"","StrokeToCurves: DONE");
+               /* ================ DONE =============*/
+//===================================================================================================================================
+        
+        return $convertCurves;
+}

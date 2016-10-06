@@ -1,0 +1,16 @@
+// ================ GMH2_initHairSystemBrushAttributesList ===========
+
+// this proc will return a list of attributes that will be pass through and connected to GMH style Main Group 
+
+global proc string[] initHairSystemBrushAttributesList()
+{
+    
+      string $connectAttributes[] =  {       
+                                  "segments",
+                                  "lengthMin",
+                                  "lengthMax"
+                                 };
+                                 
+    
+    return $connectAttributes;
+}

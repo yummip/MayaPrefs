@@ -1,0 +1,77 @@
+'''
+Initialise AutoRig Counter, root, global, local and cleanliness groups.
+'''
+
+import maya.cmds as cmds
+import riggingModule as rm
+
+def createRoot():
+    #Initialise Rig Counter Group, used frequently throughout the autorigging system to avoid name collisions and keeps a record for when the file is re-opened.
+    if cmds.objExists('autoRig_counter') == 0:
+        autoRigCounter = cmds.group(n='autoRig_counter',em=1)
+        rm.lockAttr(autoRigCounter,t=1,r=1,s=1,v=1)
+    #Create temp jnt and ctrl.
+    rootJnt = cmds.joint(n='root_jnt')
+    rootCtrl = cmds.curve(n='root_ctrl',d=1,p=[[-2.0, 0.0, -2.0], [-2.0, 0.0, 2.0], [2.0, 0.0, 2.0], [2.0, 0.0, -2.0], [-2.0, 0.0, -2.0]])
+    
+    #Colour curve.
+    cmds.setAttr(rootCtrl+'.overrideEnabled',1)
+    cmds.setAttr(rootCtrl+'.overrideColor',17)
+    #Make joint un-selectable.
+    cmds.setAttr(rootJnt+'.overrideEnabled',1)
+    #cmds.setAttr(rootJnt+'.overrideDisplayType',2)
+    
+    #Parent jnt to ctrl, create necessary groups.
+    cmds.parentConstraint(rootCtrl,rootJnt)
+    groups = rm.makeControlGroups(rootCtrl)
+    rootSdk = groups[0]
+    rootOffset = groups[1]
+    
+    cmds.move(0,8,0,rootOffset)
+    cmds.select(rootCtrl+'.cv[:]')
+    cmds.scale(1.2,1.2,1.2)
+    cmds.select(d=1)
+    
+    #Create Global SRT
+    globalCtrl = cmds.curve(n='global_SRT',d=1,p=[[1.1519815904477793, -3.6774106951558314e-27, 0.38399386348259285], [1.1519815904477793, -3.6774106951558314e-27, 0.7679877269651857], [1.9199693174129653, -3.6774106951558314e-27, 0.0], [1.1519815904477793, -3.6774106951558314e-27, -0.7679877269651857], [1.1519815904477793, -3.6774106951558314e-27, -0.38399386348259285], [0.6952810463138878, -3.6774106951558314e-27, -0.38399386348259285], [0.6594690818169145, 2.751278851502644e-17, -0.44931793457279795], [0.5699654670431213, 3.4900319238266784e-17, -0.5699654670431206], [0.44931793457279867, 4.0380835005508973e-17, -0.659469081816914], [0.38399386370932637, 4.2573685340224526e-17, -0.6952810454988883], [0.38399386348259307, -3.6774106951558314e-27, -1.1519815904477788], [0.7679877269651861, -3.6774106951558314e-27, -1.1519815904477788], [0.0, -3.6774106951558314e-27, -1.919969317412964], [-0.7679877269651861, -3.6774106951558314e-27, -1.1519815904477788], [-0.38399386348259307, -3.6774106951558314e-27, -1.1519815904477788], [-0.3839938634902286, 4.2573685347579365e-17, -0.6952810456190021], [-0.4493179344379141, 4.038083501163622e-17, -0.6594690819169796], [-0.5699654669930883, 3.4900319242396446e-17, -0.5699654671105632], [-0.6594690818169142, 2.7512788515026464e-17, -0.4493179345727984], [-0.6952810454988885, 2.3512842800515155e-17, -0.38399386370932614], [-1.1519815904477793, -3.6774106951558314e-27, -0.38399386348259285], [-1.1519815904477793, -3.6774106951558314e-27, -0.38399386348259285], [-1.1519815904477793, -3.6774106951558314e-27, -0.7679877269651857], [-1.9199693174129653, -3.6774106951558314e-27, 0.0], [-1.1519815904477793, -3.6774106951558314e-27, 0.7679877269651857], [-1.1519815904477793, -3.6774106951558314e-27, 0.38399386348259285], [-0.6952810454988887, -2.3512842807869952e-17, 0.38399386370932576], [-0.6594690818169144, -2.7512788522381263e-17, 0.44931793457279806], [-0.5699654670431211, -3.490031924562162e-17, 0.5699654670431209], [-0.4493179345727985, -4.038083501286381e-17, 0.6594690818169142], [-0.38399386370932614, -4.2573685347579365e-17, 0.6952810454988885], [-0.38399386348259307, -3.6774106951558314e-27, 1.1519815904477788], [-0.7679877269651861, -3.6774106951558314e-27, 1.1519815904477788], [0.0, -3.6774106951558314e-27, 1.919969317412964], [0.7679877269651861, -3.6774106951558314e-27, 1.1519815904477788], [0.38399386348259307, -3.6774106951558314e-27, 1.1519815904477788], [0.38399386370932587, -4.257368534757936e-17, 0.6952810454988885], [0.44931793457279817, -4.038083501286381e-17, 0.6594690818169143], [0.5699654670431207, -3.4900319245621636e-17, 0.569965467043121], [0.659469081816914, -2.7512788522381294e-17, 0.4493179345727986], [0.6952810454988883, -2.351284280786999e-17, 0.38399386370932637], [0.6952810463138878, -3.6774106951558314e-27, 0.38399386348259285], [1.1519815904477793, -3.6774106951558314e-27, 0.38399386348259285]])
+    #Colour
+    cmds.setAttr(globalCtrl+'.overrideEnabled',1)
+    cmds.setAttr(globalCtrl+'.overrideColor',17)
+    #Aesthetic Scale
+    cmds.select(globalCtrl+'.cv[:]')
+    cmds.scale(5,5,5)
+    cmds.select(d=1)
+    #Corresponding Groups
+    globalGrps = rm.makeControlGroups(globalCtrl)
+    globalSdk = globalGrps[0]
+    globalOffset = globalGrps[1]
+    
+    #Local RT
+    localCtrl = cmds.circle(n='local_RT')[0]
+    cmds.setAttr(localCtrl+'.overrideEnabled',1)
+    cmds.setAttr(localCtrl+'.overrideColor',16)
+    #Aesthetic Scale
+    cmds.select(localCtrl+'.cv[:]')
+    cmds.scale(3.5,3.5,3.5)
+    cmds.rotate(90,0,0)
+    cmds.select(d=1)
+    #Corresponding Groups
+    localGrps = rm.makeControlGroups(localCtrl)
+    localSdk = localGrps[0]
+    localOffset = localGrps[1]
+    cmds.parent(localOffset,globalCtrl)
+    
+    #Create Cleanliness Groups
+    jntGrp = cmds.group(n='Joints_grp',em=1)
+    ctrlGrp = cmds.group(n='Controls_grp',em=1)
+    miscGrp = cmds.group(n='Misc_grp',em=1)
+    #geoGrp = cmds.group(n='Geo_grp',em=1)
+    
+    cmds.parent(jntGrp,ctrlGrp,localCtrl)
+    cmds.parent(rootJnt,jntGrp)
+    cmds.parent(rootOffset,ctrlGrp)
+    
+    cmds.group(globalOffset,miscGrp,n='rig_grp')
+
+createRoot()
+#MAKE SURE YOU FREEZE ANY SCALE TRANSFORMS AFTER CREATION.

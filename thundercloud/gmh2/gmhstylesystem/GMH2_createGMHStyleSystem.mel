@@ -1,0 +1,88 @@
+//===========================GMH2_createGMHStyleSystem.mel===============
+
+//create a universal GMHStyleSystem to assign GMH hair to meshes.
+global proc string createGMHStyleSystem(string $name)
+{
+    int $debugFlag = 0;
+    /*================================     create BRUSH     ================================*/
+    string $Brush = GMH_CreateBrush($name);
+                             
+    
+    /*================================     create Maya Hair system     =====================*/
+    string $HairSystem[] = create_hair_system($name);
+
+      select $Brush; //select the PFX stroke then track which brush it's connected to 
+                                                                                                             PDD_debug($debugFlag,$Brush,"get NULLnode");
+      string $dummyStroke = PDD_NodeFromConnection("outBrush","out",$debugFlag);
+
+
+      
+                                                                                                        PDD_debug($debugFlag,$Brush,"creating Style Main Group");
+    /*================================     creating Style Main Group     =====================*/
+    string $styleMainGroup = createStyleMainGroupNode($name,$debugFlag);
+
+
+       
+       
+    /*================================     connect Attr of GMHstyleMainGroup to GMHStyle Child nodes   =======================*/
+                                                                                                                 PDD_debug($debugFlag,"","conntecting GMHStyle child nodes");
+                            //connect NULL stroke to Brush 
+        PDD_ConnectAttribute($styleMainGroup,"PFXHair",$HairSystem[1],"in_GMH_styleMainGroup",$debugFlag);
+        PDD_ConnectAttribute($styleMainGroup,"MayaHairSystem",$HairSystem[0],"in_GMH_styleMainGroup",$debugFlag);
+        PDD_ConnectAttribute($styleMainGroup,"PFXStyle",$Brush,"in_GMH_styleMainGroup",$debugFlag);
+
+ 
+/*================================     reorganize  Style Main Group  ================================*/
+        
+                                                                                                                 PDD_debug($debugFlag,"","reorganizing");
+                                                                                                                 
+
+        // parent HairSystem to Style Main Group
+        select $HairSystem;
+        select -add $dummyStroke;    //select the transformNode of HairSystem
+        select -add $Brush;
+        
+        
+                // SET UP GLOBAL SCALE ATTRIBUTES
+ addAttr -ln "GMHHairWidth"  -at double  -min 1e-005 -smx 1  -dv 0.1 $HairSystem[0];
+        addAttr -ln "GMHClumpWidth"  -at double  -min 1e-005 -smx 1  -dv 1 $HairSystem[0];
+addAttr -ln "globalScale"  -at double  -min 1e-005 -smx 1  -dv 1 $HairSystem[0];
+addAttr -ln "polygonHair"  -at bool   $HairSystem[0];
+
+expression -s ($HairSystem[0]+".hairWidth = "+$HairSystem[0]+".GMHHairWidth*"+$HairSystem[0]+".globalScale") -o $HairSystem[0] -ae 1 -uc all ;
+expression -s ($HairSystem[0]+".clumpWidth = "+$HairSystem[0]+".GMHClumpWidth*"+$HairSystem[0]+".globalScale") -o $HairSystem[0] -ae 1 -uc all ;
+
+        container -e -includeShapes -includeTransform -force -addNode `ls -sl` $styleMainGroup;
+container -e -publishAndBind ($HairSystem[0]+".globalScale") "globalScale" $styleMainGroup;
+container -e -publishAndBind ($HairSystem[0]+".GMHHairWidth") "GMHHairWidth" $styleMainGroup;
+container -e -publishAndBind ($HairSystem[0]+".GMHClumpWidth") "GMHClumpWidth" $styleMainGroup;
+container -e -publishAndBind ($HairSystem[0]+".polygonHair") "polygonHair" $styleMainGroup;
+
+
+
+
+        //publish all sub attr to styleMainGroup 
+/*================================     publish sub Attrs to  Style Main Group  ================================*/
+        
+                                                                                                                 PDD_debug($debugFlag,"","publish sub Attrs ");
+        GMH2_publishSubAttrToStyleMainGroup( $styleMainGroup,$HairSystem[0],$Brush);
+        
+// remove the Hair & clump width attributes from container
+
+            container -e -unbindAndUnpublish ($HairSystem[0]+".hairWidth") $styleMainGroup;
+           container -e -unbindAndUnpublish ($HairSystem[0]+".clumpWidth") $styleMainGroup;
+
+  /*================================     create container to hold GMH surfaces  ================================*/
+        
+                                                                                                                 PDD_debug($debugFlag,"","create surface container");
+                                                                                                                                   
+       string $GMHMainGroupAsset = ` container -type dagContainer -ind "history" -ind "channels" -includeHierarchyBelow -includeTransform -name ($name+"_surfaceGrp")`;
+        addAttr -ln "GMH_inMainGroup"  -at double;
+        connectAttr ($styleMainGroup+".GMH_OutMainGroupAsset")($GMHMainGroupAsset+".GMH_inMainGroup");     
+        //setAttr ($GMHMainGroupAsset+".blackBox") 1;
+        
+        // publish the GMH attribute to container 
+
+        
+return 1;
+}

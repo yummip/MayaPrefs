@@ -1,0 +1,172 @@
+
+
+//PDD_GMHPresetLoaderUILoader"THUNDERCLOUD/GMH2/presetsLoader/presets/";
+
+global proc int PDD_applyGMHPreset(string $presetName)
+{
+    
+         //string $GMHHairSystem = PDD_currentSelectionName(1);
+         string $GMHHairSystems[] = `textScrollList -query -selectItem "GMHStyleList"`;
+         if ( `objExists $GMHHairSystems[0]`==0)
+         {
+             warning ("the GMH Style System" + $GMHHairSystems[0] + " does not exist, abort \n");
+             return 0 ;
+         }
+         if (`attributeExists "GMH_styleMainGroup" $GMHHairSystems[0]` ==0)
+         {
+             warning ($GMHHairSystems[0] + " is not a valid GMH style System , ignored \n");
+             return 0;
+         }
+         print ("UPDATE 1 : Apply " +$presetName +" to GMH Style System :"+$GMHHairSystems[0]+"\n");
+         applyPresetToNode $GMHHairSystems[0] "" "" $presetName 1 ;
+        // PDD_executeMelFromFile($path);
+            return 1;
+    
+}
+global proc int PDD_deleteGMHPreset(string $path)
+{
+        string $fullPath = PDD_getValidScriptPath($path);
+        string $fileName = PDD_fileNameExtract($fullPath);
+        string $path = PDD_pathExtract($fullPath);
+        string $tmps[];tokenize  $fileName "_" $tmps;
+        string $presetName = $tmps[0];
+        string $thumnailPath = $path +$presetName+"_GMHPRESET_thumbnail.png";
+
+        string $answer = `confirmDialog -title "Confirm" -message ("Delete : "+$presetName +" GMH Preset ?")
+    -button "Yes" -button "No" -defaultButton "Yes"
+    -cancelButton "No" -dismissString "No"`;
+
+        if ($answer == "No")
+        {
+            return 1;
+        }
+        if ($answer == "Yes")
+        {
+             sysFile -del $thumnailPath;
+             sysFile -del $fullPath;
+             PDD_GMHPresetLoaderUILoader("THUNDERCLOUD/GMH2/presetsLoader/presets/");
+        }
+    
+    
+    return 1;
+    
+}
+global proc PDD_GMHPresetLoaderUILoader(string $path)
+{
+
+string $title = "GMH_presetLoader";
+string $fileFormat = "_GMHPreset.mel";
+string $command = "PDD_applyGMHPreset(PDD_getSelectedContextThumbnailWindow(\""+$title+"\",0))";
+string $deleteCommand = "PDD_deleteGMHPreset(PDD_getSelectedContextThumbnailWindow(\""+$title+"\",0))";
+PDD_GMHPresetLoaderUI($title,$path, $fileFormat,$command,$deleteCommand,1); 
+}
+
+
+global  proc string[] PDD_GMHPresetLoaderUI(string $title,string $path, string $fileFormat,string $command,string $deleteCommand,int $debugFlag)
+{
+    
+                string $returns[];
+                
+                 if (`filetest -e $path`==0)
+                 {
+                 $path = PDD_getValidScriptPath($path);  
+                 }
+                 if (`filetest -e $path`==0)
+                 {
+                     warning ("Path: <<"+$path+">> is not a valid path, please input a valid path\n");
+                     //return $returns;
+                 } string $itemLists[] = `getFileList -folder ($path+"/") -fs ("*"+$fileFormat)`;
+            
+            // color value
+                vector $bannerButtonColor = {(0.10605),(0.291966),(0.473686)};
+                vector $defaultThumbnailFrameColor = {(0.10605),(0.207445),(0.473686)};
+               // vector $hiLightghtThumbnailFrameColor = {(0.608),(0.147),(0.0)};
+            
+                //Window
+                string $window = "thumbNail";
+                int $width = 700;
+                int $height = 650;
+                
+                if (`window -exists $window`) deleteUI $window;
+                window -title $title -widthHeight $width $height -s true $window;
+            
+                
+               
+             // create scroll layout    
+             string $scrollLayout = `scrollLayout
+                    -horizontalScrollBarThickness 16
+                    -verticalScrollBarThickness   16 "scrollLayout"`;
+                    
+                    
+            
+            
+            
+            string $nameHolderText = $title+"SelectContext";
+            text -l "selected HairStyle"  -vis 0 $nameHolderText;
+            
+            button -l "GMH PRESET LOADER " -w 600
+                -bgc ($bannerButtonColor.x) ($bannerButtonColor.y) ($bannerButtonColor.z)
+                -en 1 ;
+                
+            string $commandSetPath ="string $PDDGMHPreset_paths[] = `fileDialog2  -fm 3 -okc \"set\"`;string $PDDGMHPreset_path = $PDDGMHPreset_paths[0];PDD_GMHPresetLoaderUILoader($PDDGMHPreset_path)"; 
+            
+            string $textFieldContent = $path;
+            if ($path =="")
+            {
+            $textFieldContent = "click on SetPath button to select the directory to your GMH PRESET library";
+            }
+            
+            textFieldButtonGrp -cw 1 80 -cw 2 450 -label "Path To GMH PRESET " -text $textFieldContent -buttonLabel "Set Path" -bc $commandSetPath PDD_VrayProxyTextField;
+            
+            
+            ////////////////////////////////////////////////////    BUTTONS     //////////////////////////////////////
+            
+              // frame layout to border the thumbnail grid   
+                
+            frameLayout -label "GMH PRESETS" -borderStyle "in" "frameLayout";
+                    //create grid layout
+                    gridLayout -nc 4 -cellWidthHeight 150 170 "gridLayout";
+                       
+                    
+                    int $index = 1;
+                        for ( $eachItem in $itemLists)
+                        {
+                           
+                            //get Image file path 
+                            string $eachItemCleanUpName = PDD_removeInvalidCharactersFromName($eachItem,"_",1);
+                            string $applyButtonName = ("PDDVPMapplyButton_"+$index);
+                            string $frameName = ("PDDVPMFrame_"+$index);
+                            string $columnName = ("PDDVPMColumn_"+$index);
+                            frameLayout -l $index -borderStyle "in" -bgc ($defaultThumbnailFrameColor.x) ($defaultThumbnailFrameColor.y) ($defaultThumbnailFrameColor.z) $frameName;
+                            columnLayout -bgc ($defaultThumbnailFrameColor.x+0.2) ($defaultThumbnailFrameColor.y+0.2) ($defaultThumbnailFrameColor.z+0.2) $columnName;
+                            string $itemNames[];
+                            tokenize($eachItem,".",$itemNames);
+                            string $thumbnailPath = ($path+"/"+$itemNames[0]+"_thumbnail.png");
+                            image -image $thumbnailPath -w 100 -h 100;
+                            
+                            
+                            // button
+                            string $command2 =" text -e -l \""+$path+"/"+$eachItem+"\"\""+$nameHolderText+"\";"+ $command;
+                            string $deleteCommand2 = " text -e -l \""+$path+"/"+$eachItem+"\"\""+$nameHolderText+"\";" + $deleteCommand;
+                            
+                            string $buttonNames[]; 
+                            tokenize($itemNames[0],"_",$buttonNames);
+                            
+                            button -l $buttonNames[0] -c $command2 -w 140  -bgc ($bannerButtonColor.x) ($bannerButtonColor.y) ($bannerButtonColor.z) $applyButtonName  ;
+                            
+                            
+                            button -l "Delete Preset" -c $deleteCommand2 -w 140  -bgc ($bannerButtonColor.x) ($bannerButtonColor.y) ($bannerButtonColor.z)  ; 
+                            $index ++;
+                            setParent ..;
+                            setParent ..;
+                        }
+             
+                        
+                         
+            
+               
+            
+            showWindow $window;
+            return $itemLists;
+}
+     

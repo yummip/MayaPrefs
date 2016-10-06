@@ -1,0 +1,854 @@
+import maya.cmds as cmds
+import riggingModule as rm
+reload(rm)
+import time
+import re
+
+#axis = left, right or mid
+#inverse = True/False (mirroring operations only)
+def tempLegRig(axis,inverse):
+    #Initialise Rig Counter Group if not already
+    if cmds.objExists('autoRig_counter') == 0:
+        autoRigCounter = cmds.group(n='autoRig_counter',em=1)
+        rm.lockAttr(autoRigCounter,t=1,r=1,s=1,v=1)
+    #Get prefix
+    X_legs = 0
+    prefix = ''
+    if axis == 'left' or axis == 'LT' or axis == 'lt' or axis == 'l' or axis == 'L':
+        prefix = 'LT'
+        normal = 6
+        light = 18
+    elif axis == 'right' or axis == 'RT' or axis == 'rt' or axis == 'r' or axis == 'R':
+        prefix = 'RT'
+        normal = 13
+        light = 20
+    elif axis == 'mid' or axis == 'middle' or axis == 'm' or axis == 'M' or axis == 'mid' or axis == 'MID' or axis == 'center':
+        prefix = 'MID'
+        normal = 10
+        light = 3
+    else:
+        prefix = 'LT'
+    
+    #Initialise Leg, count it.
+    if cmds.objExists('autoRig_counter') == 1:
+        counterAttrs = cmds.listAttr('autoRig_counter')
+        if not 'LT_legs' in counterAttrs:
+            #Initialise all different types of leg counter.
+            cmds.addAttr('autoRig_counter', ln = "LT_legs", at = 'long',dv=0,k=1)
+            cmds.addAttr('autoRig_counter', ln = "RT_legs", at = 'long',dv=0,k=1)
+            cmds.addAttr('autoRig_counter', ln = "MID_legs", at = 'long',dv=0,k=1)
+            X_legs = cmds.getAttr('autoRig_counter.'+prefix+'_legs')
+            X_legs += 1
+            cmds.setAttr('autoRig_counter.'+prefix+'_legs',X_legs)
+        else:
+            X_legs = cmds.getAttr('autoRig_counter.'+prefix+'_legs')
+            X_legs += 1
+            cmds.setAttr('autoRig_counter.'+prefix+'_legs',X_legs)
+
+    #Make Square Curves and rotate them
+    global tempJoints
+    global tempLeg_grp
+    
+    #Is root selected?
+    selection = cmds.ls(sl=1)
+    object = 0
+    if selection:
+        object = cmds.ls(sl=1)[0]
+    rootSelected = 0
+    if object == 'root_ctrl':
+        rootSelected = 1
+    
+    ################################
+    ## Create Foot Pivot Locators ##
+    ################################
+    footPivotLocators = []
+    heelPivot = cmds.spaceLocator(n='temp_heelPivot_loc')
+    toePivot = cmds.spaceLocator(n='temp_toePivot_loc')
+    innerPivot = cmds.spaceLocator(n='temp_innerPivot_loc')
+    outerPivot = cmds.spaceLocator(n='temp_outerPivot_loc')
+    
+    footPivotLocators.extend([heelPivot,toePivot,innerPivot,outerPivot])
+    
+    #Position Foot Pivot Locators
+    cmds.move(0,0,0,heelPivot)
+    cmds.move(0,0,3,toePivot)
+    cmds.move(-1,0,2,innerPivot)
+    cmds.move(1,0,2,outerPivot)
+    for loc in footPivotLocators:
+        cmds.setAttr(str(loc[0])+'Shape.localScaleX',0.35)
+        cmds.setAttr(str(loc[0])+'Shape.localScaleY',0.35)
+        cmds.setAttr(str(loc[0])+'Shape.localScaleZ',0.35)
+    #Colour Foot Pivot Locators
+    fpl_grp = cmds.group(em=1,n='footPivotLocators_grp')
+    for i in footPivotLocators:
+        cmds.setAttr(i[0] + '.overrideEnabled', 1)
+        cmds.setAttr(i[0] + '.overrideColor', 14)
+        offset = cmds.group(i,n=i[0]+'_offset')
+        cmds.parent(offset,fpl_grp)
+    
+
+    ################################
+    ##         Make Joints        ##
+    ################################
+    tempJoints = []
+    #Make & position joints
+    cmds.select(d=1)
+    cmds.joint(n='temp_upLeg_jnt', p=( 0, 8, 0))
+    cmds.joint(n='temp_lowLeg_jnt', p=(0, 4.25, 0.5))
+    cmds.joint( 'temp_upLeg_jnt', e=1, zso=1, oj='xyz')
+    cmds.joint(n='temp_foot_jnt', p= (0, 1, 0))
+    cmds.joint( 'temp_lowLeg_jnt', e=1, zso=1, oj='xyz')
+    cmds.joint(n='temp_ball_jnt', p= (0, 0, 1.316))
+    cmds.joint( 'temp_foot_jnt', e=1, zso=1, oj='xyz')
+    cmds.joint(n='temp_ball_end', p =(0, 0, 2.961))
+    cmds.joint( 'temp_ball_jnt', e=1, zso=1, oj='xyz')
+    #Get list
+    a = cmds.listRelatives('temp_upLeg_jnt',ad=1)
+    tempJoints.extend(a)
+    tempJoints.append('temp_upLeg_jnt')
+    tempJoints.reverse()
+    #Orient Hip correctly.
+    cmds.select(tempJoints[0])
+    cmds.joint(e=1, oj = 'xyz', secondaryAxisOrient = 'yup' ,ch=1,zso=1)
+    #Orient Knee correctly.
+    cmds.select(tempJoints[1]+'.rotateAxis')
+    cmds.rotate(-180,0,0)
+    #cmds.setAttr(tempJoints[0]+".jointOrientX", -90)
+    #Set end joint orient 
+    cmds.setAttr(tempJoints[-1]+'.jointOrientX',0)
+    cmds.setAttr(tempJoints[-1]+'.jointOrientY',0)
+    cmds.setAttr(tempJoints[-1]+'.jointOrientZ',0)
+    if inverse == 1:
+        for i in tempJoints:
+            cmds.select(i+'.rotateAxis')
+            cmds.rotate(0,180,0)
+    
+    
+    ################################
+    ##   Make Template Controls   ##
+    ################################
+    ctrlNames = ['temp_hip_ctrl','temp_knee_ctrl','temp_foot_ctrl','temp_ball_ctrl']
+    ctrlList = []
+    ctrlOffsetList = []
+    incr = 0
+    for jnt in tempJoints:
+        if incr < 4:
+            #Make ctrl
+            Ctrl = cmds.curve(n=ctrlNames[incr],d=1,p=[[7.355227538141662e-16, -0.09817471969930455, -0.9967846568627861], [7.274645962244903e-16, 6.950086540764915e-16, -1.0016076715686077], [7.216449660063518e-16, 0.09817471969930537, -0.9967846568627823], [6.938893903907228e-16, 0.19540396318014502, -0.982362061013445], [7.216449660063518e-16, 0.2907513596768878, -0.9584787815028208], [7.216449660063518e-16, 0.3832986616390817, -0.9253648273685252], [6.661338147750939e-16, 0.4721545879573286, -0.8833391040907997], [5.551115123125783e-16, 0.5564634074875946, -0.8328063423584067], [6.661338147750939e-16, 0.635413180209913, -0.7742532002908461], [7.771561172376096e-16, 0.7082435766546333, -0.7082435766546321], [7.771561172376096e-16, 0.7742532002908472, -0.6354131802099122], [7.771561172376096e-16, 0.8328063423584079, -0.5564634074875937], [6.661338147750939e-16, 0.8833391040908012, -0.47215458795732834], [5.551115123125783e-16, 0.9253648273685264, -0.3832986616390812], [7.771561172376096e-16, 0.9584787815028224, -0.2907513596768876], [5.551115123125783e-16, 0.9823620610134466, -0.19540396318014464], [4.440892098500626e-16, 0.9967846568627834, -0.09817471969930502], [6.661338147750939e-16, 1.0016076715686113, -1.6029716264401674e-16], [7.771561172376096e-16, 0.9967846568627836, 0.09817471969930475], [5.551115123125783e-16, 0.9823620610134471, 0.19540396318014439], [5.551115123125783e-16, 0.9584787815028226, 0.2907513596768873], [4.440892098500626e-16, 0.925364827368527, 0.38329866163908116], [9.992007221626409e-16, 0.8833391040908017, 0.47215458795732823], [7.771561172376096e-16, 0.8328063423584083, 0.5564634074875938], [7.771561172376096e-16, 0.7742532002908479, 0.6354131802099126], [7.771561172376096e-16, 0.7082435766546336, 0.7082435766546327], [4.440892098500626e-16, 0.6354131802099136, 0.7742532002908468], [5.551115123125783e-16, 0.5564634074875948, 0.8328063423584074], [6.106226635438361e-16, 0.47215458795732945, 0.8833391040908007], [6.661338147750939e-16, 0.3832986616390821, 0.9253648273685262], [6.106226635438361e-16, 0.2907513596768884, 0.9584787815028221], [6.106226635438361e-16, 0.19540396318014547, 0.9823620610134463], [6.106226635438361e-16, 0.09817471969930569, 0.9967846568627831], [6.04803033325697e-16, 8.038046014963212e-16, 1.0016076715686106], [6.245004513516506e-16, -0.09817471969930419, 0.9967846568627834], [6.106226635438361e-16, -0.19540396318014386, 0.9823620610134467], [5.551115123125783e-16, -0.2907513596768869, 0.9584787815028222], [6.106226635438361e-16, -0.3832986616390806, 0.9253648273685265], [6.106226635438361e-16, -0.4721545879573279, 0.8833391040908014], [6.661338147750939e-16, -0.5564634074875934, 0.832806342358408], [5.551115123125783e-16, -0.6354131802099121, 0.7742532002908473], [6.661338147750939e-16, -0.7082435766546323, 0.7082435766546331], [5.551115123125783e-16, -0.7742532002908467, 0.635413180209913], [6.661338147750939e-16, -0.8328063423584073, 0.5564634074875945], [5.551115123125783e-16, -0.8833391040908006, 0.472154587957329], [4.440892098500626e-16, -0.9253648273685262, 0.38329866163908183], [5.551115123125783e-16, -0.9584787815028221, 0.29075135967688803], [6.661338147750939e-16, -0.9823620610134461, 0.195403963180145], [6.661338147750939e-16, -0.9967846568627832, 0.09817471969930522], [6.661338147750939e-16, -1.0016076715686106, 1.8970031867176768e-16], [5.551115123125783e-16, -0.9967846568627833, -0.09817471969930486], [6.661338147750939e-16, -0.9823620610134468, -0.19540396318014466], [6.661338147750939e-16, -0.9584787815028222, -0.29075135967688776], [4.440892098500626e-16, -0.9253648273685268, -0.3832986616390817], [7.771561172376096e-16, -0.883339104090801, -0.47215458795732906], [6.661338147750939e-16, -0.8328063423584078, -0.5564634074875947], [6.661338147750939e-16, -0.7742532002908468, -0.6354131802099136], [5.551115123125783e-16, -0.708243576654633, -0.7082435766546338], [7.771561172376096e-16, -0.6354131802099128, -0.774253200290848], [7.771561172376096e-16, -0.5564634074875938, -0.8328063423584089], [7.216449660063518e-16, -0.4721545879573286, -0.883339104090802], [7.216449660063518e-16, -0.38329866163908133, -0.9253648273685278], [7.216449660063518e-16, -0.29075135967688753, -0.9584787815028237], [6.938893903907228e-16, -0.19540396318014455, -0.9823620610134476], [6.938893903907228e-16, -0.19540396318014455, -0.9823620610134476], [6.938893903907228e-16, -0.19540396318014455, -0.9823620610134476], [6.938893903907228e-16, -0.19540396318014455, -0.9823620610134476], [7.355227538141662e-16, -0.09817471969930455, -0.9967846568627861]])
+            ctrlList.append(Ctrl)
+            #Aesthetics
+            cmds.select(Ctrl+'.cv[:]')
+            cmds.rotate(90,0,0)
+            cmds.scale(0.7,0.7,0.7)
+            cmds.setAttr(Ctrl+'.overrideEnabled',1)
+            cmds.setAttr(Ctrl+'.overrideColor',normal)
+            #Make control groups, position and parent
+            CtrlGrps = rm.makeControlGroups(Ctrl)
+            CtrlSdk = CtrlGrps[0]
+            CtrlOffset = CtrlGrps[1]
+            ctrlOffsetList.append(CtrlOffset)
+            cmds.delete(cmds.parentConstraint(jnt,CtrlOffset))
+            cmds.parentConstraint(Ctrl,jnt,mo=1)
+            incr += 1
+            rm.lockAttr(Ctrl,r=1,s=1,v=1)
+    rm.unlockAttr(ctrlList[2],r=1)
+            
+    #Create leg root ctrl
+    legRootCtrl = cmds.curve(n='temp_legRoot_ctrl',d=1,p=[[1.0, 0.0, -1.0], [1.0, 0.0, 1.0], [-1.0, 0.0, 1.0], [-1.0, 0.0, -1.0], [1.0, 0.0, -1.0]])
+    legRootGroups = rm.makeControlGroups(legRootCtrl)
+    legRootSdk = legRootGroups[0]
+    legRootOffset = legRootGroups[1]
+    #Place it
+    rm.matchPos(ctrlList[0],legRootOffset)
+    #Create mirror option
+    if prefix == 'RT' or prefix == 'LT':
+        cmds.addAttr(legRootCtrl, ln = "legMirror", at = "bool",k=1)
+    #Asthetics
+    cmds.select(legRootCtrl+'.cv[:]')
+    cmds.rotate(0,0,90)
+    cmds.select(d=1)
+    cmds.setAttr(legRootCtrl+'.overrideEnabled',1)
+    cmds.setAttr(legRootCtrl+'.overrideColor',light)
+    rm.lockAttr(legRootCtrl,v=1)
+    
+    #Create IK control
+    IKCtrl = cmds.curve(n='temp_foot_IK_ctrl',d=1,p=[[0.7946990132331848, 0.0, 2.569427967071533], [0.6188182652293848, 0.0, 0.009364962577819824], [-0.6188182652293848, 0.0, 0.009364962577819824], [-0.7946990132331848, 0.0, 2.569427967071533], [0.0, 0.0, 2.9962995052337646], [0.7946990132331848, 0.0, 2.569427967071533], [0.6505876929190708, 0.5099207758903503, 2.388885021209717], [0.0, 0.6971108913421631, 2.629791470571169], [0.0, 0.0, 2.9962995052337646], [-0.7946990132331848, 0.0, 2.569427967071533], [-0.6505876929190708, 0.5099207758903503, 2.388885021209717], [0.0, 0.6971108913421631, 2.629791470571169]])
+    cmds.xform(IKCtrl,rp=[0,1,0],ws=1)
+    IKGrps = rm.makeControlGroups(IKCtrl)
+    IKSdk = IKGrps[0]
+    IKOffset = IKGrps[1]
+    cmds.xform(IKSdk,rp=[0,1,0],ws=1)
+    cmds.xform(IKOffset,rp=[0,1,0],ws=1)
+    cmds.parent(IKOffset,ctrlList[3])
+    #Aethetics
+    cmds.setAttr(IKCtrl+'.overrideEnabled',1)
+    cmds.setAttr(IKCtrl+'.overrideColor',normal)
+    rm.lockAttr(IKCtrl,v=1)
+    
+    #Create Foot Attribute Control
+    footAttrCtrl = cmds.curve(n='temp_footAttr_ctrl',d=1,p=[[0.23888255886696347, 0.0, 5.160889365579703e-17], [0.23888255886696352, 0.0, -0.4777651177339266], [-0.2388825588669633, 0.0, -0.4777651177339275], [-0.23888255886696347, 0.0, -5.447627315839399e-17], [-0.47776511773392694, 0.0, -1.0751885656548958e-16], [-1.06085166814191e-16, 0.0, 0.47776511773392694], [0.47776511773392694, 0.0, 1.0465147706289256e-16], [0.23888255886696347, 0.0, 5.160889365579703e-17]])
+    footAttrGrps = rm.makeControlGroups(footAttrCtrl)
+    footAttrOffset = footAttrGrps[1]
+    footAttrSdk = footAttrGrps[0]
+    cmds.move(0,0,-1.5,footAttrOffset)
+    cmds.parent(footAttrOffset,ctrlList[3])
+    #Aethetics
+    cmds.setAttr(footAttrCtrl+'.overrideEnabled',1)
+    cmds.setAttr(footAttrCtrl+'.overrideColor',light)
+    rm.lockAttr(footAttrCtrl,v=1)
+    
+    #Create Polevector control
+    circle1 = cmds.curve(n='circle1',d=1,p=[[0.04959257533984647, 3.0831822159735336e-17, -0.5035218673857907], [-1.4586012039213563e-17, 3.098100416274861e-17, -0.5059581943841895], [-0.049592575339846234, 3.0831822159735226e-17, -0.5035218673857889], [-0.0987075470691105, 3.0385712854935085e-17, -0.4962363495514102], [-0.14687191116106513, 2.964697252482165e-17, -0.48417180440046925], [-0.1936218184601853, 2.862271564261046e-17, -0.46744442009792053], [-0.23850704180308108, 2.732280636199294e-17, -0.4462152904987159], [-0.28109531195220194, 2.5759763519944162e-17, -0.42068886372591857], [-0.3209764805848947, 2.394864007347918e-17, -0.39111097322351485], [-0.3577664702459625, 2.1906878131448235e-17, -0.3577664702459624], [-0.39111097322351496, 1.9654140977493694e-17, -0.32097648058489475], [-0.4206888637259186, 1.7212123701879543e-17, -0.28109531195220194], [-0.44621529049871617, 1.4604344265912376e-17, -0.23850704180308133], [-0.46744442009792064, 1.1855917011117797e-17, -0.1936218184601854], [-0.4841718044004695, 8.993310794402657e-18, -0.14687191116106538], [-0.49623634955141055, 6.0440940784936514e-18, -0.09870754706911063], [-0.503521867385789, 3.036669432570842e-18, -0.04959257533984639], [-0.5059581943841908, 4.9581959125508776e-33, -8.097348420790332e-17], [-0.5035218673857891, -3.0366694325708334e-18, 0.04959257533984625], [-0.49623634955141077, -6.044094078493644e-18, 0.0987075470691105], [-0.48417180440046964, -8.993310794402648e-18, 0.14687191116106524], [-0.4674444200979208, -1.1855917011117795e-17, 0.19362181846018536], [-0.4462152904987164, -1.4604344265912373e-17, 0.23850704180308127], [-0.42068886372591885, -1.7212123701879546e-17, 0.281095311952202], [-0.3911109732235153, -1.9654140977493704e-17, 0.3209764805848949], [-0.3577664702459627, -2.190687813144825e-17, 0.3577664702459627], [-0.320976480584895, -2.39486400734792e-17, 0.3911109732235152], [-0.28109531195220205, -2.5759763519944187e-17, 0.420688863725919], [-0.2385070418030815, -2.732280636199297e-17, 0.4462152904987164], [-0.1936218184601855, -2.862271564261049e-17, 0.46744442009792103], [-0.14687191116106543, -2.9646972524821695e-17, 0.48417180440046986], [-0.09870754706911072, -3.038571285493512e-17, 0.4962363495514108], [-0.04959257533984641, -3.083182215973525e-17, 0.5035218673857893], [-6.954385898406273e-17, -3.0981004162748694e-17, 0.505958194384191], [0.0495925753398463, -3.0831822159735256e-17, 0.5035218673857894], [0.09870754706911057, -3.0385712854935134e-17, 0.49623634955141105], [0.14687191116106538, -2.9646972524821695e-17, 0.4841718044004699], [0.19362181846018547, -2.8622715642610495e-17, 0.4674444200979212], [0.2385070418030814, -2.7322806361992992e-17, 0.4462152904987167], [0.2810953119522022, -2.5759763519944206e-17, 0.4206888637259193], [0.3209764805848952, -2.3948640073479217e-17, 0.39111097322351546], [0.3577664702459629, -2.1906878131448262e-17, 0.3577664702459629], [0.39111097322351557, -1.965414097749372e-17, 0.32097648058489514], [0.4206888637259193, -1.7212123701879568e-17, 0.28109531195220233], [0.4462152904987168, -1.4604344265912394e-17, 0.23850704180308166], [0.46744442009792136, -1.1855917011117815e-17, 0.1936218184601857], [0.48417180440047025, -8.993310794402671e-18, 0.1468719111610656], [0.49623634955141127, -6.044094078493662e-18, 0.09870754706911081], [0.5035218673857899, -3.036669432570848e-18, 0.049592575339846484], [0.5059581943841914, -5.867673071274198e-33, 9.582637337327793e-17], [0.5035218673857899, 3.036669432570837e-18, -0.049592575339846304], [0.4962363495514115, 6.044094078493652e-18, -0.09870754706911064], [0.48417180440047036, 8.993310794402662e-18, -0.14687191116106546], [0.4674444200979217, 1.1855917011117812e-17, -0.19362181846018564], [0.44621529049871694, 1.4604344265912397e-17, -0.2385070418030817], [0.4206888637259196, 1.7212123701879574e-17, -0.28109531195220244], [0.3911109732235157, 1.9654140977493738e-17, -0.3209764805848954], [0.3577664702459633, 2.1906878131448284e-17, -0.3577664702459633], [0.3209764805848954, 2.394864007347924e-17, -0.3911109732235158], [0.28109531195220244, 2.575976351994423e-17, -0.42068886372591974], [0.2385070418030818, 2.7322806361993008e-17, -0.446215290498717], [0.1936218184601858, 2.862271564261053e-17, -0.4674444200979218], [0.14687191116106568, 2.9646972524821744e-17, -0.4841718044004707], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.04959257533984647, 3.0831822159735336e-17, -0.5035218673857907]])
+    kneeCtrl = cmds.curve(n='temp_kneeVector_ctrl',d=1,p=[[0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16], [-1.4586012039213563e-17, -0.5059581943841902, 4.686786657793824e-16], [-0.049592575339846234, -0.5035218673857895, 6.352121194731559e-16], [-0.0987075470691105, -0.4962363495514109, 6.352121194731559e-16], [-0.14687191116106513, -0.4841718044004699, 7.323566341278571e-16], [-0.1936218184601853, -0.46744442009792114, 6.07456543857527e-16], [-0.23850704180308108, -0.44621529049871655, 6.490899072809704e-16], [-0.28109531195220194, -0.4206888637259192, 6.352121194731559e-16], [-0.3209764805848947, -0.3911109732235154, 6.629676950887848e-16], [-0.3577664702459625, -0.357766470245963, 6.352121194731559e-16], [-0.39111097322351496, -0.3209764805848954, 6.352121194731559e-16], [-0.4206888637259186, -0.28109531195220255, 7.184788463200427e-16], [-0.44621529049871617, -0.23850704180308202, 7.462344219356716e-16], [-0.46744442009792064, -0.19362181846018606, 7.462344219356716e-16], [-0.4841718044004695, -0.14687191116106607, 6.97662164608321e-16], [-0.49623634955141055, -0.0987075470691113, 6.907232707044138e-16], [-0.503521867385789, -0.04959257533984709, 7.167441228440659e-16], [-0.5059581943841908, -8.026184502142547e-16, 7.216449660063518e-16], [-0.5035218673857891, 0.049592575339845534, 7.288871871759035e-16], [-0.49623634955141077, 0.09870754706910977, 7.288871871759035e-16], [-0.48417180440046964, 0.14687191116106452, 7.670511036473933e-16], [-0.4674444200979208, 0.19362181846018459, 7.531733158395788e-16], [-0.4462152904987164, 0.23850704180308055, 8.086844670708366e-16], [-0.42068886372591885, 0.28109531195220117, 7.046010585122282e-16], [-0.3911109732235153, 0.3209764805848942, 7.462344219356716e-16], [-0.3577664702459627, 0.35776647024596203, 6.490899072809704e-16], [-0.320976480584895, 0.3911109732235145, 7.462344219356716e-16], [-0.28109531195220205, 0.42068886372591846, 6.490899072809704e-16], [-0.2385070418030815, 0.44621529049871583, 7.323566341278571e-16], [-0.1936218184601855, 0.4674444200979202, 6.768454828965993e-16], [-0.14687191116106543, 0.4841718044004691, 7.184788463200427e-16], [-0.09870754706911072, 0.4962363495514101, 7.60112209743486e-16], [-0.04959257533984641, 0.5035218673857884, 6.629676950887848e-16], [-6.954385898406273e-17, 0.5059581943841902, 7.462344219356716e-16], [0.0495925753398463, 0.5035218673857886, 6.907232707044138e-16], [0.09870754706911057, 0.4962363495514103, 7.8786778535911495e-16], [0.14687191116106538, 0.484171804400469, 7.739899975513005e-16], [0.19362181846018547, 0.46744442009792053, 7.184788463200427e-16], [0.2385070418030814, 0.44621529049871606, 7.323566341278571e-16], [0.2810953119522022, 0.42068886372591857, 7.046010585122282e-16], [0.3209764805848952, 0.3911109732235146, 6.768454828965993e-16], [0.3577664702459629, 0.35776647024596225, 7.462344219356716e-16], [0.39111097322351557, 0.3209764805848943, 7.8786778535911495e-16], [0.4206888637259193, 0.2810953119522016, 8.156233609747439e-16], [0.4462152904987168, 0.2385070418030809, 7.531733158395788e-16], [0.46744442009792136, 0.193621818460185, 7.323566341278571e-16], [0.48417180440047025, 0.14687191116106488, 7.323566341278571e-16], [0.49623634955141127, 0.09870754706911014, 7.184788463200427e-16], [0.5035218673857899, 0.04959257533984577, 7.254177402239499e-16], [0.5059581943841914, -6.258185926330736e-16, 7.2164496600635185e-16], [0.5035218673857899, -0.04959257533984702, 7.236830167479731e-16], [0.4962363495514115, -0.09870754706911133, 7.254177402239499e-16], [0.48417180440047036, -0.1468719111610662, 7.184788463200427e-16], [0.4674444200979217, -0.19362181846018645, 7.115399524161354e-16], [0.44621529049871694, -0.23850704180308244, 7.392955280317644e-16], [0.4206888637259196, -0.28109531195220316, 7.046010585122282e-16], [0.3911109732235157, -0.3209764805848961, 6.629676950887848e-16], [0.3577664702459633, -0.3577664702459639, 6.213343316653415e-16], [0.3209764805848954, -0.3911109732235166, 6.490899072809704e-16], [0.28109531195220244, -0.42068886372592046, 6.07456543857527e-16], [0.2385070418030818, -0.4462152904987177, 6.07456543857527e-16], [0.1936218184601858, -0.46744442009792253, 6.490899072809704e-16], [0.14687191116106568, -0.4841718044004713, 6.768454828965993e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16], [0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16]])
+    circle3 = cmds.curve(n='circle3',d=1,p=[[4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796], [5.065392549852275e-16, -0.5059581943841902, 2.944980939503027e-16], [3.4061389849537337e-16, -0.5035218673857895, -0.049592575339845915], [3.44083345447327e-16, -0.4962363495514109, -0.0987075470691102], [2.53877724696533e-16, -0.4841718044004699, -0.14687191116106485], [3.3714445154341975e-16, -0.46744442009792114, -0.193621818460185], [3.0938887592779084e-16, -0.44621529049871655, -0.2385070418030808], [2.8857219421606915e-16, -0.4206888637259192, -0.2810953119522016], [3.1632776983169807e-16, -0.3911109732235154, -0.32097648058489436], [3.302055576395125e-16, -0.357766470245963, -0.35776647024596214], [2.6081661860044024e-16, -0.3209764805848954, -0.3911109732235147], [1.6367210394573907e-16, -0.28109531195220255, -0.42068886372591835], [2.191832551769969e-16, -0.23850704180308202, -0.4462152904987159], [1.6367210394573907e-16, -0.19362181846018606, -0.46744442009792037], [1.9142767956136798e-16, -0.14687191116106607, -0.48417180440046914], [1.7754989175355352e-16, -0.0987075470691113, -0.49623634955141016], [2.3306104298481133e-16, -0.04959257533984709, -0.5035218673857887], [2.0530546736918244e-16, -8.026184502142547e-16, -0.5059581943841904], [2.6081661860044024e-16, 0.049592575339845534, -0.5035218673857889], [1.7754989175355352e-16, 0.09870754706910977, -0.49623634955141044], [1.0816095271448124e-16, 0.14687191116106452, -0.48417180440046936], [1.6367210394573907e-16, 0.19362181846018459, -0.46744442009792053], [6.652758929103787e-17, 0.23850704180308055, -0.4462152904987161], [2.191832551769969e-16, 0.28109531195220117, -0.42068886372591857], [1.497943161379246e-16, 0.3209764805848942, -0.391110973223515], [2.3306104298481133e-16, 0.35776647024596203, -0.35776647024596236], [2.0530546736918244e-16, 0.3911109732235145, -0.32097648058489464], [2.6081661860044024e-16, 0.42068886372591846, -0.2810953119522017], [2.191832551769969e-16, 0.44621529049871583, -0.2385070418030812], [2.8857219421606915e-16, 0.4674444200979202, -0.1936218184601852], [2.3306104298481133e-16, 0.4841718044004691, -0.14687191116106516], [2.226527021289505e-16, 0.4962363495514101, -0.09870754706911043], [3.232666637356053e-16, 0.5035218673857884, -0.049592575339846096], [2.289834988289383e-16, 0.5059581943841902, 2.3954024700545373e-16], [2.9204164116802277e-16, 0.5035218673857886, 0.04959257533984662], [2.0183602041722882e-16, 0.4962363495514103, 0.09870754706911086], [1.8448878565746075e-16, 0.484171804400469, 0.1468719111610657], [2.191832551769969e-16, 0.46744442009792053, 0.19362181846018578], [2.261221490809041e-16, 0.44621529049871606, 0.23850704180308174], [2.3306104298481133e-16, 0.42068886372591857, 0.28109531195220255], [2.746944064082547e-16, 0.3911109732235146, 0.32097648058489553], [1.7754989175355352e-16, 0.35776647024596225, 0.35776647024596325], [1.497943161379246e-16, 0.3209764805848943, 0.3911109732235159], [1.220387405222957e-16, 0.2810953119522016, 0.4206888637259196], [1.9142767956136798e-16, 0.2385070418030809, 0.4462152904987171], [2.0530546736918244e-16, 0.193621818460185, 0.46744442009792175], [2.3306104298481133e-16, 0.14687191116106488, 0.48417180440047064], [2.469388307926258e-16, 0.09870754706911014, 0.4962363495514116], [2.0530546736918244e-16, 0.04959257533984577, 0.5035218673857902], [1.7754989175355352e-16, -6.258185926330736e-16, 0.5059581943841918], [2.0530546736918244e-16, -0.04959257533984702, 0.5035218673857902], [2.191832551769969e-16, -0.09870754706911133, 0.49623634955141177], [2.191832551769969e-16, -0.1468719111610662, 0.4841718044004707], [2.3306104298481133e-16, -0.19362181846018645, 0.4674444200979221], [2.3306104298481133e-16, -0.23850704180308244, 0.44621529049871733], [2.469388307926258e-16, -0.28109531195220316, 0.42068886372592007], [3.302055576395125e-16, -0.3209764805848961, 0.391110973223516], [3.1632776983169807e-16, -0.3577664702459639, 0.35776647024596375], [3.1632776983169807e-16, -0.3911109732235166, 0.3209764805848957], [3.5796113325514144e-16, -0.42068886372592046, 0.2810953119522028], [3.6490002715904866e-16, -0.4462152904987177, 0.23850704180308213], [3.024499820238836e-16, -0.46744442009792253, 0.19362181846018614], [2.8857219421606915e-16, -0.4841718044004713, 0.14687191116106602], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796], [4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796]])
+    #Merge shapes
+    shape1 = cmds.listRelatives(circle1,s=1)
+    shape2 = cmds.listRelatives(kneeCtrl,s=1)
+    shape3 = cmds.listRelatives(circle3,s=1)
+    cmds.parent(shape1,kneeCtrl,r=1,s=1)
+    cmds.parent(shape3,kneeCtrl,r=1,s=1)
+    cmds.delete(circle1,circle3)
+    #Make groups and position
+    kneeGrps = rm.makeControlGroups(kneeCtrl)
+    kneeSdk = kneeGrps[0]
+    kneeOffset = kneeGrps[1]
+    cmds.delete(cmds.pointConstraint(ctrlList[1],kneeOffset))
+    cmds.move(0,0,4,kneeOffset,r=1)
+    cmds.parentConstraint(ctrlList[1],kneeOffset,mo=1)
+    #Aethetics
+    cmds.setAttr(kneeCtrl+'.overrideEnabled',1)
+    cmds.setAttr(kneeCtrl+'.overrideColor',light)
+    rm.lockAttr(kneeCtrl,t=[1,0,0],s=1,r=1,v=1)
+    
+    #Create polevector cluster line
+    clsLine = cmds.curve(n='kneeLine',d=1,p=[[0.0, 0.0, 0.0], [0.0, 0.0, -1.0]])
+    cmds.setAttr(clsLine+'.overrideEnabled',1)
+    cmds.setAttr(clsLine+'.overrideDisplayType',2)
+    cmds.select(clsLine+'.cv[0]')
+    kneeCls = cmds.cluster(n='kneeCluster')
+    cmds.select(clsLine+'.cv[1]')
+    poleCls = cmds.cluster(n='poleCluster')
+    cmds.pointConstraint(kneeCtrl,poleCls)
+    cmds.pointConstraint(ctrlList[1],kneeCls)
+    cmds.setAttr(str(poleCls[1])+'.visibility',0)
+    cmds.setAttr(str(kneeCls[1])+'.visibility',0)
+    kneeLineGrp = cmds.group(clsLine,kneeCls,poleCls,n='kneeLine_grp')
+    
+
+
+    ################################
+    ##      Clean into Groups     ##
+    ################################
+    #Create tempLegRig Group
+    tempLeg_grp = cmds.group(em=1,n='temp_LegRig_grp')
+    if prefix == 'RT' or prefix == 'LT':
+        cmds.addAttr(tempLeg_grp, ln = "legMirror", at = "bool",k=1)
+        cmds.connectAttr(legRootCtrl+'.legMirror',tempLeg_grp+'.legMirror',f=1)
+    cmds.addAttr(tempLeg_grp, ln = "inverse", at = "bool",k=1)
+    if inverse == True:
+        cmds.setAttr(tempLeg_grp+'.inverse',1)
+        
+    #Parent respective groups to main group.
+    cmds.parent(kneeOffset,kneeLineGrp,legRootOffset,fpl_grp,tempJoints[0],  tempLeg_grp)
+    #Parent leg controls to legRoot control
+    cmds.parent(ctrlOffsetList[:],legRootCtrl)
+    #Parent foot locators to ball control
+    cmds.parentConstraint(ctrlList[3],fpl_grp,mo=1)
+    cmds.scaleConstraint(ctrlList[3],fpl_grp,mo=1)
+    #Parent ball control to foot control
+    cmds.parent(ctrlOffsetList[3],ctrlList[2])
+    #Scale constraint to poleVector control
+    cmds.scaleConstraint(legRootCtrl,kneeOffset)
+    #cmds.scaleConstraint(legRootCtrl,tempJoints[3])
+
+    #Point constraint creates average between hip and foot controls for knee control
+    cmds.pointConstraint(ctrlList[0],ctrlList[2],ctrlOffsetList[1],mo=1)
+    cmds.scaleConstraint(legRootCtrl,ctrlOffsetList[1],mo=1)
+    
+    cmds.select(legRootCtrl)
+    
+    #Position relating to root/global ctrls
+    if rootSelected:
+        cmds.delete(cmds.pointConstraint('root_ctrl',legRootOffset))
+        #Distance between global and root
+        globalScale = cmds.getAttr('global_SRT.scaleX')
+        cmds.scale(globalScale,globalScale,globalScale,legRootCtrl)
+        cmds.move(0,0,-(globalScale),legRootOffset,r=1,os=1)
+        
+        #Make Hip Control
+        pelvisCtrl = cmds.circle(n='temp_pelvis_ctrl')[0]
+        pelvisGroups = rm.makeControlGroups(pelvisCtrl)
+        pelvisSdk = pelvisGroups[0]
+        pelvisOffset = pelvisGroups[1]
+        #Match pos
+        rm.matchPos('root_ctrl',pelvisOffset)
+        globalScale = cmds.getAttr('global_SRT.scale')
+        cmds.select(pelvisCtrl+'.cv[:]')
+        cmds.xform(s=(globalScale[0][0]*2,globalScale[0][1]*2,globalScale[0][2]*2))
+        cmds.xform(ro=(90,0,0))
+        cmds.select(d=1)
+        #Aesthetic
+        cmds.select(pelvisCtrl+'.cv[1]', pelvisCtrl+'.cv[5]')
+        cmds.move(0,-1.5,0,r=1)
+        cmds.select(d=1)
+        cmds.setAttr(pelvisCtrl+'.overrideEnabled',1)
+        cmds.setAttr(pelvisCtrl+'.overrideColor',17)
+        rm.lockAttr(pelvisCtrl,s=1,v=1)
+        
+        cmds.parent(tempLeg_grp,pelvisCtrl)
+        cmds.parent(pelvisOffset,'root_ctrl')
+        cmds.parent(tempJoints[0],'rig_grp')
+        
+        cmds.select('root_ctrl')
+        
+        cmds.parent(tempJoints[0],tempLeg_grp)
+    
+    #Rename to avoid double name collisions and corresponding to axis
+    ad = cmds.listRelatives(tempLeg_grp,ad=1)   
+    newTempLeg_grp = cmds.rename(tempLeg_grp,prefix+'_'+tempLeg_grp+'_'+str(X_legs))
+    for i in ad:
+        cmds.rename(i,prefix+'_'+i+'_'+str(X_legs))
+        
+    return newTempLeg_grp
+##################################################################
+##################################################################
+
+
+
+#Next process:
+    #-Generate new joint chain
+    #-Place joint chain in correlation to temp joint position
+    #-Run the below.
+    #-Place new controls in correlation to temp ctrl position
+    #-New polevector shit
+    #-World/hip space
+    #-Potentially convert to blendColors
+
+##################################################################
+##################################################################
+
+def autoLeg(tempLegGrp):
+    #Get joints
+    tempJoints = []
+    ad = cmds.listRelatives(tempLegGrp,ad=1)
+    for item in ad:
+        if cmds.objectType(item,i='joint'):
+            tempJoints.append(item)
+    tempJoints.reverse()
+    
+    if cmds.objExists('autoRig_counter') == 1:
+        #Search for prefix, stopping at first underscore. (python regular expressions)
+        pre = re.search('.*?_',tempLegGrp)
+        prefix = pre.group()[:-1]
+        
+        suffix = tempLegGrp[-1]
+    
+    #Mirroring 
+    mirror = cmds.getAttr(tempLegGrp+'.legMirror')
+    if mirror == True:
+        count = tempLegGrp[-1]
+        opposite = []
+        #Rename and Recolor for left > right
+        if prefix == 'LT':
+            opposite = 'RT'
+        if prefix == 'RT':
+            opposite = 'LT'
+        mirrorTempLegGrp = tempLegRig(axis = opposite, inverse = 1)
+        mirrorCount = mirrorTempLegGrp[-1]
+        
+        #These lists are in a particular order so that they can be matched up properly. (because knee ctrl is influences by hip and foot, thus it needs to be placed after)
+        mirrorCtrls = [opposite+'_temp_legRoot_ctrl_'+mirrorCount, opposite+'_temp_hip_ctrl_'+mirrorCount, opposite+'_temp_foot_ctrl_'+mirrorCount, opposite+'_temp_ball_ctrl_'+mirrorCount, opposite+'_temp_foot_IK_ctrl_'+mirrorCount, opposite+'_temp_knee_ctrl_'+mirrorCount,opposite+'_temp_kneeVector_ctrl_'+mirrorCount,opposite+'_temp_footAttr_ctrl_'+mirrorCount,opposite+'_temp_heelPivot_loc_'+mirrorCount,opposite+'_temp_outerPivot_loc_'+mirrorCount,opposite+'_temp_innerPivot_loc_'+mirrorCount,opposite+'_temp_toePivot_loc_'+mirrorCount]
+        originalCtrls = [prefix+'_temp_legRoot_ctrl_'+suffix, prefix+'_temp_hip_ctrl_'+suffix, prefix+'_temp_foot_ctrl_'+suffix, prefix+'_temp_ball_ctrl_'+suffix, prefix+'_temp_foot_IK_ctrl_'+suffix, prefix+'_temp_knee_ctrl_'+suffix,prefix+'_temp_kneeVector_ctrl_'+suffix,prefix+'_temp_footAttr_ctrl_'+suffix,prefix+'_temp_heelPivot_loc_'+suffix,prefix+'_temp_outerPivot_loc_'+suffix,prefix+'_temp_innerPivot_loc_'+suffix,prefix+'_temp_toePivot_loc_'+suffix]
+        #For every original control, get values and mirror them to opposite.
+        for item in originalCtrls:
+            rm.mirrorValues(item,rotate=True,translate=True,scale=True,left=prefix,right=opposite)
+        #Finally, run autoLeg for mirror
+        autoLeg(mirrorTempLegGrp)
+    
+    #Gather all elements.
+    cmds.select(d=1)
+    cmds.select(tempLegGrp,hi=1)
+    cmds.select(tempLegGrp,d=1)
+    allElements = cmds.ls(sl=1)
+    cmds.select(d=1)
+    
+    #Get rid of the 'temp' prefix.
+    newlist = []
+    for item in allElements:
+        if 'temp' in item:
+            newName = item.replace('_temp','')
+            newlist.append(cmds.rename(item,newName))
+    
+    tempLegGrp = cmds.rename(tempLegGrp,(tempLegGrp.replace('_temp','')))
+    allElements =[]
+    allElements = newlist
+    allElements.append(tempLegGrp)
+    
+    allJointElements = []
+    #Select upper leg joint and run.
+    for item in allElements:
+        if cmds.objectType(item, i='joint'):
+            allJointElements.append(item)
+
+    
+    bindchain =[]
+    constraints = []
+    
+    cmds.select(tempLegGrp)
+    cmds.select(hi=1)
+    tempAllElements = cmds.ls(sl=1)
+    #Put all temp controls into list
+    tempCtrls = []
+    for item in tempAllElements:
+        if cmds.objectType(item,i='nurbsCurve'):
+            prnt = cmds.listRelatives(item,ap=1)[0]
+            if 'ctrl' in prnt:
+                tempCtrls.append(prnt)
+    tempCtrls = list(set(tempCtrls))
+    
+    #Strip all constraints off
+    for item in allJointElements:
+        if cmds.objectType(item,i='joint'):
+            bindchain.append(item) 
+        else:
+            constraints.append(item)
+    cmds.delete(constraints)
+    
+    bindConst =[]
+    bindConst = cmds.listRelatives(bindchain[0],ad=1)
+    for item in bindConst:
+        if cmds.objectType(item,i='parentConstraint') or cmds.objectType(item,i='scaleConstraint'):
+            cmds.delete(item)
+            
+    
+    #Orient the chain
+    cmds.joint(bindchain[0], e=1, oj='xyz', secondaryAxisOrient='yup', ch=1, zso=1)
+    #If mirrored, flip axis
+    if cmds.getAttr(tempLegGrp+'.inverse') == True:
+        for i in bindchain:
+            cmds.select(i+'.rotateAxis')
+            cmds.rotate(180,180,0)
+            
+    
+    #Convert rotation values to joint orient values
+    for i in bindchain:
+        if i == bindchain[0]:
+            rot = cmds.xform(i,ro=1,q=1,ws=1)
+            cmds.setAttr(i+'.rotate',0,0,0)
+            cmds.setAttr(i+'.jointOrient',rot[0],rot[1],rot[2])
+        else:
+            rot = cmds.getAttr(i+'.rotate')[0]
+            jo = cmds.getAttr(i+'.jointOrient')[0]
+            finalX = rot[0] + jo[0]
+            finalY = rot[1] + jo[1]
+            finalZ = rot[2] + jo[2]
+            cmds.setAttr(i+'.rotate',0,0,0)
+            cmds.setAttr(i+'.jointOrient',finalX,finalY,finalZ)
+    
+    #Orient the chain... again.
+    cmds.joint(bindchain[0], e=1, oj='xyz', secondaryAxisOrient='yup', ch=1, zso=1)
+    #If mirrored, flip axis
+    if cmds.getAttr(tempLegGrp+'.inverse') == True:
+        for i in bindchain:
+            cmds.select(i+'.rotateAxis')
+            cmds.rotate(180,180,0)
+
+    #Convert all channels from all controls to their corresponding offsets.
+    cmds.delete(cmds.listConnections(prefix+'_knee_ctrl_offset_'+suffix))
+    rm.unlockAttr(prefix+'_kneeVector_ctrl_'+suffix,t=1)
+    for object in tempCtrls:
+        offset = cmds.listRelatives(cmds.listRelatives(object,ap=1),ap=1)[0]
+        objectAttr = cmds.listAttr(object,k=1)
+        #Detect what attributes are locked.
+        if 'translate' in objectAttr[0]:
+            ct = cmds.xform(object,t=1,q=1,ws=1)
+            cmds.setAttr(object+'.translate',0,0,0)
+            cmds.xform(offset,t=ct,ws=1)
+        if len(objectAttr) > 3:
+            if 'rotate' in objectAttr[3]:
+                cr = cmds.xform(object,ro=1,q=1,ws=1)
+                cmds.setAttr(object+'.rotate',0,0,0)
+                cmds.xform(offset,ro=cr,ws=1)
+        if len(objectAttr) > 6:
+            if 'scale' in objectAttr[6]:
+                cs = cmds.xform(object,s=1,q=1,os=1)
+                cmds.setAttr(object+'.scale',1,1,1)
+                cmds.xform(offset,s=cs,os=1)
+    
+    #Name bind joints
+    b1 = cmds.rename(bindchain[0],prefix+'_bind_upperLeg_jnt_'+suffix)
+    b2 = cmds.rename(bindchain[1],prefix+'_bind_lowerLeg_jnt_'+suffix)
+    b3 = cmds.rename(bindchain[2],prefix+'_bind_foot_jnt_'+suffix)
+    b4 = cmds.rename(bindchain[3],prefix+'_bind_footroll_jnt_'+suffix)
+    b5 = cmds.rename(bindchain[4],prefix+'_bind_toe_end_'+suffix)
+    cmds.select(b1,b2,b3,b4,b5)
+    bindchain = cmds.ls(sl=True)
+    
+    
+    #Make FK chain
+    copy = cmds.duplicate(bindchain[0],rc=True)
+    fkchain = []
+    for i in copy:
+        newname = i.replace("bind","fk")
+        fkchain.append(cmds.rename(i,newname[0:-1]+suffix))
+    
+    #Make IK chain
+    copy = cmds.duplicate(bindchain[0],rc=True)
+    ikchain = []
+    for i in copy:
+        newname = i.replace("bind","ik")
+        ikchain.append(cmds.rename(i,newname[0:-1]+suffix))
+        
+    #Make IK handles
+    legIK = cmds.ikHandle(n=prefix+'_leg_IK_'+suffix,sj=ikchain[0],ee=ikchain[2],pw=0,sol='ikRPsolver',s='sticky')[0]
+    footrollIK = cmds.ikHandle(n=prefix+'_footroll_IK_'+suffix,sj=ikchain[2],ee=ikchain[3],pw=0,sol='ikSCsolver',s='sticky')[0]
+    toepivotIK = cmds.ikHandle(n=prefix+'_toepivot_IK_'+suffix,sj=ikchain[3],ee=ikchain[4],pw=0,sol='ikSCsolver',s='sticky')[0]
+    
+    #Make parent Constrains
+    constraints = []
+    incr = 0
+    for i in bindchain:
+        fkandik = [ikchain[incr],fkchain[incr]]
+        constraints.append(cmds.parentConstraint(fkandik,i))
+        incr = incr+1
+        
+    #Make foot attribute control
+    footAttrCtrl = prefix+'_footAttr_ctrl_'+suffix
+    footAttrOffset = cmds.pickWalk(cmds.pickWalk(footAttrCtrl,d='up'),d='up')[0]
+    cmds.addAttr(footAttrCtrl,shortName='FKIK', niceName='FK/IK Switch', defaultValue=1.0, minValue=0.0, maxValue=1.0 )
+    cmds.setAttr(footAttrCtrl+'.FKIK',keyable=True)
+    cmds.parent(footAttrOffset,tempLegGrp)
+    cmds.parentConstraint(bindchain[2],footAttrOffset,mo=1)
+    
+    #lock remaining values
+    rm.lockAttr(footAttrCtrl,t=1,r=1,s=1,v=1)
+    
+    #Make IK control
+    ikControl = prefix+'_foot_IK_ctrl_'+suffix
+    IKSdk = prefix+'_foot_IK_ctrl_sdk_'+suffix
+    IKOffset = prefix+'_foot_IK_ctrl_offset_'+suffix
+    cmds.select(ikControl)
+    #Create IK control attributes
+    cmds.addAttr(shortName='Divider1', niceName='---', at = "enum", en = "---:")
+    cmds.setAttr(str(ikControl)+'.Divider1',keyable=True)
+    cmds.addAttr(shortName='footRoll', niceName='Foot Roll', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.footRoll',keyable=True)
+    cmds.addAttr(shortName='toePivot', niceName='Toe Pivot', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.toePivot',keyable=True)
+    cmds.addAttr(shortName='heelPivot', niceName='Heel Pivot', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.heelPivot',keyable=True)
+    cmds.addAttr(shortName='ballPivot', niceName='Ball Pivot', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.ballPivot',keyable=True)
+    cmds.addAttr(shortName='toeTap', niceName='Toe Tap', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.toeTap',keyable=True)
+    cmds.addAttr(shortName='bank', niceName='Bank', defaultValue=0.0, minValue=-10.0, maxValue=10.0 )
+    cmds.setAttr(str(ikControl)+'.bank',keyable=True)
+    cmds.parent(IKOffset,tempLegGrp)
+    #Position center point to foot jnt
+    footPos = cmds.xform(bindchain[2],t=1,q=1,ws=1)
+    cmds.xform(ikControl,IKSdk,IKOffset,rp= footPos,ws=1)
+        
+    #Make Polevector Control
+    polevector = prefix+'_kneeVector_ctrl_'+suffix
+    polevector_sdk = prefix+'_kneeVector_ctrl_sdk_'+suffix
+    polevector_offset = prefix+'_kneeVector_ctrl_offset_'+suffix
+    cmds.delete(cmds.listConnections(polevector_offset))
+    #Place and activate polevector
+    rm.positionPoleVector(bindchain[1],polevector_offset)
+    cmds.select(d=True)
+    cmds.select(polevector,legIK)
+    cmds.poleVectorConstraint()
+    #Re-pointConstraint kneeLine to IK chain
+    cmds.delete(cmds.listRelatives(prefix+'_kneeClusterHandle_'+suffix,c=1)[1])
+    cmds.pointConstraint(ikchain[1],prefix+'_kneeClusterHandle_'+suffix)
+    #Hide polevector lines when changed to FK
+    cmds.connectAttr(footAttrCtrl+'.FKIK',prefix+'_kneeLine_'+suffix+'.visibility')
+    
+
+    #Create FK Controls
+    fkControl = [prefix+'_hip_ctrl_'+suffix,prefix+'_knee_ctrl_'+suffix,prefix+'_foot_ctrl_'+suffix,prefix+'_ball_ctrl_'+suffix]
+    fkSdk = []
+    fkOffset = []
+    #Delete original connections that kept knee averaged between hip and foot. 
+    cmds.delete(cmds.listConnections(prefix+'_knee_ctrl_offset_'+suffix))
+    cmds.delete(cmds.listConnections(prefix+'_footPivotLocators_grp_'+suffix))
+    previousCtrl = []
+    incr = 0
+    for i in fkControl:
+        rm.unlockAttr(i,t=1,r=1)
+        sdk = cmds.pickWalk(i,d='up')[0]
+        offset = cmds.pickWalk(sdk,d='up')[0]
+        fkOffset.append(offset)
+        fkSdk.append(sdk)
+        cmds.delete(cmds.orientConstraint(fkchain[incr],fkOffset[incr]))
+        cmds.parentConstraint(i,fkchain[incr])
+        incr += 1
+    cmds.parent(fkOffset[1],fkControl[0])
+    cmds.parent(fkOffset[2],fkControl[1])
+    
+    cmds.delete(cmds.parentConstraint(prefix+'_ik_footroll_jnt_'+suffix,prefix+'_ball_ctrl_offset_'+suffix))
+    
+    
+    #Create Set driven key for IK
+    cmds.setAttr(footAttrCtrl+'.FKIK', 1)
+    for i in range(0,len(bindchain)):
+        #bindchain parent constraint
+        cmds.setAttr(str(constraints[i][0])+'.'+fkchain[i]+'W1', 0)
+        cmds.setAttr(str(constraints[i][0])+'.'+ikchain[i]+'W0', 1)
+        cmds.setDrivenKeyframe(str(constraints[i][0])+'.'+ikchain[i]+'W0',currentDriver = footAttrCtrl+'.FKIK')
+        cmds.setDrivenKeyframe(str(constraints[i][0])+'.'+fkchain[i]+'W1',currentDriver = footAttrCtrl+'.FKIK')
+    #fk control visibility
+    for i in fkOffset:
+        cmds.setAttr(str(i)+'.visibility',0)
+        cmds.setDrivenKeyframe(str(i)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    #ik control visibility
+    cmds.setAttr(str(IKOffset)+'.visibility',1)
+    cmds.setDrivenKeyframe(str(IKOffset)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    cmds.setAttr(str(polevector_offset)+'.visibility',1)
+    cmds.setDrivenKeyframe(str(polevector_offset)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    
+    
+    #Create Set driven key for FK
+    cmds.setAttr(footAttrCtrl+'.FKIK', 0)
+    for i in range(0,len(bindchain)):
+        cmds.setAttr(str(constraints[i][0])+'.'+fkchain[i]+'W1', 1)
+        cmds.setAttr(str(constraints[i][0])+'.'+ikchain[i]+'W0', 0)
+        cmds.setDrivenKeyframe(str(constraints[i][0])+'.'+ikchain[i]+'W0',currentDriver = footAttrCtrl+'.FKIK')
+        cmds.setDrivenKeyframe(str(constraints[i][0])+'.'+fkchain[i]+'W1',currentDriver = footAttrCtrl+'.FKIK')
+    
+    #fk control visibility
+    for i in fkOffset:
+        cmds.setAttr(str(i)+'.visibility',1)
+        cmds.setDrivenKeyframe(str(i)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    #ik control visibility
+    cmds.setAttr(str(IKOffset)+'.visibility',0)
+    cmds.setDrivenKeyframe(str(IKOffset)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    cmds.setAttr(str(polevector_offset)+'.visibility',0)
+    cmds.setDrivenKeyframe(str(polevector_offset)+'.visibility',currentDriver = footAttrCtrl+'.FKIK')
+    
+    cmds.setAttr(footAttrCtrl+'.FKIK', 1)
+    
+    #Create Foot Attribute Groups
+    footroll = cmds.group(n=prefix+'_footroll_grp_'+suffix,em=True)
+    footroll_offset = cmds.group(n=prefix+'_footroll_offset_grp_'+suffix)
+    
+    toetap = cmds.group(n=prefix+'_toeTap_grp_'+suffix,em=True)
+    toeTap_offset = cmds.group(n=prefix+'_toeTap_offset_grp_'+suffix)
+    
+    
+    #Make and group foot attribute IK groups.
+    footAttributeList = []
+    
+    cmds.select(footroll_offset,toeTap_offset)
+    toepivot = cmds.group(n=prefix+'_toepivot_grp_'+suffix)
+    toepivot_offset = cmds.group(n=prefix+'_toepivot_offset_grp_'+suffix)
+    
+    footinner = cmds.group(n=prefix+'_footInner_grp_'+suffix)
+    footinner_offset = cmds.group(n=prefix+'_footInner_offset_grp_'+suffix)
+    
+    footouter = cmds.group(n=prefix+'_footOuter_grp_'+suffix)
+    footouter_offset = cmds.group(n=prefix+'_footOuter_offset_grp_'+suffix)
+    
+    heelpivot = cmds.group(n=prefix+'_heelpivot_grp_'+suffix)
+    heelpivot_offset = cmds.group(n=prefix+'_heelpivot_offset_grp_'+suffix)
+    
+    ankle = cmds.group(n=prefix+'_ankle_grp_'+suffix)
+    ankle_offset = cmds.group(n=prefix+'_ankle_offset_grp_'+suffix)
+    a = cmds.parentConstraint(ikchain[3],ankle_offset)
+    cmds.delete(a)
+    
+    cmds.select(d=True)
+    cmds.select(toeTap_offset,footroll_offset)
+    ballpivot = cmds.group(n=prefix+'_ballpivot_grp_'+suffix)
+    ballpivot_offset = cmds.group(n=prefix+'_ballPivot_offset_grp_'+suffix)
+    
+    temporaryList = [toepivot,footinner,footouter,heelpivot,ballpivot,footroll,toetap]
+    for i in temporaryList:
+        footAttributeList.append(i)
+    
+    cmds.parent(legIK,prefix+'_footroll_grp_'+suffix)
+    cmds.parent(footrollIK,prefix+'_footroll_grp_'+suffix)
+    cmds.parent(toepivotIK,prefix+'_toeTap_grp_'+suffix)
+    cmds.parent(prefix+'_ankle_offset_grp_'+suffix,ikControl)
+    
+    #Position Foot Pivot Locators in accordance to tempLegRig setup
+    hp_T = cmds.xform(prefix+'_heelPivot_loc_'+suffix,t=1,q=1,ws=1)
+    tp_T = cmds.xform(prefix+'_toePivot_loc_'+suffix,t=1,q=1,ws=1)
+    ip_T = cmds.xform(prefix+'_innerPivot_loc_'+suffix,t=1,q=1,ws=1)
+    op_T = cmds.xform(prefix+'_outerPivot_loc_'+suffix,t=1,q=1,ws=1)
+    
+    cmds.xform(heelpivot,rp=(hp_T[0],hp_T[1],hp_T[2]),ws=1)
+    cmds.xform(heelpivot_offset,rp=(hp_T[0],hp_T[1],hp_T[2]),ws=1)
+
+    cmds.xform(toepivot,rp=(tp_T[0],tp_T[1],tp_T[2]),ws=1)
+    cmds.xform(toepivot_offset,rp=(tp_T[0],tp_T[1],tp_T[2]),ws=1)    
+
+    cmds.xform(footinner,rp=(ip_T[0],ip_T[1],ip_T[2]),ws=1)
+    cmds.xform(footinner_offset,rp=(ip_T[0],ip_T[1],ip_T[2]),ws=1)
+
+    cmds.xform(footouter,rp=(op_T[0],op_T[1],op_T[2]),ws=1)
+    cmds.xform(footouter_offset,rp=(op_T[0],op_T[1],op_T[2]),ws=1)
+    
+    #Their work here is done.
+    cmds.delete(prefix+'_footPivotLocators_grp_'+suffix)
+    
+    #Make foot attribute ctrls
+    #(Create base curve to duplicate from)
+    circle1 = cmds.curve(n='circle1',d=1,p=[[0.04959257533984647, 3.0831822159735336e-17, -0.5035218673857907], [-1.4586012039213563e-17, 3.098100416274861e-17, -0.5059581943841895], [-0.049592575339846234, 3.0831822159735226e-17, -0.5035218673857889], [-0.0987075470691105, 3.0385712854935085e-17, -0.4962363495514102], [-0.14687191116106513, 2.964697252482165e-17, -0.48417180440046925], [-0.1936218184601853, 2.862271564261046e-17, -0.46744442009792053], [-0.23850704180308108, 2.732280636199294e-17, -0.4462152904987159], [-0.28109531195220194, 2.5759763519944162e-17, -0.42068886372591857], [-0.3209764805848947, 2.394864007347918e-17, -0.39111097322351485], [-0.3577664702459625, 2.1906878131448235e-17, -0.3577664702459624], [-0.39111097322351496, 1.9654140977493694e-17, -0.32097648058489475], [-0.4206888637259186, 1.7212123701879543e-17, -0.28109531195220194], [-0.44621529049871617, 1.4604344265912376e-17, -0.23850704180308133], [-0.46744442009792064, 1.1855917011117797e-17, -0.1936218184601854], [-0.4841718044004695, 8.993310794402657e-18, -0.14687191116106538], [-0.49623634955141055, 6.0440940784936514e-18, -0.09870754706911063], [-0.503521867385789, 3.036669432570842e-18, -0.04959257533984639], [-0.5059581943841908, 4.9581959125508776e-33, -8.097348420790332e-17], [-0.5035218673857891, -3.0366694325708334e-18, 0.04959257533984625], [-0.49623634955141077, -6.044094078493644e-18, 0.0987075470691105], [-0.48417180440046964, -8.993310794402648e-18, 0.14687191116106524], [-0.4674444200979208, -1.1855917011117795e-17, 0.19362181846018536], [-0.4462152904987164, -1.4604344265912373e-17, 0.23850704180308127], [-0.42068886372591885, -1.7212123701879546e-17, 0.281095311952202], [-0.3911109732235153, -1.9654140977493704e-17, 0.3209764805848949], [-0.3577664702459627, -2.190687813144825e-17, 0.3577664702459627], [-0.320976480584895, -2.39486400734792e-17, 0.3911109732235152], [-0.28109531195220205, -2.5759763519944187e-17, 0.420688863725919], [-0.2385070418030815, -2.732280636199297e-17, 0.4462152904987164], [-0.1936218184601855, -2.862271564261049e-17, 0.46744442009792103], [-0.14687191116106543, -2.9646972524821695e-17, 0.48417180440046986], [-0.09870754706911072, -3.038571285493512e-17, 0.4962363495514108], [-0.04959257533984641, -3.083182215973525e-17, 0.5035218673857893], [-6.954385898406273e-17, -3.0981004162748694e-17, 0.505958194384191], [0.0495925753398463, -3.0831822159735256e-17, 0.5035218673857894], [0.09870754706911057, -3.0385712854935134e-17, 0.49623634955141105], [0.14687191116106538, -2.9646972524821695e-17, 0.4841718044004699], [0.19362181846018547, -2.8622715642610495e-17, 0.4674444200979212], [0.2385070418030814, -2.7322806361992992e-17, 0.4462152904987167], [0.2810953119522022, -2.5759763519944206e-17, 0.4206888637259193], [0.3209764805848952, -2.3948640073479217e-17, 0.39111097322351546], [0.3577664702459629, -2.1906878131448262e-17, 0.3577664702459629], [0.39111097322351557, -1.965414097749372e-17, 0.32097648058489514], [0.4206888637259193, -1.7212123701879568e-17, 0.28109531195220233], [0.4462152904987168, -1.4604344265912394e-17, 0.23850704180308166], [0.46744442009792136, -1.1855917011117815e-17, 0.1936218184601857], [0.48417180440047025, -8.993310794402671e-18, 0.1468719111610656], [0.49623634955141127, -6.044094078493662e-18, 0.09870754706911081], [0.5035218673857899, -3.036669432570848e-18, 0.049592575339846484], [0.5059581943841914, -5.867673071274198e-33, 9.582637337327793e-17], [0.5035218673857899, 3.036669432570837e-18, -0.049592575339846304], [0.4962363495514115, 6.044094078493652e-18, -0.09870754706911064], [0.48417180440047036, 8.993310794402662e-18, -0.14687191116106546], [0.4674444200979217, 1.1855917011117812e-17, -0.19362181846018564], [0.44621529049871694, 1.4604344265912397e-17, -0.2385070418030817], [0.4206888637259196, 1.7212123701879574e-17, -0.28109531195220244], [0.3911109732235157, 1.9654140977493738e-17, -0.3209764805848954], [0.3577664702459633, 2.1906878131448284e-17, -0.3577664702459633], [0.3209764805848954, 2.394864007347924e-17, -0.3911109732235158], [0.28109531195220244, 2.575976351994423e-17, -0.42068886372591974], [0.2385070418030818, 2.7322806361993008e-17, -0.446215290498717], [0.1936218184601858, 2.862271564261053e-17, -0.4674444200979218], [0.14687191116106568, 2.9646972524821744e-17, -0.4841718044004707], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.09870754706911086, 3.0385712854935165e-17, -0.4962363495514115], [0.04959257533984647, 3.0831822159735336e-17, -0.5035218673857907]])
+    tempFootAttrCtrl = cmds.curve(n='temp_footAttr_ctrl',d=1,p=[[0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16], [-1.4586012039213563e-17, -0.5059581943841902, 4.686786657793824e-16], [-0.049592575339846234, -0.5035218673857895, 6.352121194731559e-16], [-0.0987075470691105, -0.4962363495514109, 6.352121194731559e-16], [-0.14687191116106513, -0.4841718044004699, 7.323566341278571e-16], [-0.1936218184601853, -0.46744442009792114, 6.07456543857527e-16], [-0.23850704180308108, -0.44621529049871655, 6.490899072809704e-16], [-0.28109531195220194, -0.4206888637259192, 6.352121194731559e-16], [-0.3209764805848947, -0.3911109732235154, 6.629676950887848e-16], [-0.3577664702459625, -0.357766470245963, 6.352121194731559e-16], [-0.39111097322351496, -0.3209764805848954, 6.352121194731559e-16], [-0.4206888637259186, -0.28109531195220255, 7.184788463200427e-16], [-0.44621529049871617, -0.23850704180308202, 7.462344219356716e-16], [-0.46744442009792064, -0.19362181846018606, 7.462344219356716e-16], [-0.4841718044004695, -0.14687191116106607, 6.97662164608321e-16], [-0.49623634955141055, -0.0987075470691113, 6.907232707044138e-16], [-0.503521867385789, -0.04959257533984709, 7.167441228440659e-16], [-0.5059581943841908, -8.026184502142547e-16, 7.216449660063518e-16], [-0.5035218673857891, 0.049592575339845534, 7.288871871759035e-16], [-0.49623634955141077, 0.09870754706910977, 7.288871871759035e-16], [-0.48417180440046964, 0.14687191116106452, 7.670511036473933e-16], [-0.4674444200979208, 0.19362181846018459, 7.531733158395788e-16], [-0.4462152904987164, 0.23850704180308055, 8.086844670708366e-16], [-0.42068886372591885, 0.28109531195220117, 7.046010585122282e-16], [-0.3911109732235153, 0.3209764805848942, 7.462344219356716e-16], [-0.3577664702459627, 0.35776647024596203, 6.490899072809704e-16], [-0.320976480584895, 0.3911109732235145, 7.462344219356716e-16], [-0.28109531195220205, 0.42068886372591846, 6.490899072809704e-16], [-0.2385070418030815, 0.44621529049871583, 7.323566341278571e-16], [-0.1936218184601855, 0.4674444200979202, 6.768454828965993e-16], [-0.14687191116106543, 0.4841718044004691, 7.184788463200427e-16], [-0.09870754706911072, 0.4962363495514101, 7.60112209743486e-16], [-0.04959257533984641, 0.5035218673857884, 6.629676950887848e-16], [-6.954385898406273e-17, 0.5059581943841902, 7.462344219356716e-16], [0.0495925753398463, 0.5035218673857886, 6.907232707044138e-16], [0.09870754706911057, 0.4962363495514103, 7.8786778535911495e-16], [0.14687191116106538, 0.484171804400469, 7.739899975513005e-16], [0.19362181846018547, 0.46744442009792053, 7.184788463200427e-16], [0.2385070418030814, 0.44621529049871606, 7.323566341278571e-16], [0.2810953119522022, 0.42068886372591857, 7.046010585122282e-16], [0.3209764805848952, 0.3911109732235146, 6.768454828965993e-16], [0.3577664702459629, 0.35776647024596225, 7.462344219356716e-16], [0.39111097322351557, 0.3209764805848943, 7.8786778535911495e-16], [0.4206888637259193, 0.2810953119522016, 8.156233609747439e-16], [0.4462152904987168, 0.2385070418030809, 7.531733158395788e-16], [0.46744442009792136, 0.193621818460185, 7.323566341278571e-16], [0.48417180440047025, 0.14687191116106488, 7.323566341278571e-16], [0.49623634955141127, 0.09870754706911014, 7.184788463200427e-16], [0.5035218673857899, 0.04959257533984577, 7.254177402239499e-16], [0.5059581943841914, -6.258185926330736e-16, 7.2164496600635185e-16], [0.5035218673857899, -0.04959257533984702, 7.236830167479731e-16], [0.4962363495514115, -0.09870754706911133, 7.254177402239499e-16], [0.48417180440047036, -0.1468719111610662, 7.184788463200427e-16], [0.4674444200979217, -0.19362181846018645, 7.115399524161354e-16], [0.44621529049871694, -0.23850704180308244, 7.392955280317644e-16], [0.4206888637259196, -0.28109531195220316, 7.046010585122282e-16], [0.3911109732235157, -0.3209764805848961, 6.629676950887848e-16], [0.3577664702459633, -0.3577664702459639, 6.213343316653415e-16], [0.3209764805848954, -0.3911109732235166, 6.490899072809704e-16], [0.28109531195220244, -0.42068886372592046, 6.07456543857527e-16], [0.2385070418030818, -0.4462152904987177, 6.07456543857527e-16], [0.1936218184601858, -0.46744442009792253, 6.490899072809704e-16], [0.14687191116106568, -0.4841718044004713, 6.768454828965993e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.09870754706911086, -0.49623634955141216, 7.323566341278571e-16], [0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16], [0.04959257533984647, -0.5035218673857914, 4.964342413950114e-16]])
+    circle3 = cmds.curve(n='circle3',d=1,p=[[4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796], [5.065392549852275e-16, -0.5059581943841902, 2.944980939503027e-16], [3.4061389849537337e-16, -0.5035218673857895, -0.049592575339845915], [3.44083345447327e-16, -0.4962363495514109, -0.0987075470691102], [2.53877724696533e-16, -0.4841718044004699, -0.14687191116106485], [3.3714445154341975e-16, -0.46744442009792114, -0.193621818460185], [3.0938887592779084e-16, -0.44621529049871655, -0.2385070418030808], [2.8857219421606915e-16, -0.4206888637259192, -0.2810953119522016], [3.1632776983169807e-16, -0.3911109732235154, -0.32097648058489436], [3.302055576395125e-16, -0.357766470245963, -0.35776647024596214], [2.6081661860044024e-16, -0.3209764805848954, -0.3911109732235147], [1.6367210394573907e-16, -0.28109531195220255, -0.42068886372591835], [2.191832551769969e-16, -0.23850704180308202, -0.4462152904987159], [1.6367210394573907e-16, -0.19362181846018606, -0.46744442009792037], [1.9142767956136798e-16, -0.14687191116106607, -0.48417180440046914], [1.7754989175355352e-16, -0.0987075470691113, -0.49623634955141016], [2.3306104298481133e-16, -0.04959257533984709, -0.5035218673857887], [2.0530546736918244e-16, -8.026184502142547e-16, -0.5059581943841904], [2.6081661860044024e-16, 0.049592575339845534, -0.5035218673857889], [1.7754989175355352e-16, 0.09870754706910977, -0.49623634955141044], [1.0816095271448124e-16, 0.14687191116106452, -0.48417180440046936], [1.6367210394573907e-16, 0.19362181846018459, -0.46744442009792053], [6.652758929103787e-17, 0.23850704180308055, -0.4462152904987161], [2.191832551769969e-16, 0.28109531195220117, -0.42068886372591857], [1.497943161379246e-16, 0.3209764805848942, -0.391110973223515], [2.3306104298481133e-16, 0.35776647024596203, -0.35776647024596236], [2.0530546736918244e-16, 0.3911109732235145, -0.32097648058489464], [2.6081661860044024e-16, 0.42068886372591846, -0.2810953119522017], [2.191832551769969e-16, 0.44621529049871583, -0.2385070418030812], [2.8857219421606915e-16, 0.4674444200979202, -0.1936218184601852], [2.3306104298481133e-16, 0.4841718044004691, -0.14687191116106516], [2.226527021289505e-16, 0.4962363495514101, -0.09870754706911043], [3.232666637356053e-16, 0.5035218673857884, -0.049592575339846096], [2.289834988289383e-16, 0.5059581943841902, 2.3954024700545373e-16], [2.9204164116802277e-16, 0.5035218673857886, 0.04959257533984662], [2.0183602041722882e-16, 0.4962363495514103, 0.09870754706911086], [1.8448878565746075e-16, 0.484171804400469, 0.1468719111610657], [2.191832551769969e-16, 0.46744442009792053, 0.19362181846018578], [2.261221490809041e-16, 0.44621529049871606, 0.23850704180308174], [2.3306104298481133e-16, 0.42068886372591857, 0.28109531195220255], [2.746944064082547e-16, 0.3911109732235146, 0.32097648058489553], [1.7754989175355352e-16, 0.35776647024596225, 0.35776647024596325], [1.497943161379246e-16, 0.3209764805848943, 0.3911109732235159], [1.220387405222957e-16, 0.2810953119522016, 0.4206888637259196], [1.9142767956136798e-16, 0.2385070418030809, 0.4462152904987171], [2.0530546736918244e-16, 0.193621818460185, 0.46744442009792175], [2.3306104298481133e-16, 0.14687191116106488, 0.48417180440047064], [2.469388307926258e-16, 0.09870754706911014, 0.4962363495514116], [2.0530546736918244e-16, 0.04959257533984577, 0.5035218673857902], [1.7754989175355352e-16, -6.258185926330736e-16, 0.5059581943841918], [2.0530546736918244e-16, -0.04959257533984702, 0.5035218673857902], [2.191832551769969e-16, -0.09870754706911133, 0.49623634955141177], [2.191832551769969e-16, -0.1468719111610662, 0.4841718044004707], [2.3306104298481133e-16, -0.19362181846018645, 0.4674444200979221], [2.3306104298481133e-16, -0.23850704180308244, 0.44621529049871733], [2.469388307926258e-16, -0.28109531195220316, 0.42068886372592007], [3.302055576395125e-16, -0.3209764805848961, 0.391110973223516], [3.1632776983169807e-16, -0.3577664702459639, 0.35776647024596375], [3.1632776983169807e-16, -0.3911109732235166, 0.3209764805848957], [3.5796113325514144e-16, -0.42068886372592046, 0.2810953119522028], [3.6490002715904866e-16, -0.4462152904987177, 0.23850704180308213], [3.024499820238836e-16, -0.46744442009792253, 0.19362181846018614], [2.8857219421606915e-16, -0.4841718044004713, 0.14687191116106602], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [2.6081661860044024e-16, -0.49623634955141216, 0.09870754706911118], [4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796], [4.741876061455875e-16, -0.5035218673857914, 0.049592575339846796]])
+    #Merge shapes
+    shape1 = cmds.listRelatives(circle1,s=1)
+    shape2 = cmds.listRelatives(tempFootAttrCtrl,s=1)
+    shape3 = cmds.listRelatives(circle3,s=1)
+    cmds.parent(shape1,tempFootAttrCtrl,r=1,s=1)
+    cmds.parent(shape3,tempFootAttrCtrl,r=1,s=1)
+    cmds.delete(circle1,circle3)
+    
+    
+    #Generate lists
+    footAttributeCtrls = []
+    footAttributeSdks = []
+    footAttributeOffsets = []
+    
+    #Position & populate lists
+    for i in footAttributeList:
+        ctrl = cmds.duplicate(tempFootAttrCtrl,n=i+'_ctrl')[0]
+        ctrlGrps = rm.makeControlGroups(ctrl)
+        sdk = ctrlGrps[0]
+        offset = ctrlGrps[1]
+        cmds.delete(cmds.parentConstraint(i,offset))
+        cmds.parentConstraint(ctrl,i)
+        footAttributeCtrls.append(ctrl)
+        footAttributeSdks.append(sdk)
+        footAttributeOffsets.append(offset)
+        rm.lockAttr(ctrl,t=1,s=1,v=1)
+    #Delete initial curve used to duplicate from.
+    cmds.delete(tempFootAttrCtrl)
+    
+    #transfer names so that the SDK's become the target for foot attribute.
+    toepivot = footAttributeSdks[0]
+    footinner = footAttributeSdks[1]
+    footouter = footAttributeSdks[2]
+    heelpivot = footAttributeSdks[3]
+    ballpivot = footAttributeSdks[4]
+    footroll = footAttributeSdks[5]
+    toetap = footAttributeSdks[6]
+    #Make sure to parent them in this order to achieve desired affect.
+    cmds.parent(footAttributeOffsets[1],footAttributeCtrls[0])
+    cmds.parent(footAttributeOffsets[2],footAttributeCtrls[1])
+    cmds.parent(footAttributeOffsets[3],footAttributeCtrls[2])
+    cmds.parent(footAttributeOffsets[4],footAttributeCtrls[3])
+    cmds.parent(footAttributeOffsets[5],footAttributeCtrls[4])
+    cmds.parent(footAttributeOffsets[6],footAttributeCtrls[4])
+    
+    cmds.parent(footAttributeOffsets[0],ikControl)
+    #Add to visibility switch
+    cmds.connectAttr(footAttrCtrl+'.FKIK', footAttributeOffsets[0]+'.visibility', f=1)
+    
+    #Set driven foot attributes
+    #Foot roll 0
+    cmds.setAttr(str(ikControl)+'.footRoll', 0)
+    cmds.setDrivenKeyframe(str(footroll)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    cmds.setDrivenKeyframe(str(heelpivot)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    #Foot roll -10
+    cmds.setAttr(str(ikControl)+'.footRoll', -10)
+    cmds.rotate(0,0,50,heelpivot)
+    cmds.setDrivenKeyframe(str(heelpivot)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    #Foot roll +5
+    cmds.setAttr(str(ikControl)+'.footRoll', 5)
+    cmds.rotate(0,0,-35,footroll)
+    cmds.setDrivenKeyframe(str(footroll)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    #Foot roll +10
+    cmds.setAttr(str(ikControl)+'.footRoll', 10)
+    cmds.rotate(0,0,-25,footroll)
+    cmds.rotate(0,0,-40,toepivot)
+    cmds.setDrivenKeyframe(str(footroll)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.footRoll')
+    cmds.setAttr(str(ikControl)+'.footRoll', 0)
+    
+    #Toe pivot 0
+    cmds.setAttr(str(ikControl)+'.toePivot', 0)
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.toePivot')
+    #Toe pivot +10
+    cmds.setAttr(str(ikControl)+'.toePivot', 10)
+    cmds.rotate(0,0,-50,toepivot)
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.toePivot')
+    #Toe pivot -10
+    cmds.setAttr(str(ikControl)+'.toePivot', -10)
+    cmds.rotate(0,0,50,toepivot)
+    cmds.setDrivenKeyframe(str(toepivot)+'.rotate',currentDriver = str(ikControl)+'.toePivot')
+    cmds.setAttr(str(ikControl)+'.toePivot', 0)
+    
+    #Heel pivot 0
+    cmds.setAttr(str(ikControl)+'.heelPivot', 0)
+    cmds.setDrivenKeyframe(str(heelpivot)+'.rotate',currentDriver = str(ikControl)+'.heelPivot')
+    #Heel pivot +10
+    cmds.setAttr(str(ikControl)+'.heelPivot', 10)
+    cmds.rotate(0,0,-50,heelpivot)
+    cmds.setDrivenKeyframe(str(heelpivot)+'.rotate',currentDriver = str(ikControl)+'.heelPivot')
+    #Heel pivot -10
+    cmds.setAttr(str(ikControl)+'.heelPivot', -10)
+    cmds.rotate(0,0,50,heelpivot)
+    cmds.setDrivenKeyframe(str(heelpivot)+'.rotate',currentDriver = str(ikControl)+'.heelPivot')
+    cmds.setAttr(str(ikControl)+'.heelPivot', 0)
+    
+    #Ball pivot 0
+    cmds.setAttr(str(ikControl)+'.ballPivot', 0)
+    cmds.setDrivenKeyframe(str(ballpivot)+'.rotate',currentDriver = str(ikControl)+'.ballPivot')
+    #Ball pivot +10
+    cmds.setAttr(str(ikControl)+'.ballPivot', 10)
+    cmds.rotate(0,-50,0,ballpivot)
+    cmds.setDrivenKeyframe(str(ballpivot)+'.rotate',currentDriver = str(ikControl)+'.ballPivot')
+    #Ball pivot -10
+    cmds.setAttr(str(ikControl)+'.ballPivot', -10)
+    cmds.rotate(0,50,0,ballpivot)
+    cmds.setDrivenKeyframe(str(ballpivot)+'.rotate',currentDriver = str(ikControl)+'.ballPivot')
+    cmds.setAttr(str(ikControl)+'.ballPivot', 0)
+    
+    #Toe Tap 0
+    cmds.setAttr(str(ikControl)+'.toeTap', 0)
+    cmds.setDrivenKeyframe(str(toetap)+'.rotate',currentDriver = str(ikControl)+'.toeTap')
+    #Toe Tap +10
+    cmds.setAttr(str(ikControl)+'.toeTap', 10)
+    cmds.rotate(0,0,-35,toetap)
+    cmds.setDrivenKeyframe(str(toetap)+'.rotate',currentDriver = str(ikControl)+'.toeTap')
+    #Toe Tap -10
+    cmds.setAttr(str(ikControl)+'.toeTap', -10)
+    cmds.rotate(0,0,35,toetap)
+    cmds.setDrivenKeyframe(str(toetap)+'.rotate',currentDriver = str(ikControl)+'.toeTap')
+    cmds.setAttr(str(ikControl)+'.toeTap', 0)
+    
+    #Bank 0
+    cmds.setAttr(str(ikControl)+'.bank', 0)
+    cmds.setDrivenKeyframe(str(footinner)+'.rotate',currentDriver = str(ikControl)+'.bank')
+    cmds.setDrivenKeyframe(str(footouter)+'.rotate',currentDriver = str(ikControl)+'.bank')
+    #Bank +10
+    cmds.setAttr(str(ikControl)+'.bank', 10)
+    cmds.rotate(45,0,0,footinner)
+    cmds.setDrivenKeyframe(str(footinner)+'.rotate',currentDriver = str(ikControl)+'.bank')
+    #Bank -10
+    cmds.setAttr(str(ikControl)+'.bank', -10)
+    cmds.rotate(-45,0,0,footouter)
+    cmds.setDrivenKeyframe(str(footouter)+'.rotate',currentDriver = str(ikControl)+'.bank')
+    cmds.setAttr(str(ikControl)+'.bank', 0)
+    
+    
+    #lock Attribs
+    for i in fkControl:
+        rm.lockAttr(i,s=1,v=1)
+    rm.lockAttr(ikControl,s=1,v=1)
+    
+    #Get rid of legRoot
+    cmds.parent(prefix+'_hip_ctrl_offset_'+suffix,tempLegGrp)
+    cmds.delete(prefix+'_legRoot_ctrl_offset_'+suffix)
+    
+    
+    
+
+
+tempLegRig(axis = 'l',inverse = 0)
+autoLeg('LT_temp_LegRig_grp_1')
+

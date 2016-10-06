@@ -1,0 +1,86 @@
+//========================GMH2_presetSaver.mel======================
+
+global proc int GMH2_SaveGMHPreset()
+{
+              // test GMH SYSTEM node
+            string $GMHHairSystems[] = `textScrollList -query -selectItem "GMHStyleList"`;
+            string $GMHHairSystem = $GMHHairSystems[0];
+            //string $GMHHairSystem = PDD_currentSelectionName(1);
+                     if (`attributeExists "GMH_styleMainGroup" $GMHHairSystem` ==0)
+                     {
+                         warning ($GMHHairSystem +" is not a valid GMH style System , ignored \n");
+                         return 0;
+                     }
+                     
+                     
+                string $name;     
+                     
+             // get user input Name        
+               string $text;
+            string $result = `promptDialog
+                -title "Enter GMH Preset Name "
+                -message "Enter GMH Preset Name:"
+                -button "OK" -button "Cancel"
+                -defaultButton "OK" -cancelButton "Cancel"
+                -dismissString "Cancel"`;
+            if ($result == "OK") 
+            {
+                $name = `promptDialog -query -text`;
+            }
+            if ($result == "Cancel") 
+            {
+                print "CANCEL";
+               return 0;
+            }
+           
+             print ("RESULT = "+$result+"\n");
+            // save preset
+            string $result =   `saveAttrPreset $GMHHairSystem $name false`;
+            
+            //rename preset file
+            string $filename = PDD_fileNameExtract($result);
+            string $path = PDD_pathExtract($result);
+            string $newFullPath = $path + "/"+ $name +"_GMHPRESET.mel"; 
+            sysFile -rename $newFullPath $result; 
+            
+            //move to GMH2 preset folder
+            string $des = (PDD_getValidScriptPath("THUNDERCLOUD/GMH2/presetsLoader/presets/")+$name +"_GMHPRESET.mel") ;
+            if (`filetest -e $des` ==1 )
+            {
+                warning ("A preset with name :" +$name +" is already existed, abort \n");
+                
+              
+                sysFile -delete $newFullPath; //delete the tmp file
+                return 0;
+            }
+             sysFile -move $des $newFullPath ; 
+            
+            
+            
+            
+              //get user Input thumbnail Image 
+            
+            string $thumbnailSourcePaths[] = `fileDialog2 -cap "thumbnail PNG file " -fileFilter "*.png *.jpg" -dialogStyle 2 -fm 1`;
+            
+            
+            if ($thumbnailSourcePaths[0] == "") // if no image was specifed then asign the default no thumbnail image
+            {
+            $thumbnailSourcePaths[0] = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/presetsLoader/presets/noGMHPresetThumbnail.png");   
+            }
+            
+            // new thumbnail path
+            string $newThumbnailPath =  (PDD_getValidScriptPath("THUNDERCLOUD/GMH2/presetsLoader/presets/")+$name +"_GMHPRESET_thumbnail.png") ;
+            
+            //if the thumbnail already existed , delete it 
+            if ( `filetest -e $newThumbnailPath`)
+            {
+               sysFile -del  $newThumbnailPath;
+            }
+            //copy the file over
+            sysFile -copy $newThumbnailPath $thumbnailSourcePaths[0] ; 
+            
+            //load the preset loader
+            PDD_GMHPresetLoaderUILoader("THUNDERCLOUD/GMH2/presetsLoader/presets/");
+            
+            return 1;  
+}

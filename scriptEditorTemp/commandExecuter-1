@@ -1,0 +1,174 @@
+#Batch FBX export 
+import maya.cmds as cmds
+import os
+import re
+
+#USER INPUT:
+multipleFilters = "Maya Files (*.ma *.mb);;Maya ASCII (*.ma);;Maya Binary (*.mb);"
+filepath = cmds.fileDialog2(fm=4,okc='Set Files To Export', dialogStyle=2,ff=multipleFilters)
+exportPath = cmds.fileDialog2(fm=3,okc='Set Export Path', dialogStyle=2)[0]
+rigPath = cmds.fileDialog2(fm=0,okc='Set Rig Reference', dialogStyle=2)[0]
+modelGroup = ['Environment','forgotten_model']
+rigGroup = 'game_rig'
+rootGroup = ['game_rig','hammer_rig_grp','door_rig_grp','window_rig_grp','fence_bg_rig_grp','electricuted_rig_grp','electricFence_rig_grp','boltCutter_rig_grp','crowbar_rig_grp','exclamation_rig_grp','fence_rig_grp','tripWire_rig_grp']
+
+#Make sure all slashes are forward facing
+exportPath = exportPath.replace('\\' , '/')
+#Make new variable for writing out text file (it requires double slash for whatever reason.)
+exportPath_doubleSlash = exportPath.replace('/','//')
+
+#Get files in filePath
+files = []
+for i in filepath:
+    print i.rsplit('/', 1)[-1]
+    files.append(i.rsplit('/', 1)[-1])
+
+print ', '.join(files)
+
+mayaFiles = []
+ab = 0
+for i in files:
+    if '.mb' in i or '.ma' in i:
+        mayaFiles.append(i)
+
+mayaFilesConfirm = mayaFiles
+if len(mayaFiles) > 50:
+    mayaFilesConfirm = mayaFiles[0:50]
+    mayaFilesConfirm.append('\n...had to omit '+str((len(mayaFiles)-50))+' files from this message for display purposes\n')
+
+confirmSelection = cmds.confirmDialog(title='Confirm Selection', m = 'You are about to batch export these files:\n\n'+('\n'.join(mayaFilesConfirm))+'\n\n To: '+ exportPath +'\nConfirm selection?', ma='center', button=['Ok','Cancel'],icn='question')
+
+
+if confirmSelection == 'Ok':    
+    ###Progress Bar stuff###
+    incr = 1.0
+    fileIncr = 0
+    progNum = float(len(mayaFiles))
+    cmds.progressWindow( title='FBX Export', progress=0, status='Batch FBX Exporting: '+ str(int(incr/progNum*100))+'%', isInterruptable=True )
+    while True:
+        # Check if the dialog has been cancelled
+        if cmds.progressWindow( query=True, isCancelled=True ) :
+            break
+    
+        # Check if end condition has been reached
+        if cmds.progressWindow( query=True, progress=True ) >= 100 :
+            break
+    
+    
+        #######################
+        #### Main function ####
+        #######################
+        for i in mayaFiles:
+            if fileIncr >= len(filepath):
+                break
+            #import file
+            cmds.file(filepath[fileIncr],f=1,o=1)
+                
+            #delete usless shaders
+            #for num in (0,10):
+            #    if cmds.objExists('initialShadingGroup'+str(num)):
+            #        cmds.delete('initialShadingGroup'+str(num))
+            #if cmds.objExists('ATOnion*'):
+            #    cmds.delete('ATOnion*')
+            
+            #Import model and rig references
+            refs = cmds.ls(type='reference')
+            refRig = []
+            refModel = []
+            
+            try:
+                refRigGrp = cmds.referenceQuery(rigGroup,rfn=1)
+                if refRigGrp:
+                    #Change reference from current to new
+                    maya.mel.eval('file -loadReference '+refRigGrp+' -type "mayaBinary" -options "v=0;" "'+rigPath+'";')
+            except:
+                pass
+            
+            for y in range(0,2):
+                refs = cmds.ls(type='reference')
+                for x in refs:
+                    try:
+                        rFile = cmds.referenceQuery(x, f=True)
+                        cmds.file(rFile, importReference=True)
+                    except:
+                        pass
+            
+            for groups in rootGroup:
+                cmds.select(groups)
+                cmds.select(groups,hi=1,add=1)
+                cmds.select(groups,d=1)
+                
+                hierarchy = cmds.ls(sl=1)
+                jntList = []
+                otherList = []
+                
+                for obj in hierarchy:
+                    if cmds.objectType(obj,i='joint'):
+                        jntList.append(obj)
+                    else:
+                        otherList.append(obj)
+                
+                start = cmds.playbackOptions(q=1, minTime=1)
+                end = cmds.playbackOptions(q=1, maxTime=1)
+                
+                cmds.bakeResults(jntList,simulation=True,t=(start,end),sb=1,disableImplicitControl = True,preserveOutsideKeys = True, sparseAnimCurveBake = False, removeBakedAttributeFromLayer = False,removeBakedAnimFromLayer = False,bakeOnOverrideLayer =False ,minimizeRotation =True, controlPoints =False, shape =True)
+                
+            
+            #find all non-joint items in rootGroup
+            cmds.select(rootGroup[0],add=1,hi=1)
+            hi = cmds.ls(sl=1)
+            
+            #get all joints items
+            noChild = []
+            for item in hi:
+                if cmds.objectType(item) == 'joint':
+                    noChild.append(item)
+                    
+            #Drill up from joint and append all parents to keepList
+            keepList = []
+            incr = 0
+            for item in noChild:
+                if cmds.objectType(item,i='joint'):
+                    keepList.append(item)
+                    print item
+                    par = cmds.listRelatives(item,p=1)
+                    while par != rootGroup:
+                        print item,par,incr
+                        keepList.append(par)
+                        par = cmds.listRelatives(par,p=1)
+                        incr += 1
+                        if incr > 1000:
+                            break
+            
+            #Delete everything under rootGroup that is not a joint, or a relative/parent of a joint
+            for keepies in keepList:
+                cmds.select(keepies,d=1)
+            
+            cmds.select(rootGroup,d=1)
+            cmds.delete()
+            
+            #Delete everything other than rootGroup and modelGroup
+            cmds.select(ado = 1)
+            cmds.select(rootGroup,modelGroup,d=1)
+            cmds.delete()
+            
+            #remove redundant nodes.
+            mel.eval('hyperShadePanelMenuCommand("hyperShadePanel1", "deleteUnusedNodes");')
+            
+            #fbx export
+            #maya.mel.eval('file -force -options "precision=8;statics=1;baked=1;sdk=0;constraint=0;animLayers=0;selected=selectedOnly;whichRange=1;range=1:31;hierarchy=none;controlPoints=0;useChannelBox=1;options=keys;copyKeyCmd=-animation objects -option keys -hierarchy none -controlPoints 0 " -typ "atomExport" -es "'+exportPath+'/'+str(i[:-3])+'.atom";')
+            maya.mel.eval('file -force -options "v=0;" -type "FBX export" -pr -ea "'+exportPath+'/'+str(i[:-3])+'.fbx";')
+            
+            cmds.progressWindow( edit=True, progress=(incr/progNum*100), status=('Exporting: ' + str(i[:-3]) ))
+            incr += 1
+            fileIncr += 1
+            
+            if i == mayaFiles[-1]:
+                break
+        if fileIncr >= len(filepath):
+            break
+    
+    cmds.progressWindow(endProgress=1)
+    cmds.confirmDialog(title='Export Complete', m = 'Batch FBX export sucessful.\n'+exportPath, ma='center', button=['Ok'])
+
+

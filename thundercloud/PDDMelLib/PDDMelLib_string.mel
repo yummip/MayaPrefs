@@ -1,0 +1,43 @@
+//========file: PDDMelLib_string.mel========
+
+
+// this file contain all proc to support string manipulation
+
+/*
+
+//adding an extra / infront of every / in a string to make it actually mean / in the string
+global proc string legalizeSlashInString(string $string)
+{
+    string $subString = "\\\\";
+    string $expression = "*\\*";
+    string $oriString =  "Z:\MODEL"
+    string $s2 = `substitute $subString $expression "Z:\MODEL"`;
+    
+}
+*/
+
+//convert strings[] into string with : {"","","",......etc}
+
+global proc string PDD_StringArrayToContainedString(string $strings[])
+{
+    
+     
+    int $i = 0;
+    int $size = size($strings);
+    
+    string $string="{";
+    //build up the component list as array to pass it on EVAL command
+    for ($i =0;$i<=$size-1;$i++)
+    {
+        $string += "\""+$strings[$i]+"\"";
+        if($i==$size-1)
+        {
+           $string += "}"; 
+        }
+        else
+        {
+           $string += ",";             
+        }
+    }
+    return $string;
+}

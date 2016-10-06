@@ -1,0 +1,57 @@
+global proc int GMH_ShowFolliclesCurves( string  $GMHSurfaces[])
+{
+string $curvelist[];
+
+        for ( $obj in $GMHSurfaces)
+        {
+            string $mainGroup = getMainGroup( $obj);
+            
+                if ( $mainGroup =="" )
+            {
+                warning ($obj + " is not a GMH Surface,ignored \n" );
+                
+                
+            }
+            else
+            {
+            
+            
+                 setAttr ($mainGroup+".GMH_folliclesCurves") 1;
+                select $mainGroup;
+                string $curves[] = PDD_NodesFromConnection("GMH_folliclesCurves","out",1);
+                appendStringArray($curvelist,$curves,size($curves));
+            }
+            
+        }
+                
+select $curvelist;
+
+    return 1;
+}
+
+
+
+global proc int GMH_HideFolliclesCurves( string  $GMHSurfaces[])
+{
+string $curvelist[];
+
+        for ( $obj in $GMHSurfaces)
+        {
+            string $mainGroup = getMainGroup( $obj);
+            
+                if ( $mainGroup =="" )
+            {
+                warning ($obj + " is not a GMH Surface,ignored \n" );
+                
+                
+            }
+            else
+            {
+                 setAttr ($mainGroup+".GMH_folliclesCurves") 0;
+            }
+            
+        }
+                
+
+    return 1;
+}

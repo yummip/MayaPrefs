@@ -1,0 +1,101 @@
+global proc shelf_nClothMuscle () {
+    global string $gBuffStr;
+    global string $gBuffStr0;
+    global string $gBuffStr1;
+
+
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import correctiveShapeBuilder as csb\ncsb.ui().create()" 
+        -enableBackground 0
+        -align "center" 
+        -label "import correctiveShapeBuilder as csb\ncsb.ui().create()" 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "MAIN" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import correctiveShapeBuilder as csb\ncsb.ui().create()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "#Create 2 locators, called buildUpper_loc and buildLower_loc, then run this\n#SELECT ORDER: buildUpper_loc, buildLower_loc, root joint\n\nimport muscleRig as mr\nmr.createRig( prefix=\"bicep\") # twist = True  (for some muscles)" 
+        -enableBackground 0
+        -align "center" 
+        -label "#Create 2 locators, called buildUpper_loc and buildLower_loc, th..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "musRig" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "#Create 2 locators, called buildUpper_loc and buildLower_loc, then run this\n#SELECT ORDER: buildUpper_loc, buildLower_loc, root joint\n\nimport muscleRig as mr\nmr.createRig( prefix=\"bicep\") # twist = True  (for some muscles)" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+    shelfButton
+        -enableCommandRepeat 1
+        -enable 1
+        -width 35
+        -height 35
+        -manage 1
+        -visible 1
+        -preventOverride 0
+        -annotation "import muscleRig as mr\n\n#duplicate attract, get rid of suffix, then run this to create nClothObj\nmr.createNCloth( type='muscle' )\n\n#select attract, then nClothObj then run this to connect necessary attrs\nmr.connectAttractMeshToNcloth()" 
+        -enableBackground 0
+        -align "center" 
+        -label "import muscleRig as mr\n\n#duplicate attract, get rid of suffix, t..." 
+        -labelOffset 0
+        -rotation 0
+        -flipX 0
+        -flipY 0
+        -useAlpha 1
+        -font "plainLabelFont" 
+        -imageOverlayLabel "nCloth" 
+        -overlayLabelColor 0.8 0.8 0.8 
+        -overlayLabelBackColor 0 0 0 0.5 
+        -image "pythonFamily.png" 
+        -image1 "pythonFamily.png" 
+        -style "iconOnly" 
+        -marginWidth 1
+        -marginHeight 1
+        -command "import muscleRig as mr\n\n#duplicate attract, get rid of suffix, then run this to create nClothObj\nmr.createNCloth( type='muscle' )\n\n#select attract, then nClothObj then run this to connect necessary attrs\nmr.connectAttractMeshToNcloth()" 
+        -sourceType "python" 
+        -commandRepeatable 1
+        -flat 1
+    ;
+
+} 

@@ -1,0 +1,75 @@
+
+global proc int refreshGMHSystemFromNode()
+{
+    string $selection = PDD_currentSelectionName(1);
+    //CHECK if selection is already GMH STYLE SSYTEM
+    if (attributeExists ("GMH_styleMainGroup",PDD_currentSelectionName(1)) == 1 )
+    {
+        
+        
+    refreshGMHSystem (PDD_currentSelectionName(1));
+    select $selection;
+        return 1;
+    
+    }
+    
+    // IF NOT THEN GET IT MAIN GROUP
+    string $mainGroup = getMainGroup(PDD_currentSelectionName(1));
+    
+   select $mainGroup;
+    
+    string $GMHStyleSystem = PDD_NodeFromConnection("GMH_StyleMainGroupIn","in",1);
+    refreshGMHSystem ($GMHStyleSystem);
+    select $selection;
+    
+    return 1;
+    
+    
+}
+
+global proc int refreshGMHSystem(string $GMHStyleSystem)
+{
+                //CHECK EXISTENCE FOR GMH STYLE SYSTEM
+                    if (`objExists $GMHStyleSystem ` == 0)
+                    {
+                                warning "Invalid GMH style system";
+                                return 0;
+                        
+                    }
+                   else
+                {
+                   select $GMHStyleSystem;
+                }
+                
+    
+    //GET GMH HAIR MAIN GROUP
+                string $GMHHairMainGroup[] = PDD_NodesFromConnection("GMH_OutMainGroup","out",1);
+                
+                
+    //CHECK EXISTENCE FOR GMH HAIR MAIN GROUP
+                if ($GMHHairMainGroup[0] =="")
+                {
+                    warning "No GMH Hair group associated with selected GMH style system";
+                    return 0;
+                    
+                } 
+                else
+                {
+                   select $GMHHairMainGroup; 
+                }
+                
+     //RECONVERT TO GMH HAIR    
+                
+                for ($eachHairGroup in $GMHHairMainGroup)
+                {
+                    select $eachHairGroup;
+                    
+                    CreateGMHSystem(1,$GMHStyleSystem);
+                    
+                }
+                
+             
+                return 1;
+    
+    
+}

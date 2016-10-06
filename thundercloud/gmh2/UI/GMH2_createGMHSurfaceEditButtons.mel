@@ -1,0 +1,134 @@
+
+
+//==============================GMH2_createGMHSurfaceEditButtons.mel======================
+//this is the main proc to create GMH2 UI main window. 
+
+global proc createGMHSurfaceEditButtons()
+{   
+    //SURFACE EDIT
+            frameLayout -l "GMH Surface Edit";
+            
+            rowLayout -numberOfColumns 4;
+            
+            string $command = ("string $selections[] = `ls-sl`; for ($eachObj in $selections){GMH2_GMHSurfaceAttributeReset($eachObj,0) ;} select $selections; updateGUI(0)");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/reset.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l"Reset" -w 80 -bgc 1 0.450843 0;
+            
+            string $command = ("string $selections[] = `ls-sl`; for ($eachObj in $selections){select $eachObj;GMH_RotateSurface();} select $selections; updateGUI(0)");
+            //string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/rotate.png");
+            //symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l"Rotate"-w 80 ;
+            
+            string $command = ("string $selections[] = `ls-sl`; for ($eachObj in $selections){GMH2_GMHSurfaceAttributeEdit($eachObj,\"GMH_Clump_Per_Edge_loop\",0.5,0) ;} select $selections; updateGUI(0)");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/thicken.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l"thicken"-w 80 ;
+           
+            
+            string $command = ("string $selections[] = `ls-sl`; for ($eachObj in $selections){GMH2_GMHSurfaceAttributeEdit($eachObj,\"GMH_Clump_Per_Edge_loop\",(-0.5),0) ;} select $selections; updateGUI(0)");
+          //  string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/thinning.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+            button -c $command -l"thinning"-w 80 ;
+            
+                        setParent ..;
+                        
+            rowLayout -numberOfColumns 4;
+            string $command = ("GMH2_editPressureRampGMHSurface()");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/distribution.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+           
+            button -c $command -l"Edit Distribution Ramp"-w 120;
+            
+          
+            string $command = ("string $selections[] = `ls-sl`;GMH_ShowFolliclesCurves($selections); updateGUI(0)");
+           // string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/ShowFollicles.png");
+           // symbolButton -image $buttonImagePath -c $command ;
+           
+            button -c $command -l"Show Follicles"-w 80 -bgc 0.060298 0.511 0.0633853;
+            
+            string $command = ("string $selections[] = `ls-sl`;GMH_HideFolliclesCurves($selections); updateGUI(0)");
+            //string $buttonImagePath = PDD_getValidScriptPath("THUNDERCLOUD/GMH2/graphic/HideFollicles.png");
+            //symbolButton -image $buttonImagePath -c $command ;
+            
+            button -c $command -l"Hide Follicles"-w 80 -bgc 0.725 0.0855499 0.161485;
+            
+
+                        setParent ..;
+            
+            
+     // GMH PROPERTY PER SURFACE EDIT  
+            frameLayout -l "GMH Surface Properties Edit";
+            string $updateCommand = "";
+            colorSliderGrp -label "Per Surface Hair Color" -rgb 0 0 1 -cc "updateGMHHairProperties(\"GMH_HairColor\")" "GMH_HairColor_control";
+            
+            floatSliderGrp -label "Hair Color Overide strength" -field true
+            -minValue 0 -maxValue 1 -s 0.001
+            -fieldMinValue 0 -fieldMaxValue 1
+            -value 0 -cc "updateGMHHairProperties(\"GMH_Overide_Hair_Color\")"  "GMH_Overide_Hair_Color_control";
+            
+            
+            floatSliderGrp -label "Hair Num Per Clump Multiply" -field true
+            -minValue 0.001 -maxValue 5 -s 0.001
+            -fieldMinValue 0.001 -fieldMaxValue 100
+            -value 1 -cc "updateGMHHairProperties(\"GMH_Hair_Num_Per_Clump_Mul\")"  "GMH_Hair_Num_Per_Clump_Mul_control";
+                      					           		
+            floatSliderGrp -label "Clump Width Multiply" -field true
+            -minValue 0 -maxValue 10 -s 0.001
+            -fieldMinValue 0 -fieldMaxValue 100
+            -value 1 -cc "updateGMHHairProperties(\"GMH_Clump_Width_Mul\")"  "GMH_Clump_Width_Mul_control";
+                      					           		
+            floatSliderGrp -label " Curl Multiply " -field true
+            -minValue 0 -maxValue 2 -s 0.001
+            -fieldMinValue 0 -fieldMaxValue 100
+            -value 1 -cc "updateGMHHairProperties(\"GMH_Curl_Mult\")"  "GMH_Curl_Mult_control";		
+                      					           		
+            checkBoxGrp -label "Braid" -v1 0  -cc  "updateGMHHairProperties(\"GMH_Braid\")" "GMH_Braid_control";	
+            
+
+
+
+
+            }
+            
+            
+
+global proc updateGMHHairProperties(string $property)
+{
+
+    string $GMHSurface[];
+    // filter out GMH base mesh 
+    string $selections[] = `ls-sl`;
+    for ( $obj in $selections ) 
+    {
+        select $obj;string $objShape = PDD_currentSelectionShapeName(1); 
+        if ( `attributeExists "GMH_baseMesh" $objShape`)
+        {
+            string $tmps[]; $tmps[0] = $obj; appendStringArray ($GMHSurface,$tmps,1);
+            
+            vector $color = `colorSliderGrp -q -rgb "GMH_HairColor_control"`;
+            if ($property == "GMH_HairColor")
+           setAttr ($obj+".GMH_HairColor") ($color.x) ($color.y)($color.z);
+           
+           if (($property == "GMH_Hair_Num_Per_Clump_Mul")
+               ||($property == "GMH_Clump_Width_Mul")
+               ||($property == "GMH_Curl_Mult")
+               ||($property == "GMH_Overide_Hair_Color"))
+               {
+                   float $value = `floatSliderGrp -q -v ($property+"_control")`;
+                   setAttr ($obj+"."+$property) $value;
+               }
+               
+                if ($property == "GMH_Braid")
+               {
+                   float $value = `checkBoxGrp -q -v1 ($property+"_control")`;
+                   setAttr ($obj+"."+$property) $value;
+               }
+              
+        }
+    }
+    
+    select $GMHSurface;
+    
+    
+}
